@@ -1,0 +1,11 @@
+<svg width="32" height="20" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="20%" stop-color="white" />
+    <stop offset="70%" stop-color="red" />
+    <stop offset="100%" stop-color="#990000" />
+  </linearGradient>
+ 
+  <rect x="0" y="0" width="32" height="20" fill="url(#gradient)" />
+ </g>
+</svg>

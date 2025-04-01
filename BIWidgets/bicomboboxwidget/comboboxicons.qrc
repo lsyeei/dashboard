@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>combobox.png</file>
+        <file>modify.svg</file>
+        <file>combobox.svg</file>
+    </qresource>
+</RCC>

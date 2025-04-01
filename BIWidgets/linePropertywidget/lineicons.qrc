@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>linestyle.png</file>
+        <file>pen.svg</file>
+    </qresource>
+</RCC>

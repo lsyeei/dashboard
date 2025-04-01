@@ -1,0 +1,21 @@
+QWidget{
+background-color:white;
+}
+#mainWin{
+background-color: #fff;
+}
+QToolButton{
+border:none;
+color:black;
+font-size:14px;
+padding-top:5px;
+}
+
+QToolButton:hover{
+background-color:#ddd;
+border-radius:5px;
+}
+QToolButton:checked{
+background-color:#aaa;
+border-radius:5px;
+}

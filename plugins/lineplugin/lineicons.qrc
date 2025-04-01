@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/straightLine.svg</file>
+        <file>arrows/arcArrow.svg</file>
+        <file>arrows/arrow.svg</file>
+        <file>arrows/line-normal.svg</file>
+        <file>arrows/line-sharp.svg</file>
+        <file>arrows/triangle-nofill.svg</file>
+        <file>arrows/triangle-sharp-nofill.svg</file>
+        <file>arrows/triangle-sharp.svg</file>
+        <file>arrows/triangle.svg</file>
+        <file>arrows/arrow-nofill.svg</file>
+        <file>arrows/circle.svg</file>
+        <file>arrows/circle-concentric.svg</file>
+        <file>icons/bidirectionalLine.svg</file>
+        <file>icons/curvedLine.svg</file>
+        <file>icons/dashLine.svg</file>
+        <file>icons/directionalLine.svg</file>
+        <file>icons/dotLine.svg</file>
+        <file>icons/polygonLine.svg</file>
+        <file>icons/horiaontalElbow.svg</file>
+        <file>icons/verticalElbow.svg</file>
+        <file>icons/cubicLine.svg</file>
+    </qresource>
+</RCC>

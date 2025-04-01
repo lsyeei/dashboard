@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>posproperty.png</file>
+        <file>OneAXIS.svg</file>
+    </qresource>
+</RCC>

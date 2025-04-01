@@ -1,0 +1,42 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>icons/down.png</file>
+        <file>icons/right.png</file>
+        <file>icons/save.svg</file>
+        <file>icons/zoom in.svg</file>
+        <file>icons/zoom out.svg</file>
+        <file>icons/Aligne-down.svg</file>
+        <file>icons/Aligne-left.svg</file>
+        <file>icons/Aligne-midle.svg</file>
+        <file>icons/Aligne-right.svg</file>
+        <file>icons/Aligne-up.svg</file>
+        <file>icons/Aligne-vertical-midl.svg</file>
+        <file>icons/bring-to-downer.svg</file>
+        <file>icons/bring-to-top.svg</file>
+        <file>icons/bring-to-upper.svg</file>
+        <file>icons/Distribute-midle.svg</file>
+        <file>icons/Distribute-vertical .svg</file>
+        <file>icons/exclude.svg</file>
+        <file>icons/exclude-selection.svg</file>
+        <file>icons/export.svg</file>
+        <file>icons/group.svg</file>
+        <file>icons/intersect-selection.svg</file>
+        <file>icons/preview.svg</file>
+        <file>icons/Redo.svg</file>
+        <file>icons/Undo.svg</file>
+        <file>icons/ungroup.svg</file>
+        <file>icons/union-selection.svg</file>
+        <file>icons/bring-to-bottom.svg</file>
+        <file>icons/flip_horizontal.svg</file>
+        <file>icons/flip_vertical.svg</file>
+        <file>icons/rotateH.svg</file>
+        <file>icons/rotateV.svg</file>
+        <file>icons/arrow-down.svg</file>
+        <file>icons/arrow-right.svg</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>animation/path/icons/curvedLine.svg</file>
+        <file>animation/path/icons/polygonLine.svg</file>
+        <file>animation/path/icons/straightLine.svg</file>
+    </qresource>
+</RCC>

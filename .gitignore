@@ -1,0 +1,10 @@
+**/release/
+**/debug/
+*.ilk
+*.exp
+*.pdb
+*.Debug
+*.Release
+*.stash
+**/CMakeLists.txt
+BIDesigner/plugins/*.*

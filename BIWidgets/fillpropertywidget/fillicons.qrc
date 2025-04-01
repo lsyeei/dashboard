@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>fillbg.png</file>
+        <file>fillcolor.svg</file>
+    </qresource>
+</RCC>

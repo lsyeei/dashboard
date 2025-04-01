@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/colorpicker.png</file>
+        <file>icons/sip-line.svg</file>
+        <file>icons/dropper.svg</file>
+    </qresource>
+</RCC>
