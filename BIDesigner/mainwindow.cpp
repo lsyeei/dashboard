@@ -391,7 +391,7 @@ void MainWindow::setScene()
 
     QRect rect = ui->graphicsView->rect();
     scene->setSceneRect(0,0, rect.width(),rect.height());
-    ui->graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
+    // ui->graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
 
     connect(ui->graphicsView, SIGNAL(mouseMove(QMouseEvent*)),
             this, SLOT(graphicsViewMouseMove(QMouseEvent*)));

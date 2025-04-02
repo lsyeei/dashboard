@@ -129,8 +129,7 @@ QString BIGraphicsScene::toXml(QList<QGraphicsItem *> items)
             i --;
             continue;
         }
-        auto hideFlag = item->data(itemHideFlag);
-        if (hideFlag.isValid() && hideFlag.toInt() == 1){
+        if (isHide(item)){
             continue;
         }
         if (typeid(*item) == typeid(GraphicsItemGroup)) {
@@ -710,6 +709,51 @@ bool BIGraphicsScene::isHide(QGraphicsItem *item)
         return true;
     }
     return false;
+}
+
+void BIGraphicsScene::setSelectionArea(const QPainterPath &path,
+                                       Qt::ItemSelectionOperation selectionOperation,
+                                       Qt::ItemSelectionMode mode,
+                                       const QTransform &deviceTransform)
+{
+    auto unselectItems = selectedItems();
+
+    // Disable emitting selectionChanged() for individual items.
+    blockSignals(true);
+    bool changed = false;
+
+    // Set all items in path to selected.
+    const auto items = this->items(path, mode, Qt::DescendingOrder, deviceTransform);
+    for (QGraphicsItem *item : items) {
+        if (item->flags() & QGraphicsItem::ItemIsSelectable) {
+            unselectItems.removeOne(item);
+            if (!isHide(item)){
+                if (!item->isSelected())
+                    changed = true;
+                item->setSelected(true);
+            }else{
+                if (item->isSelected()) {
+                    changed = true;
+                    item->setSelected(false);
+                }
+            }
+        }
+    }
+
+    switch (selectionOperation) {
+    case Qt::ReplaceSelection:
+        // Deselect all items outside path.
+        for (QGraphicsItem *item : std::as_const(unselectItems)) {
+            item->setSelected(false);
+            changed = true;
+        }
+        break;
+    default:
+        break;
+    }
+    blockSignals(false);
+    if (changed)
+        emit selectionChanged();
 }
 
 void BIGraphicsScene::drawBackground(QPainter *painter, const QRectF &rect)

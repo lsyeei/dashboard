@@ -38,8 +38,7 @@ SUBTARGETS    =  \
 		sub-common \
 		sub-BIWidgets \
 		sub-plugins \
-		sub-BIDesigner \
-		sub-test-CommonTest
+		sub-BIDesigner
 
 
 sub-common-qmake_all:  FORCE
@@ -174,39 +173,6 @@ sub-BIDesigner-uninstall_subtargets: FORCE
 	@if not exist BIDesigner\ mkdir BIDesigner\ & if not exist BIDesigner\ exit 1
 	@set MAKEFLAGS=$(MAKEFLAGS)
 	cd BIDesigner\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\BIDesigner\BIDesigner.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile uninstall
-sub-test-CommonTest-qmake_all:  FORCE
-	@if not exist test\CommonTest\ mkdir test\CommonTest\ & if not exist test\CommonTest\ exit 1
-	cd test\CommonTest\ && $(QMAKE) -o Makefile E:\project\dashboard\test\CommonTest\CommonTest.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug"
-	@set MAKEFLAGS=$(MAKEFLAGS)
-	cd test\CommonTest\ && $(MAKE) -f Makefile qmake_all
-sub-test-CommonTest: $(MAKEFILE) FORCE
-	@if not exist test\CommonTest\ mkdir test\CommonTest\ & if not exist test\CommonTest\ exit 1
-	@set MAKEFLAGS=$(MAKEFLAGS)
-	cd test\CommonTest\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\test\CommonTest\CommonTest.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile
-sub-test-CommonTest-make_first: FORCE
-	@if not exist test\CommonTest\ mkdir test\CommonTest\ & if not exist test\CommonTest\ exit 1
-	@set MAKEFLAGS=$(MAKEFLAGS)
-	cd test\CommonTest\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\test\CommonTest\CommonTest.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile 
-sub-test-CommonTest-all: FORCE
-	@if not exist test\CommonTest\ mkdir test\CommonTest\ & if not exist test\CommonTest\ exit 1
-	@set MAKEFLAGS=$(MAKEFLAGS)
-	cd test\CommonTest\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\test\CommonTest\CommonTest.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile all
-sub-test-CommonTest-clean: FORCE
-	@if not exist test\CommonTest\ mkdir test\CommonTest\ & if not exist test\CommonTest\ exit 1
-	@set MAKEFLAGS=$(MAKEFLAGS)
-	cd test\CommonTest\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\test\CommonTest\CommonTest.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile clean
-sub-test-CommonTest-distclean: FORCE
-	@if not exist test\CommonTest\ mkdir test\CommonTest\ & if not exist test\CommonTest\ exit 1
-	@set MAKEFLAGS=$(MAKEFLAGS)
-	cd test\CommonTest\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\test\CommonTest\CommonTest.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile distclean
-sub-test-CommonTest-install_subtargets: FORCE
-	@if not exist test\CommonTest\ mkdir test\CommonTest\ & if not exist test\CommonTest\ exit 1
-	@set MAKEFLAGS=$(MAKEFLAGS)
-	cd test\CommonTest\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\test\CommonTest\CommonTest.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile install
-sub-test-CommonTest-uninstall_subtargets: FORCE
-	@if not exist test\CommonTest\ mkdir test\CommonTest\ & if not exist test\CommonTest\ exit 1
-	@set MAKEFLAGS=$(MAKEFLAGS)
-	cd test\CommonTest\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\test\CommonTest\CommonTest.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile uninstall
 
 Makefile: dashboard.pro D:\Qt\6.8.0\msvc2022_64\mkspecs\win32-msvc\qmake.conf D:\Qt\6.8.0\msvc2022_64\mkspecs\features\spec_pre.prf \
 		D:\Qt\6.8.0\msvc2022_64\mkspecs\common\windows-desktop.conf \
@@ -884,16 +850,16 @@ dashboard.pro:
 qmake: FORCE
 	@$(QMAKE) -o Makefile dashboard.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug"
 
-qmake_all: sub-common-qmake_all sub-BIWidgets-qmake_all sub-plugins-qmake_all sub-BIDesigner-qmake_all sub-test-CommonTest-qmake_all FORCE
+qmake_all: sub-common-qmake_all sub-BIWidgets-qmake_all sub-plugins-qmake_all sub-BIDesigner-qmake_all FORCE
 
-make_first: sub-common-make_first sub-BIWidgets-make_first sub-plugins-make_first sub-BIDesigner-make_first sub-test-CommonTest-make_first  FORCE
-all: sub-common-all sub-BIWidgets-all sub-plugins-all sub-BIDesigner-all sub-test-CommonTest-all  FORCE
-clean: sub-common-clean sub-BIWidgets-clean sub-plugins-clean sub-BIDesigner-clean sub-test-CommonTest-clean  FORCE
-distclean: sub-common-distclean sub-BIWidgets-distclean sub-plugins-distclean sub-BIDesigner-distclean sub-test-CommonTest-distclean  FORCE
+make_first: sub-common-make_first sub-BIWidgets-make_first sub-plugins-make_first sub-BIDesigner-make_first  FORCE
+all: sub-common-all sub-BIWidgets-all sub-plugins-all sub-BIDesigner-all  FORCE
+clean: sub-common-clean sub-BIWidgets-clean sub-plugins-clean sub-BIDesigner-clean  FORCE
+distclean: sub-common-distclean sub-BIWidgets-distclean sub-plugins-distclean sub-BIDesigner-distclean  FORCE
 	-$(DEL_FILE) Makefile
 	-$(DEL_FILE) .qmake.stash
-install_subtargets: sub-common-install_subtargets sub-BIWidgets-install_subtargets sub-plugins-install_subtargets sub-BIDesigner-install_subtargets sub-test-CommonTest-install_subtargets FORCE
-uninstall_subtargets: sub-common-uninstall_subtargets sub-BIWidgets-uninstall_subtargets sub-plugins-uninstall_subtargets sub-BIDesigner-uninstall_subtargets sub-test-CommonTest-uninstall_subtargets FORCE
+install_subtargets: sub-common-install_subtargets sub-BIWidgets-install_subtargets sub-plugins-install_subtargets sub-BIDesigner-install_subtargets FORCE
+uninstall_subtargets: sub-common-uninstall_subtargets sub-BIWidgets-uninstall_subtargets sub-plugins-uninstall_subtargets sub-BIDesigner-uninstall_subtargets FORCE
 
 sub-common-debug:
 	@if not exist common\ mkdir common\ & if not exist common\ exit 1
@@ -911,11 +877,7 @@ sub-BIDesigner-debug:
 	@if not exist BIDesigner\ mkdir BIDesigner\ & if not exist BIDesigner\ exit 1
 	@set MAKEFLAGS=$(MAKEFLAGS)
 	cd BIDesigner\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\BIDesigner\BIDesigner.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile debug
-sub-test-CommonTest-debug:
-	@if not exist test\CommonTest\ mkdir test\CommonTest\ & if not exist test\CommonTest\ exit 1
-	@set MAKEFLAGS=$(MAKEFLAGS)
-	cd test\CommonTest\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\test\CommonTest\CommonTest.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile debug
-debug: sub-common-debug sub-BIWidgets-debug sub-plugins-debug sub-BIDesigner-debug sub-test-CommonTest-debug
+debug: sub-common-debug sub-BIWidgets-debug sub-plugins-debug sub-BIDesigner-debug
 
 sub-common-release:
 	@if not exist common\ mkdir common\ & if not exist common\ exit 1
@@ -933,11 +895,7 @@ sub-BIDesigner-release:
 	@if not exist BIDesigner\ mkdir BIDesigner\ & if not exist BIDesigner\ exit 1
 	@set MAKEFLAGS=$(MAKEFLAGS)
 	cd BIDesigner\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\BIDesigner\BIDesigner.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile release
-sub-test-CommonTest-release:
-	@if not exist test\CommonTest\ mkdir test\CommonTest\ & if not exist test\CommonTest\ exit 1
-	@set MAKEFLAGS=$(MAKEFLAGS)
-	cd test\CommonTest\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\test\CommonTest\CommonTest.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile release
-release: sub-common-release sub-BIWidgets-release sub-plugins-release sub-BIDesigner-release sub-test-CommonTest-release
+release: sub-common-release sub-BIWidgets-release sub-plugins-release sub-BIDesigner-release
 
 sub-common-check:
 	@if not exist common\ mkdir common\ & if not exist common\ exit 1
@@ -955,11 +913,7 @@ sub-BIDesigner-check:
 	@if not exist BIDesigner\ mkdir BIDesigner\ & if not exist BIDesigner\ exit 1
 	@set MAKEFLAGS=$(MAKEFLAGS)
 	cd BIDesigner\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\BIDesigner\BIDesigner.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile check
-sub-test-CommonTest-check:
-	@if not exist test\CommonTest\ mkdir test\CommonTest\ & if not exist test\CommonTest\ exit 1
-	@set MAKEFLAGS=$(MAKEFLAGS)
-	cd test\CommonTest\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\test\CommonTest\CommonTest.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile check
-check: sub-common-check sub-BIWidgets-check sub-plugins-check sub-BIDesigner-check sub-test-CommonTest-check
+check: sub-common-check sub-BIWidgets-check sub-plugins-check sub-BIDesigner-check
 
 sub-common-benchmark:
 	@if not exist common\ mkdir common\ & if not exist common\ exit 1
@@ -977,11 +931,7 @@ sub-BIDesigner-benchmark:
 	@if not exist BIDesigner\ mkdir BIDesigner\ & if not exist BIDesigner\ exit 1
 	@set MAKEFLAGS=$(MAKEFLAGS)
 	cd BIDesigner\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\BIDesigner\BIDesigner.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile benchmark
-sub-test-CommonTest-benchmark:
-	@if not exist test\CommonTest\ mkdir test\CommonTest\ & if not exist test\CommonTest\ exit 1
-	@set MAKEFLAGS=$(MAKEFLAGS)
-	cd test\CommonTest\ && ( if not exist Makefile $(QMAKE) -o Makefile E:\project\dashboard\test\CommonTest\CommonTest.pro -spec win32-msvc "CONFIG+=debug" "CONFIG-=qml_debug" ) && $(MAKE) -f Makefile benchmark
-benchmark: sub-common-benchmark sub-BIWidgets-benchmark sub-plugins-benchmark sub-BIDesigner-benchmark sub-test-CommonTest-benchmark
+benchmark: sub-common-benchmark sub-BIWidgets-benchmark sub-plugins-benchmark sub-BIDesigner-benchmark
 install:install_subtargets  FORCE
 
 uninstall: uninstall_subtargets FORCE

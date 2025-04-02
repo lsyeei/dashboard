@@ -113,11 +113,7 @@ public:
     QSize selectSize();
     bool exportToImage(bool selectedScope, const QString &fileName, const QSize &size, const QColor &bgcolor, int quality);
     bool exportToSvg(bool selectedScope, const QString &fileName, const QSize &size);
-    // /**
-    //  * @brief setNextDrawPlugin 下一个要绘制的图元
-    //  * @param plugin 绘制图元的插件
-    //  */
-    // void setNextDrawPlugin(IGraphicPlugin *plugin);
+    void setDragMode(QGraphicsView::DragMode mode);
 
 Q_SIGNALS:
     void mouseMove(QMouseEvent *event);
@@ -196,6 +192,12 @@ private:
     bool showRefLine{true};
     // 通过拖放方式创建
     bool createByDrop{false};
+    // 图元区域选择
+    bool rubberBanding{false};
+    QRect rubberBandRect;
+    bool extendSelection{false};
+    QPointF mousePressScenePoint, lastMouseMoveScenePoint, lastRubberbandScenePoint;
+    QPoint mousePressViewPoint;
     
     /**
      * @brief 初始化刻度尺等
@@ -223,6 +225,7 @@ private:
      * @return 图元与位置的列表
      */
     QHash<QGraphicsItem *, QPointF> getItemsPos(QList<QGraphicsItem*> items);
+    QRegion rubberBandRegion(const QWidget *widget, const QRect &rect) const;
 };
 
 #endif // BIGRAPHICSVIEW_H

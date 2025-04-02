@@ -35,8 +35,10 @@
 #include <QMessageBox>
 #include "biundocommand.h"
 #include "rectselector.h"
+#include <QApplication>
 #include <QImageWriter>
 #include <QMimeData>
+#include <QStyleOptionRubberBand>
 #include <QSvgGenerator>
 #include <QTime>
 
@@ -425,11 +427,17 @@ bool BIGraphicsView::exportToSvg(bool selectedScope, const QString &fileName, co
     return true;
 }
 
-void BIGraphicsView::mousePressEvent(QMouseEvent *event)
+void BIGraphicsView::setDragMode(DragMode mode)
 {
+    // qDebug() << "set drag mode:" << mode;
+    // QGraphicsView::setDragMode(mode);
+}
+
+void BIGraphicsView::mousePressEvent(QMouseEvent *event)
+{    
+    QGraphicsView::mousePressEvent(event);
     mousePos = event->position();
     if (currentGraphicItem != nullptr) {
-    // if (graphicPluginWidget != nullptr && graphicPluginWidget->getSelectedPlugin() != nullptr) {
         // 在鼠标点击位置创建图元
         createGraphicsItem(mousePos);
     } else if (!scene()->selectedItems().isEmpty()){
@@ -439,7 +447,22 @@ void BIGraphicsView::mousePressEvent(QMouseEvent *event)
             ruler->setTraceFlag(true);
         }
     }
-    QGraphicsView::mousePressEvent(event);
+    if (event->isAccepted()) {
+        return;
+    }
+    mousePressViewPoint = event->position().toPoint();
+    mousePressScenePoint = mapToScene(mousePressViewPoint);
+    lastMouseMoveScenePoint = mousePressScenePoint;
+    if (event->button() == Qt::LeftButton) {
+        event->accept();
+        rubberBanding = true;
+        rubberBandRect = QRect();
+        extendSelection = (event->modifiers() & Qt::ControlModifier) != 0;
+        auto s = scene();
+        if (s && !extendSelection) {
+            s->clearSelection();
+        }
+    }
 }
 
 void BIGraphicsView::mouseReleaseEvent(QMouseEvent *event)
@@ -454,6 +477,23 @@ void BIGraphicsView::mouseReleaseEvent(QMouseEvent *event)
         isDrag = false;
         if (showRefLine) {
             ruler->setTraceFlag(false);
+        }
+    }
+    if (rubberBanding) {
+        auto s = dynamic_cast<BIGraphicsScene*>(scene());
+        if (s) {
+            QPainterPath selectionArea;
+            selectionArea.addPolygon(mapToScene(rubberBandRect));
+            selectionArea.closeSubpath();
+            s->setSelectionArea(selectionArea,
+                                extendSelection?Qt::AddToSelection:Qt::ReplaceSelection,
+                                Qt::ContainsItemShape, viewportTransform());
+        }
+        viewport()->update(rubberBandRegion(viewport(), rubberBandRect));
+        rubberBanding = false;
+        if (!rubberBandRect.isNull()) {
+            rubberBandRect = QRect();
+            emit rubberBandChanged(rubberBandRect, QPointF(), QPointF());
         }
     }
     QGraphicsView::mouseReleaseEvent(event);
@@ -492,6 +532,32 @@ void BIGraphicsView::mouseMoveEvent(QMouseEvent *event)
             ruler->setTraceZone(bound.boundingRect());
         }
     }
+    if (event->buttons().testFlag(Qt::LeftButton) && rubberBanding) {
+        if ((mousePressViewPoint - event->position().toPoint()).manhattanLength() < QApplication::startDragDistance())
+            return;
+        viewport()->update(rubberBandRegion(viewport(), rubberBandRect));
+        QRect oldRubberband = rubberBandRect;
+        const QPoint mp = mapFromScene(mousePressScenePoint);
+        const QPoint ep = event->position().toPoint();
+        rubberBandRect = QRect(qMin(mp.x(), ep.x()), qMin(mp.y(), ep.y()),
+                               qAbs(mp.x() - ep.x()) + 1, qAbs(mp.y() - ep.y()) + 1);
+        if (rubberBandRect != oldRubberband || lastRubberbandScenePoint != lastMouseMoveScenePoint) {
+            lastRubberbandScenePoint = lastMouseMoveScenePoint;
+            emit rubberBandChanged(rubberBandRect, mousePressScenePoint, lastRubberbandScenePoint);
+        }
+        viewport()->update(rubberBandRegion(viewport(), rubberBandRect));
+    }
+
+    if (rubberBanding && !event->buttons()) {
+        viewport()->update(rubberBandRegion(viewport(), rubberBandRect));
+        rubberBanding = false;
+        extendSelection = false;
+        if (!rubberBandRect.isNull()) {
+            rubberBandRect = QRect();
+            emit rubberBandChanged(rubberBandRect, QPointF(), QPointF());
+        }
+        return;
+    }
     QGraphicsView::mouseMoveEvent(event);
 }
 
@@ -523,6 +589,22 @@ void BIGraphicsView::wheelEvent(QWheelEvent *event)
         }
     }
     QGraphicsView::wheelEvent(event);
+}
+
+QRegion BIGraphicsView::rubberBandRegion(const QWidget *widget, const QRect &rect) const
+{
+    QStyleHintReturnMask mask;
+    QStyleOptionRubberBand option;
+    option.initFrom(widget);
+    option.rect = rect;
+    option.opaque = false;
+    option.shape = QRubberBand::Rectangle;
+
+    QRegion tmp;
+    tmp += rect.adjusted(-1, -1, 1, 1);
+    if (widget->style()->styleHint(QStyle::SH_RubberBand_Mask, &option, widget, &mask))
+        tmp &= mask.region;
+    return tmp;
 }
 
 void BIGraphicsView::resizeEvent(QResizeEvent *event)
@@ -668,6 +750,22 @@ void BIGraphicsView::drawItems(QPainter *painter, int numItems, QGraphicsItem *i
 void BIGraphicsView::paintEvent(QPaintEvent *event)
 {
     QGraphicsView::paintEvent(event);
+
+    QPainter painter(viewport());
+    if (rubberBanding && !rubberBandRect.isEmpty()) {
+        QStyleOptionRubberBand option;
+        option.initFrom(viewport());
+        option.rect = rubberBandRect;
+        option.shape = QRubberBand::Rectangle;
+
+        QStyleHintReturnMask mask;
+        if (viewport()->style()->styleHint(QStyle::SH_RubberBand_Mask, &option, viewport(), &mask)) {
+            // painter clipping for masked rubberbands
+            painter.setClipRegion(mask.region, Qt::IntersectClip);
+        }
+
+        viewport()->style()->drawControl(QStyle::CE_RubberBand, &option, &painter, viewport());
+    }
 }
 
 void BIGraphicsView::scrollContentsBy(int dx, int dy)
@@ -747,6 +845,8 @@ void BIGraphicsView::init()
     undoStack.setUndoLimit(0);
     // 接受拖放操作
     setAcceptDrops(true);
+    // 不使用默认拖动选择动作
+    QGraphicsView::setDragMode(QGraphicsView::NoDrag);
 }
 
 void BIGraphicsView::updateRuler(const QSize &size)
