@@ -16,7 +16,6 @@
 * limitations under the License.
 */
 
-#include "animation/path/imovepathplugin.h"
 #include "animationfactory.h"
 #include "animationform.h"
 #include "bigraphicsscene.h"
@@ -47,7 +46,22 @@ void AnimationForm::setGraphicItem(ICustomGraphic *item)
     if (item == nullptr || graphicItem == item) {
         return;
     }
+    if (!player.isNull()){
+        // 终止正在执行的动画
+        onPlay();
+        graphicItem->setSelected(false);
+    }
+
     graphicItem = item;
+
+    // 隐藏属性面板
+    ui->property->hide();
+    auto childs = ui->property->children();
+    foreach (auto child, childs) {
+        if (child->isWidgetType()) {
+            dynamic_cast<QWidget*>(child)->hide();
+        }
+    }
 
     // 更新数据
     QSignalBlocker animationView(ui->animationView);
@@ -73,6 +87,7 @@ void AnimationForm::setGraphicItem(ICustomGraphic *item)
     foreach (auto act, actions) {
         addAnimateItem(act);
     }
+    ui->animationView->setCurrentItemIndex(-1);
 }
 
 void AnimationForm::onAnimationMenuSelected()
@@ -121,7 +136,8 @@ void AnimationForm::onPlay()
         }
         emit playEvent(true);
         graphicItem->setSelected(false);
-        connect(player, SIGNAL(finished()), this, SLOT(onPlayEnd()));
+        graphicItem->setFlag(QGraphicsItem::ItemIsSelectable, false);
+        connect(player, SIGNAL(finished()), this, SLOT(onPlayEnd()), Qt::QueuedConnection);
         ui->playBtn->setText(tr("停止"));
         ui->playBtn->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::MediaPlaybackStop));
         editItemIndex = ui->animationView->currentItemIndex();
@@ -138,6 +154,7 @@ void AnimationForm::onPlayEnd()
     ui->playBtn->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::MediaPlaybackStart));
     player.clear();
     ui->animationView->setCurrentItemIndex(editItemIndex);
+    graphicItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
     graphicItem->setSelected(true);
     emit playEvent(false);
 }
@@ -166,6 +183,7 @@ void AnimationForm::onAnimateSelectChanged(int oldIndex, int newIndex)
         param = ui->animationView->getItem(newIndex).params;
         type = AnimationFactory::instance()->getAnimateType(param.getTypeId());
     }
+    ui->property->show();
     auto widget = type->paramWidget();
     widget->update(param);
     widget->show();

@@ -56,9 +56,11 @@ AbstractTextItem::AbstractTextItem(const QString &xml, QGraphicsItem *parent)
 
 AbstractTextItem::~AbstractTextItem()
 {
-    textItem->disconnect();
-    textItem->deleteLater();
-    delete textItem;
+    if (textItem) {
+        textItem->disconnect();
+        textItem->deleteLater();
+        delete textItem;
+    }
 }
 
 QString AbstractTextItem::toXml() const
@@ -132,7 +134,7 @@ QPainterPath AbstractTextItem::shapePath() const
 
 QVariant AbstractTextItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if (change == QGraphicsItem::ItemPositionHasChanged) {
+    if (textItem && change == QGraphicsItem::ItemPositionHasChanged) {
         textItem->setPos(logicRect.topLeft());
     }
     return AbstractZoneItem::itemChange(change, value);

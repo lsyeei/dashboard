@@ -52,7 +52,7 @@ protected slots:
     void adjustEnd(AbstractSelector::AdjustType type) override;
     void docSizeChanged(QSizeF size);
 protected:
-    QGraphicsTextItem *textItem;
+    QGraphicsTextItem *textItem{nullptr};
     // 手动调整大小标记
     bool adjustFlag{false};
 };

@@ -400,11 +400,11 @@ void MainWindow::setScene()
     connect(graphicPluginWidget, SIGNAL(graphicItemChanged(IGraphicPlugin*)),
             ui->graphicsView, SLOT(graphicItemChangedHandler(IGraphicPlugin*)));
     // 监听图元选中状态，同步切换属性设置页面
-    connect(scene, SIGNAL(selectionChanged()), this, SLOT(onSceneSelectionChanged()));
+    connect(scene, SIGNAL(selectionChanged()), this, SLOT(onSceneSelectionChanged()), Qt::QueuedConnection);
     connect(this, SIGNAL(singleSelectEvent(QGraphicsItem*)),
-            this, SLOT(oneGraphSelected(QGraphicsItem*)));
-    connect(this, SIGNAL(noSelectEvent()), this, SLOT(noGraphSelected()));
-    connect(this, SIGNAL(multiSelectEvent()), this, SLOT(multiGraphSelected()));
+            this, SLOT(oneGraphSelected(QGraphicsItem*)), Qt::QueuedConnection);
+    connect(this, SIGNAL(noSelectEvent()), this, SLOT(noGraphSelected()), Qt::QueuedConnection);
+    connect(this, SIGNAL(multiSelectEvent()), this, SLOT(multiGraphSelected()), Qt::QueuedConnection);
 
     ui->graphicsView->setMouseTracking(true);
 
@@ -412,10 +412,7 @@ void MainWindow::setScene()
 
 void MainWindow::onSceneSelectionChanged()
 {
-    if (playFlag) {
-        return;
-    }
-    QtConcurrent::run([&]{
+    auto f = QtConcurrent::run([&]{
         // 选中的图元
         auto selectedItems = scene->selectedItems();
         if (!selectedItems.isEmpty()){
@@ -475,6 +472,9 @@ void MainWindow::oneGraphSelected(QGraphicsItem *item)
 
 void MainWindow::noGraphSelected()
 {
+    if (playFlag) {
+        return;
+    }
     if (ui->scrollArea->widget() != projectWidget) {
         ui->propertyWidget->setCurrentIndex(0);
         ui->propertyWidget->setTabText(0, tr("项目"));
@@ -839,7 +839,7 @@ void MainWindow::projectPropertyChanged(const ProjectProperty &project)
 }
 
 void MainWindow::pagePropertyChanged(const PageProperty &page)
-{qDebug() << page.getPenProperty().getColor();
+{
     ui->graphicsView->setPageProperty(page);
     QSignalBlocker blocker(ui->showViewGrid);
     ui->showViewGrid->setCheckable(page.getShowLine());
