@@ -6,4 +6,4 @@ SUBDIRS    += \
     BIWidgets \
     plugins\
     BIDesigner \
-    # test/CommonTest \
+    test/CommonTest \

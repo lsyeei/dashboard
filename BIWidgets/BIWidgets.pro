@@ -1,4 +1,4 @@
-CONFIG      += plugin debug_and_release
+CONFIG      += plugin
 TARGET      = $$qtLibraryTarget(BIWidgets)
 TEMPLATE    = lib
 
@@ -11,6 +11,8 @@ LIBS        += -L.
 
 QT += designer core svg xml
 CONFIG      += c++17
+
+CONFIG += debug_and_release
 
 DEFINES =  COLOR_PICKER_LIB
 
@@ -63,6 +65,3 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../comm
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../common/release/common.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../common/debug/common.lib
 else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../common/libcommon.a
-
-# win32:CONFIG(release, debug|release):DESTDIR = $$PWD/../BIDesigner/release
-# else:win32:CONFIG(debug, debug|release):DESTDIR = $$PWD/../BIDesigner/debug

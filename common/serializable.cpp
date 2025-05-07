@@ -1,22 +1,24 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #include "serializable.h"
+
+#include "variantutil.h"
 Serializable::Serializable()
 {
     QUuid uid = QUuid::createUuid();
@@ -53,7 +55,8 @@ void Serializable::copy(const Serializable &from, Serializable &to)
         for(int i=0; i< count; i++){
             if (QString(fromMeta->method(i).tag()).compare("JSON_FLAG") == 0){
                 QMap<QString, QString> jsonInfo;
-                jsonInfo = invokeMethod<QMap<QString, QString>>(fromMeta, i);
+                fromMeta->method(i).invokeOnGadget(this, qReturnArg(jsonInfo));
+                // jsonInfo = invokeMethod<QMap<QString, QString>>(fromMeta, i);
                 QVariant value = const_cast<Serializable&>(from).getValue(jsonInfo["name"]);
                 to.setValue(jsonInfo["name"], value);
             }
@@ -80,7 +83,8 @@ void Serializable::copy(const Serializable &from){
         for(int i=0; i< count; i++){
             if (QString(fromMeta->method(i).tag()).compare("JSON_FLAG") == 0){
                 QMap<QString, QString> jsonInfo;
-                jsonInfo = invokeMethod<QMap<QString, QString>>(fromMeta, i);
+                fromMeta->method(i).invokeOnGadget(this, qReturnArg(jsonInfo));
+                // jsonInfo = invokeMethod<QMap<QString, QString>>(fromMeta, i);
                 QVariant value = const_cast<Serializable&>(from).getValue(jsonInfo["name"]);
                 setValue(jsonInfo["name"], value);
             }
@@ -125,7 +129,8 @@ QString Serializable::toString()
         for(int i=0; i< count; i++){
             if (QString(metaInfo->method(i).tag()).compare("JSON_FLAG") == 0){
                 QMap<QString, QString> jsonInfo;
-                jsonInfo = invokeMethod<QMap<QString, QString>>(metaInfo, i);
+                metaInfo->method(i).invokeOnGadget(this, qReturnArg(jsonInfo));
+                // jsonInfo = invokeMethod<QMap<QString, QString>>(metaInfo, i);
                 QVariant value = getValue(jsonInfo["name"]);
                 bool isObject = Serializable::isSubClass(value.metaType());
                 QString str;
@@ -155,19 +160,22 @@ void Serializable::setValue(QString fieldName, QVariant value)
 {
     const QMetaObject *metaInfo = getMetaInfo();
     int index = metaInfo->indexOfProperty(fieldName.toLocal8Bit());
+    if (index == -1) {
+        return;
+    }
     QMetaProperty field = metaInfo->property(index);
-
-    QObject *objPtr = reinterpret_cast<QObject*>(this);
-    field.write(objPtr, value);
+    field.writeOnGadget(this, value);
 }
 
 QVariant Serializable::getValue(QString fieldName)
 {
     const QMetaObject *metaInfo = getMetaInfo();
     int index = metaInfo->indexOfProperty(fieldName.toLocal8Bit().constData());
+    if (index == -1) {
+        return QVariant();
+    }
     QMetaProperty field = metaInfo->property(index);
-    QObject *objPtr = reinterpret_cast<QObject*>(this);
-    return field.read(objPtr);
+    return field.readOnGadget(this);
 }
 
 template<typename T>
@@ -188,7 +196,8 @@ QDataStream &operator<<(QDataStream &stream, const Serializable &data){
         for(int i=0; i< count; i++){
             if (QString(metaInfo->method(i).tag()).compare("JSON_FLAG") == 0){
                 QMap<QString, QString> jsonInfo;
-                jsonInfo = dataPtr->invokeMethod<QMap<QString, QString>>(metaInfo, i);
+                metaInfo->method(i).invokeOnGadget(dataPtr, qReturnArg(jsonInfo));
+                // jsonInfo = dataPtr->invokeMethod<QMap<QString, QString>>(metaInfo, i);
                 QVariant value = dataPtr->getValue(jsonInfo["name"]);
                 QMetaProperty fieldType = metaInfo->property(metaInfo->indexOfProperty(jsonInfo["name"].toLocal8Bit()));
                 if (fieldType.metaType().id() == QMetaType::QVariant){
@@ -210,7 +219,8 @@ QDataStream &operator>>(QDataStream &stream, Serializable &data){
         for(int i=0; i< count; i++){
             if (QString(metaInfo->method(i).tag()).compare("JSON_FLAG") == 0){
                 QMap<QString, QString> jsonInfo;
-                jsonInfo = dataPtr->invokeMethod<QMap<QString, QString>>(metaInfo, i);
+                metaInfo->method(i).invokeOnGadget(dataPtr, qReturnArg(jsonInfo));
+                // jsonInfo = dataPtr->invokeMethod<QMap<QString, QString>>(metaInfo, i);
                 QMetaProperty fieldType = metaInfo->property(metaInfo->indexOfProperty(jsonInfo["name"].toLocal8Bit()));
                 QMetaType fieldMeta = fieldType.metaType();
                 if (fieldMeta.id() == QMetaType::QVariant) {
@@ -237,7 +247,8 @@ QDebug operator<<(QDebug dbg, const Serializable &data){
         for(int i=0; i< count; i++){
             if (QString(metaInfo->method(i).tag()).compare("JSON_FLAG") == 0){
                 QMap<QString, QString> jsonInfo;
-                jsonInfo = dataPtr->invokeMethod<QMap<QString, QString>>(metaInfo, i);
+                metaInfo->method(i).invokeOnGadget(dataPtr, qReturnArg(jsonInfo));
+                // jsonInfo = dataPtr->invokeMethod<QMap<QString, QString>>(metaInfo, i);
                 QVariant value = dataPtr->getValue(jsonInfo["name"]);
                 QString str = dbg.toString(value);
                 str = str.replace(reg, "\\1");

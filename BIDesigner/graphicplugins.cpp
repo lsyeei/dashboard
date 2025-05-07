@@ -18,6 +18,7 @@
 
 #include <QVBoxLayout>
 #include "graphicplugins.h"
+#include "customplugin/usergraphicplugins.h"
 #include "igraphicplugin.h"
 #include "graphicplugingroup.h"
 #include "igraphicpluginCollection.h"
@@ -51,6 +52,8 @@ GraphicPlugins::GraphicPlugins(QWidget *parent)
 
     // 加载控件
     loadGraphicPlugin();
+    // 加载用户图元控件
+    loadUserGraphicPlugin();
 }
 
 GraphicPlugins::~GraphicPlugins()
@@ -205,6 +208,16 @@ void GraphicPlugins::loadGraphicPlugin()
             }
         }
     }
+}
+
+void GraphicPlugins::loadUserGraphicPlugin()
+{
+    auto userGraphics = new UserGraphicPlugins(this);
+    auto widgets = userGraphics->load();
+    connect(userGraphics, SIGNAL(graphicItemChanged(IGraphicPlugin*)),
+                        this, SIGNAL(graphicItemChanged(IGraphicPlugin*)));
+    // pluginMap["CUSTOM"] = userGraphics;
+    graphicItemGroup.insert(widgets);
 }
 
 void GraphicPlugins::installPlugin(IGraphicPlugin *graphicItem)

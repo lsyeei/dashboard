@@ -22,6 +22,7 @@
 #include <QObject>
 #include <QWidget>
 
+class QToolButton;
 class FlowLayout;
 class QGridLayout;
 class QVBoxLayout;
@@ -52,9 +53,8 @@ Q_SIGNALS:
      * @brief 点击图元
      * @param graphicItem 图元对象
      */
-    void graphicItemClicked(const QString &itemName);
+    void graphicItemClicked(const QString &itemId);
 private Q_SLOTS:
-    void itemClicked(QToolButton * button);
     void onTitleclicked();
 
 private:
@@ -85,6 +85,7 @@ private:
      */
     QString createId(QString name, qint32 index);
     void paletteChanged();
+    void itemClicked(QToolButton * button);
 };
 
 #endif // GRAPHICPLUGINGROUP_H

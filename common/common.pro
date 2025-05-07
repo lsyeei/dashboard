@@ -59,7 +59,10 @@ HEADERS     = svghelper.h \
     textproperty.h \
     variantutil.h \
     xmlHelper.h \
-    undoobject.h
+    undoobject.h \
+    painterpathex.h \
+    svgpathdevice.h \
+
 SOURCES     = svghelper.cpp \
     cursorlib.cpp \
     easyjsonimpl.cpp \
@@ -86,7 +89,9 @@ SOURCES     = svghelper.cpp \
     pathimage.cpp \
     serializable.cpp \
     snowflake.cpp \
-    svgparser.cpp
+    svgparser.cpp \
+    painterpathex.cpp \
+    svgpathdevice.cpp \
 
 # Default rules for deployment.
 unix {

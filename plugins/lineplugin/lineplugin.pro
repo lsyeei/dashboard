@@ -38,13 +38,11 @@ SOURCES += \
     horizontalelbowplugin.cpp \
     lineplugincollection.cpp \
     linepropertyform.cpp \
-    painterpathex.cpp \
     # straightlineitem.cpp \
     polygonline.cpp \
     polygonlineplugin.cpp \
     solidline.cpp \
     solidlineplugin.cpp \
-    svgpathdevice.cpp \
     verticalelbow.cpp \
     verticalelbowplugin.cpp
 
@@ -80,13 +78,11 @@ HEADERS += \
     # lineitemproperty.h \
     lineplugincollection.h \
     linepropertyform.h \
-    painterpathex.h \
     # straightlineitem.h \
     polygonline.h \
     polygonlineplugin.h \
     solidline.h \
     solidlineplugin.h \
-    svgpathdevice.h \
     verticalelbow.h \
     verticalelbowplugin.h
 
@@ -108,7 +104,7 @@ FORMS += \
 RESOURCES += \
     lineicons.qrc
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../BIWidgets/release/ -lBIWidgetsd
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../BIWidgets/release/ -lBIWidgets
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../BIWidgets/debug/ -lBIWidgetsd
 
 INCLUDEPATH += \
@@ -119,9 +115,9 @@ INCLUDEPATH += \
 win32:CONFIG(release, debug|release): DEPENDPATH += $$OUT_PWD/../../BIWidgets/release
 else:win32:CONFIG(debug, debug|release): DEPENDPATH += $$OUT_PWD/../../BIWidgets/debug
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/release/libBIWidgetsd.a
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/release/libBIWidgets.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/debug/libBIWidgetsd.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/release/BIWidgetsd.lib
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/release/BIWidgets.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/debug/BIWidgetsd.lib
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../common/release/ -lcommon

@@ -1,21 +1,21 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #include "rectselector.h"
 #include "qgraphicsscene.h"
 
@@ -228,15 +228,15 @@ void RectSelector::calacRotation(const QPointF &from, const QPointF &to)
     // 找到原点
     QPointF origin = parentItem()->transformOriginPoint();
     qreal angle = QLineF(origin, to).angleTo(QLineF(origin, from));
-    setRotation(std::fmodf(rotation() + angle, 360));
+    setRotation(std::fmod(rotation() + angle, 360));
     foreach (auto item, adjuster) {
-        item->setRotation(std::fmodf(item->rotation() + angle, 360));
+        item->setRotation(std::fmod(item->rotation() + angle, 360));
     }
 
     emit rectRotateChanged(angle);
 
     // 提示角度
-    qreal value = std::fmodf(parentItem()->rotation(), 360);
+    qreal value = std::fmod(parentItem()->rotation(), 360);
     value = value > 180? value-360:value;
     auto tips = QString::asprintf("%.1f°",value);
     QToolTip::showText(QCursor::pos(), tips);

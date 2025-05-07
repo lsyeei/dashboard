@@ -1,14 +1,14 @@
 ﻿/**
 * This file is part of the dashboard library
-* 
+*
 * Copyright 2025 lishiying  lsyeei@163.com
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the License);
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an AS IS BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,25 +16,14 @@
 * limitations under the License.
 */
 
-#ifndef BIWIDGETS_H
-#define BIWIDGETS_H
+#include <QString>
+#ifndef CONFIGS_H
+#define CONFIGS_H
 
-#include <QtUiPlugin/customwidget.h>
-#include <QtCore/qplugin.h>
+struct Configs{
+    QString dbName{"config.dat"};
+    QString dbUser{"admin@conf"};
+    QString dbPwd{"lsyeei@163.com"};
+} appConfigs;
 
-class BIWidgets : public QObject, public QDesignerCustomWidgetCollectionInterface
-{
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetCollectionInterface")
-    Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
-
-public:
-    BIWidgets(QObject *parent = 0);
-
-    QList<QDesignerCustomWidgetInterface*> customWidgets() const override;
-
-private:
-    QList<QDesignerCustomWidgetInterface*> widgets;
-};
-
-#endif // BIWIDGETS_H
+#endif // CONFIGS_H

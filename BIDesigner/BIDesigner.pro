@@ -1,7 +1,7 @@
-QT       += core gui concurrent svg xml
-
+QT       += core gui concurrent svg xml sql
+QT += core-private
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-QMAKE_CXXFLAGS += /MP
+# QMAKE_CXXFLAGS += /MP
 # QT += webenginequick
 
 CONFIG += c++17
@@ -41,6 +41,10 @@ SOURCES += \
     bigraphicsscene.cpp \
     bigraphicsview.cpp \
     biundocommand.cpp \
+    customplugin/usergraphicplugins.cpp \
+    customplugin/abstractuserplugin.cpp \
+    customplugin/userimageitem.cpp \
+    customplugin/usersvgitem.cpp \
     exportdialog.cpp \
     graphicplugingroup.cpp \
     graphicplugins.cpp \
@@ -95,6 +99,16 @@ HEADERS += \
     bigraphicsscene.h \
     bigraphicsview.h \
     biundocommand.h \
+    configs.h \
+    customplugin/usergraphicplugins.h \
+    customplugin/userimageitem.h \
+    customplugin/userplugindo.h \
+    customplugin/abstractuserplugin.h \
+    customplugin/userplugingroupdo.h \
+    customplugin/userplugintype.h \
+    customplugin/usersvgitem.h \
+    dbutil/basemapper.h \
+    dbutil/entity.h \
     exportdialog.h \
     filetemplate.h \
     graphicplugingroup.h \
@@ -139,14 +153,6 @@ INCLUDEPATH += \
     $$PWD/../BIWidgets/linepropertywidget \
     $$PWD/../BIWidgets/pospropertywidget \
     $$PWD/../BIWidgets/bicomboboxwidget
-# DEPENDPATH += $$PWD/../BIWidgets \
-#     $$PWD/../BIWidgets/colorpickerwidget\
-#     $$PWD/../BIWidgets/fillpropertywidget \
-#     $$PWD/../BIWidgets/linepropertywidget \
-#     $$PWD/../BIWidgets/pospropertywidget
-# win32:CONFIG(release, debug|release): DEPENDPATH += $$OUT_PWD/../BIWidgets/release
-# else:win32:CONFIG(debug, debug|release): DEPENDPATH += $$OUT_PWD/../BIWidgets/debug
-# QMAKE_CXXFLAGS += -Wno-unused-variable
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../common/release/ -lcommon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../common/debug/ -lcommon

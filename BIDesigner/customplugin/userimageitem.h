@@ -1,40 +1,42 @@
 ﻿/**
 * This file is part of the dashboard library
-* 
+*
 * Copyright 2025 lishiying  lsyeei@163.com
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the License);
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an AS IS BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+#ifndef USERIMAGEITEM_H
+#define USERIMAGEITEM_H
 
-#ifndef BIWIDGETS_H
-#define BIWIDGETS_H
+#include <QObject>
+#include <abstractzoneitem.h>
 
-#include <QtUiPlugin/customwidget.h>
-#include <QtCore/qplugin.h>
-
-class BIWidgets : public QObject, public QDesignerCustomWidgetCollectionInterface
+class UserImageItem : public AbstractZoneItem
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetCollectionInterface")
-    Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
-
 public:
-    BIWidgets(QObject *parent = 0);
+    explicit UserImageItem(const QString &classId, const QString &imgPath, QGraphicsItem *parent = nullptr);
+    explicit UserImageItem(const QString &xml, QGraphicsItem *parent = nullptr);
+    // ICustomGraphic interface
+    QString classId() const override;
 
-    QList<QDesignerCustomWidgetInterface*> customWidgets() const override;
-
+    // AbstractZoneItem interface
+protected:
+    QPainterPath shapePath() const override;
+    void parseXML(const QString &xml) override;
 private:
-    QList<QDesignerCustomWidgetInterface*> widgets;
+    QString id;
+
 };
 
-#endif // BIWIDGETS_H
+#endif // USERIMAGEITEM_H

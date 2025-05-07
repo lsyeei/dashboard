@@ -27,6 +27,7 @@ class QVBoxLayout;
 class IGraphicPlugin;
 class GraphicPluginGroup;
 class ICustomGraphic;
+class UserGraphicPlugins;
 class GraphicPlugins : public QWidget
 {
     Q_OBJECT
@@ -94,6 +95,10 @@ private:
      * @brief 加载图元控件G
      */
     void loadGraphicPlugin();
+    /**
+     * @brief 加载用户自定义控件
+     */
+    void loadUserGraphicPlugin();
     /**
      * @brief 将插件安装到程序
      * @param graphicItem 插件对象

@@ -184,4 +184,5 @@ else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../common/release/libcommon.a
 # else:win32:CONFIG(release, debug|release): QMAKE_POST_LINK += xcopy /F /E /Y \"$${OUT_PWD}/release/rectplugin.dll\" \"$${PWD}/../../BIDesigner/plugins/\"
 
 # DLLDESTDIR = $$PWD/../../BIDesigner/plugins
+
 DESTDIR = $$PWD/../../BIDesigner/plugins

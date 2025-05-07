@@ -76,7 +76,7 @@ void AbstractTextItem::setSize(const QSizeF &size)
     auto ratioX = size.width() / attr->getWidth();
     auto ratioY = size.height() / attr->getHeight();
     AbstractZoneItem::setSize(size);
-    if (ratioX <= 0 || ratioY <= 0 || isnan(ratioX) || isnan(ratioY)) {
+    if (ratioX <= 0 || ratioY <= 0 || std::isnan(ratioX) || std::isnan(ratioY)) {
         return;
     }
     textItem->setPos(logicRect.topLeft());
@@ -90,7 +90,7 @@ void AbstractTextItem::setWidth(qreal newWidth)
     auto attr = attribute();
     auto ratioX = newWidth / attr->getWidth();
     AbstractZoneItem::setWidth(newWidth);
-    if (ratioX <= 0 || isnan(ratioX)) {
+    if (ratioX <= 0 || std::isnan(ratioX)) {
         return;
     }
     textItem->setPos(logicRect.topLeft());
@@ -104,7 +104,7 @@ void AbstractTextItem::setHeight(qreal newHeight)
     auto attr = attribute();
     auto ratioY = newHeight / attr->getHeight();
     AbstractZoneItem::setHeight(newHeight);
-    if (ratioY <= 0 || isnan(ratioY)) {
+    if (ratioY <= 0 || std::isnan(ratioY)) {
         return;
     }
     textItem->setPos(logicRect.topLeft());
