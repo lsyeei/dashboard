@@ -1,0 +1,8 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <text transform="matrix(1 0 0 1 0 0)" stroke="#000" fill="#000000" x="7" y="46.5" id="svg_4" font-size="40" font-family="'Public Sans'" text-anchor="start" xml:space="preserve" font-style="italic" font-weight="bold">A</text>
+  <text transform="matrix(1 0 0 1 0 0)" font-weight="bold" stroke-width="0" xml:space="preserve" text-anchor="start" font-family="'Public Sans'" font-size="40" id="svg_1" y="46.5" x="31" stroke="#000" fill="#000000">B</text>
+ </g>
+
+</svg>

@@ -1,0 +1,5 @@
+<svg  xmlns="http://www.w3.org/2000/svg" style="left: 1px; top: 1px; width: 64px; height: 64px; display: block; position: relative; overflow: hidden;">
+<g>
+  <path id="arrow_end" stroke="black" stroke-width="0" d="m44,0l20,10l-20,10q8,-8 0,-20l0,0z" fill="black"/>
+  <polyline id="line" points="2,62,26,62,26,10,48,10" stroke="black" stroke-width="2" fill="none"/>
+</g></svg>

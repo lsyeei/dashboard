@@ -1,0 +1,7 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <text transform="matrix(1 0 0 1 0 0)" stroke="#000" fill="#000000" x="9" y="46.5" id="svg_4" font-size="40" font-family="'Public Sans'" text-anchor="start" xml:space="preserve" font-style="italic" font-weight="bold">A</text>
+  <path transform="rotate(-90 45.8 18.8292)" stroke="#000" stroke-width="0" id="svg_10" d="m44.93627,22.48674l3.01242,-2.25909l-5.82437,0l-5.82436,0l0,-1.39848l0,-1.39848l5.75754,0c3.16664,0 5.75753,-0.07088 5.75753,-0.15752c0,-0.08663 -1.26063,-1.10322 -2.8014,-2.25909l-2.80141,-2.10158l2.58936,0l2.58935,0l3.95452,2.96117l3.95452,2.96116l-3.9621,2.9555l-3.9621,2.9555l-2.72596,0l-2.72597,0l3.01243,-2.25909l0,0z" fill="#56aaff"/>
+ </g>
+
+</svg>
