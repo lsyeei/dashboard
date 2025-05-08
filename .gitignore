@@ -10,3 +10,4 @@
 BIDesigner/plugins/*.*
 **/Makefile
 **/Makefile.*
+msvc_make.bat
