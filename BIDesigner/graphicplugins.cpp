@@ -30,6 +30,7 @@
 #include <QDragEnterEvent>
 #include <QMessageBox>
 #include <QPluginLoader>
+#include <QPushButton>
 #include <icustomgraphic.h>
 
 QMap<QString, IGraphicPlugin *> GraphicPlugins::pluginMap = QMap<QString, IGraphicPlugin *>{};
@@ -50,6 +51,11 @@ GraphicPlugins::GraphicPlugins(QWidget *parent)
     layout->setSpacing(0);
     setLayout(layout);
 
+    addGroupBtn = new QPushButton(QIcon::fromTheme(QIcon::ThemeIcon::FolderNew),
+                            tr("新建图库"));
+    layout->addWidget(addGroupBtn);
+    connect(addGroupBtn.data(), SIGNAL(clicked(bool)), this, SLOT(onAddNewGroup()));
+
     // 加载控件
     loadGraphicPlugin();
     // 加载用户图元控件
@@ -68,12 +74,12 @@ GraphicPlugins::~GraphicPlugins()
         }
         pluginMap.clear();
     }
-    if (!graphicItemGroup.isEmpty()) {
-        for (auto group : graphicItemGroup.values()){
+    if (!groupWidgetMap.isEmpty()) {
+        for (auto group : groupWidgetMap.values()){
             delete group;
             group = nullptr;
         }
-        graphicItemGroup.clear();
+        groupWidgetMap.clear();
     }
 }
 
@@ -157,6 +163,23 @@ void GraphicPlugins::graphicItemSelected(const QString item)
     emit graphicItemChanged(pluginMap[item]);
 }
 
+void GraphicPlugins::onAddNewGroup()
+{
+    auto groupName = tr("新建分组");
+    createGroupWidget(groupName)->setEditable(true);
+}
+
+void GraphicPlugins::onRemoveGroup()
+{
+    auto obj = sender();
+    auto widget = dynamic_cast<GraphicPluginGroup*>(obj);
+    if (widget) {
+        auto id = widget->getGroupId();
+        layout->removeWidget(groupWidgetMap[id]);
+        groupWidgetMap.remove(id);
+    }
+}
+
 // QString GraphicPlugins::genItemKey(const QString &group, const QString &name)
 // {
 //     QCryptographicHash hash(QCryptographicHash::Md5);
@@ -217,31 +240,41 @@ void GraphicPlugins::loadUserGraphicPlugin()
     connect(userGraphics, SIGNAL(graphicItemChanged(IGraphicPlugin*)),
                         this, SIGNAL(graphicItemChanged(IGraphicPlugin*)));
     // pluginMap["CUSTOM"] = userGraphics;
-    graphicItemGroup.insert(widgets);
+    // graphicItemGroup.insert(widgets);
 }
 
 void GraphicPlugins::installPlugin(IGraphicPlugin *graphicItem)
 {
     QString group = graphicItem->group();
+    GraphicPluginGroup *groupWidget{nullptr};
     // 如果该组已存在，加入该组，否则新建一组并加入
-    if (!graphicItemGroup.contains(group)){
-        createGroupWidget(group);
+    foreach (auto widget, groupWidgetMap) {
+        if (widget->getGroupName().compare(group) == 0) {
+            groupWidget = widget;
+        }
+    }
+    if (groupWidget == nullptr){
+        groupWidget = createGroupWidget(group);
     }
     // 将图元加入控件组
-    if (graphicItemGroup[group]->addPlugin(graphicItem)) {
+    if (groupWidget->addPlugin(graphicItem)) {
         QString id = graphicItem->id();
         pluginMap[id] = graphicItem;
     }
 }
 
 
-void GraphicPlugins::createGroupWidget(QString group)
+GraphicPluginGroup * GraphicPlugins::createGroupWidget(QString group)
 {
-    GraphicPluginGroup *groupWidget = new GraphicPluginGroup(group, graphicItemGroup.count(), this);
+    GraphicPluginGroup *groupWidget = new GraphicPluginGroup(group, groupWidgetMap.count(), this);
     layout->addWidget(groupWidget);
-    graphicItemGroup[group] = groupWidget;
+    groupWidgetMap[groupWidget->getGroupId()] = groupWidget;
     connect(groupWidget, SIGNAL(graphicItemClicked(QString)),
             this, SLOT(graphicItemSelected(QString)));
+    connect(groupWidget, SIGNAL(removeGroup()),
+            this, SLOT(onRemoveGroup()));
+
+    return groupWidget;
 }
 
 void GraphicPlugins::paletteChanged()
@@ -249,7 +282,7 @@ void GraphicPlugins::paletteChanged()
     auto p = palette();
     auto windowColor = p.brush(QPalette::Window).color().name();
     auto windowLightColor = p.brush(QPalette::Light).color().name();
-    foreach (auto item, graphicItemGroup){
+    foreach (auto item, groupWidgetMap){
         item->setStyleSheet("#" + item->getGroupId() + "{border:1px solid "+windowLightColor+"; background:"+windowColor+";}");
     }
 }

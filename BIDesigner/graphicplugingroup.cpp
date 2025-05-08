@@ -26,8 +26,11 @@
 #include <QDrag>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
+#include <QMenu>
 #include <QMimeData>
 #include <QMouseEvent>
+#include <QPushButton>
 #include <QStyle>
 #include <QToolButton>
 #include <igraphicplugin.h>
@@ -124,6 +127,49 @@ void GraphicPluginGroup::itemClicked(QToolButton * button)
     }
 }
 
+void GraphicPluginGroup::createEditBtns()
+{
+    if (!editBtn.isNull()) {
+        return;
+    }
+
+    titleEditor = new QLineEdit();
+    titleLayout->addWidget(titleEditor);
+    titleEditor->hide();
+    connect(titleEditor.data(), SIGNAL(editingFinished()), this, SLOT(onNameEditEnd()));
+
+    titleLayout->addStretch();
+
+    QIcon menuIcon(SvgHelper{QString{":/icons/icons/more-line.svg"}}.toPixmap(SvgHelper::Normal));
+    editBtn = new QPushButton(menuIcon, tr(""));
+    editBtn->setIconSize({18,18});
+    editBtn->setFlat(true);
+    editBtn->setMaximumWidth(20);
+    editBtn->setMaximumHeight(18);
+    connect(editBtn.data(), &QPushButton::clicked,
+            this, [&](){popMenu->popup(QCursor::pos());});
+
+    titleLayout->addWidget(editBtn);
+
+    popMenu = new QMenu(tr("编辑"),editBtn);
+    renameAct = popMenu->addAction(SvgHelper{QString{":/icons/icons/edit-box.svg"}}
+                                       .toPixmap(SvgHelper::Normal), tr("修改组名"));
+    connect(renameAct.data(), SIGNAL(triggered(bool)), this, SLOT(onEditClicked()));
+    delAct = popMenu->addAction(QIcon::fromTheme(QIcon::ThemeIcon::EditDelete), tr("删除组"));
+    connect(delAct.data(), SIGNAL(triggered(bool)), this, SLOT(onDeleteClicked()));
+    importAct = popMenu->addAction(SvgHelper{QString{":/icons/icons/bottom.svg"}}
+                                       .toPixmap(SvgHelper::Normal), tr("导入图元"));
+    connect(importAct.data(), SIGNAL(triggered(bool)), this, SLOT(onImportClicked()));
+}
+
+void GraphicPluginGroup::showEditBtns(bool showFlag)
+{
+    if (!editBtn.isNull()) {
+        return;
+    }
+    editBtn->setVisible(showFlag);
+}
+
 void GraphicPluginGroup::onTitleclicked()
 {
     if (contentWidget->isHidden()) {
@@ -135,9 +181,47 @@ void GraphicPluginGroup::onTitleclicked()
     }
 }
 
+void GraphicPluginGroup::onEditClicked()
+{
+    title->hide();
+    titleEditor->setText(groupName);
+    titleEditor->show();
+}
+
+void GraphicPluginGroup::onDeleteClicked()
+{
+    emit removeGroup();
+}
+
+void GraphicPluginGroup::onImportClicked()
+{
+
+}
+
+void GraphicPluginGroup::onNameEditEnd()
+{
+    auto newName = titleEditor->text().trimmed();
+    if (newName.isEmpty()) {
+        return;
+    }
+    title->setText(newName);
+    groupName = newName;
+    titleEditor->hide();
+    title->show();
+}
+
 QString GraphicPluginGroup::getGroupId() const
 {
     return widgetId;
+}
+
+void GraphicPluginGroup::setEditable(bool flag)
+{
+    if (editBtn.isNull() && flag) {
+        createEditBtns();
+        return;
+    }
+    editBtn->setVisible(flag);
 }
 
 QString GraphicPluginGroup::createId(QString name, qint32 index)

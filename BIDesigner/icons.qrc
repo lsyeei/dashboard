@@ -33,6 +33,9 @@
         <file>icons/rotateV.svg</file>
         <file>icons/arrow-down.svg</file>
         <file>icons/arrow-right.svg</file>
+        <file>icons/more-line.svg</file>
+        <file>icons/bottom.svg</file>
+        <file>icons/edit-box.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>animation/path/icons/curvedLine.svg</file>

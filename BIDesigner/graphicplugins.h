@@ -24,6 +24,7 @@
 #include <QWidget>
 
 class QVBoxLayout;
+class QPushButton;
 class IGraphicPlugin;
 class GraphicPluginGroup;
 class ICustomGraphic;
@@ -82,13 +83,19 @@ private Q_SLOTS:
      * @param item 元件ID
      */
     void graphicItemSelected(const QString item);
+    /**
+     * @brief onAddNewGroup 新增图元分组
+     */
+    void onAddNewGroup();
+    void onRemoveGroup();
 private:
     // 布局方式
     QVBoxLayout *layout;
+    QPointer<QPushButton> addGroupBtn;
     // 所有控件集合，key 控件group与name 生成的唯一ID，value 控件对象
     static QMap<QString, IGraphicPlugin *> pluginMap;
-    // 图元控件组，key 图元组名称，value 该组控件所在widget
-    QMap<QString, GraphicPluginGroup *> graphicItemGroup;
+    // 图元控件组控件，key 组控件ID，value widget对象
+    QMap<QString, GraphicPluginGroup *> groupWidgetMap;
     // 当前选中的插件
     IGraphicPlugin *selectedPlugin;
     /**
@@ -105,7 +112,7 @@ private:
      */
     void installPlugin(IGraphicPlugin *graphicItem);
     // QString genItemKey(const QString &group, const QString &name);
-    void createGroupWidget(QString group);
+    GraphicPluginGroup *createGroupWidget(QString group);
     void paletteChanged();
 };
 

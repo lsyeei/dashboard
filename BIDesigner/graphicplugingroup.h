@@ -20,8 +20,11 @@
 #define GRAPHICPLUGINGROUP_H
 
 #include <QObject>
+#include <QPointer>
 #include <QWidget>
 
+class QPushButton;
+class QLineEdit;
 class QToolButton;
 class FlowLayout;
 class QGridLayout;
@@ -47,6 +50,11 @@ public:
     bool event(QEvent *event) override;
 
     QString getGroupId() const;
+    /**
+     * @brief setEditable 设置是否允许编辑组
+     * @param flag true允许编辑组，false 不允许编辑
+     */
+    void setEditable(bool flag);
 
 Q_SIGNALS:
     /**
@@ -54,14 +62,30 @@ Q_SIGNALS:
      * @param graphicItem 图元对象
      */
     void graphicItemClicked(const QString &itemId);
+    /**
+     * @brief removeGroup 通知父控件移除该组
+     */
+    void removeGroup();
+
 private Q_SLOTS:
+
     void onTitleclicked();
+    void onEditClicked();
+    void onDeleteClicked();
+    void onImportClicked();
+    void onNameEditEnd();
 
 private:
     QString widgetId;
     QVBoxLayout *layout;
     QWidget *titleWidget;
     QHBoxLayout *titleLayout;
+    QPointer<QLineEdit> titleEditor;
+    QPointer<QPushButton> editBtn;
+    QPointer<QMenu> popMenu;
+    QPointer<QAction> renameAct;
+    QPointer<QAction> delAct;
+    QPointer<QAction> importAct;
     QLabel *icon;
     QLabel *title;
     QWidget *contentWidget;
@@ -86,6 +110,8 @@ private:
     QString createId(QString name, qint32 index);
     void paletteChanged();
     void itemClicked(QToolButton * button);
+    void createEditBtns();
+    void showEditBtns(bool showFlag);
 };
 
 #endif // GRAPHICPLUGINGROUP_H

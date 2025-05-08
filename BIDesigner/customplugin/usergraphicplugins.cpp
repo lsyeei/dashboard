@@ -29,6 +29,8 @@
 
 #include "dbutil/basemapper.h"
 
+QMap<QString, GraphicPluginGroup *> UserGraphicPlugins::groupWidgetMap = QMap<QString, GraphicPluginGroup *>();
+
 UserGraphicPlugins::UserGraphicPlugins(QWidget *parent) : parent(parent) {}
 
 QMap<QString, GraphicPluginGroup *> UserGraphicPlugins::load()

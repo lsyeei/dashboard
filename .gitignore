@@ -8,3 +8,5 @@
 *.stash
 **/CMakeLists.txt
 BIDesigner/plugins/*.*
+**/Makefile
+**/Makefile.*
