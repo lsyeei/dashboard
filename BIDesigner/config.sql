@@ -1,0 +1,18 @@
+CREATE TABLE userPluginGroup (
+	id INTEGER DEFAULT (0) PRIMARY KEY AUTOINCREMENT,
+	name TEXT(100) NOT NULL,
+	create_time REAL NOT NULL,
+	modify_time REAL NOT NULL
+);
+CREATE TABLE userPlugin (
+	id INTEGER DEFAULT (0) NOT NULL PRIMARY KEY AUTOINCREMENT,
+	group_id INTEGER NOT NULL,
+	name TEXT(100) NOT NULL,
+	note TEXT(500),
+	"type" INTEGER DEFAULT (0) NOT NULL,
+	"path" TEXT(200) NOT NULL,
+	thumb BLOB,
+	create_time REAL NOT NULL,
+	modify_time REAL NOT NULL,
+	CONSTRAINT userPlugin_FK FOREIGN KEY (group_id) REFERENCES userPluginGroup(id)
+);

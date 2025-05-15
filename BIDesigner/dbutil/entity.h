@@ -24,6 +24,7 @@
 #include <QString>
 #include <QObject>
 #include <QList>
+#include "qobjectdefs.h"
 
 #ifndef Q_MOC_RUN
 // define the tag text as empty, so the compiler doesn't see it
@@ -46,11 +47,12 @@ protected:\
         return &staticMetaObject; \
     }
 
-#define TABLE_FIELD(field, colName) \
+
+#define TABLE_FIELD(field, colName, ...) \
 using __type_##field = decltype(field);\
 Q_PROPERTY(__type_##field field READ get_##field WRITE set_##field) \
 protected:\
-    Q_INVOKABLE MAP_FLAG inline QString map_##field(){return #colName;}\
+    Q_INVOKABLE MAP_FLAG inline QList<QString> map_##field(){return {#colName, #__VA_ARGS__};}\
 public:\
     Q_INVOKABLE GETTER_FLAG __type_##field get_##field() const {return field;}\
     Q_INVOKABLE SETTER_FLAG void set_##field(const __type_##field &value){if (value != field) field = value;}
@@ -62,7 +64,9 @@ public:
     virtual QString getTableName() const = 0;
     virtual QList<QString> getPrimaryKey() const = 0;
     QMap<QString, QString> getFieldMap();
-    QString getTest(){return "a";};
+    QVariant getValueByColName(const QString &colName) const;
+    void setValueByColName(const QString &colName, const QVariant &value);
+    QString getColPropery(const QString &colName);
     template<typename T>
     T getValue(const QString &field) const;
     template<typename T>
@@ -72,7 +76,10 @@ protected:
     virtual const QMetaObject* getMetaInfo() const = 0;
 private:
     QMetaMethod getMethod(const QString &methodName) const;
+    // key:class field, value:table field
     QMap<QString, QString> fieldMap;
+    // key:table field, value:table field property
+    QMap<QString, QString> colProperty;
 };
 
 inline QMap<QString, QString> Entity::getFieldMap()
@@ -85,14 +92,65 @@ inline QMap<QString, QString> Entity::getFieldMap()
             if (tag.compare("MAP_FLAG") == 0){
                 auto name = metaInfo->method(i).name();
                 auto fieldName = name.split('_')[1];
-                QString colName{""};
-                if (metaInfo->method(i).invokeOnGadget(this, qReturnArg(colName))){
-                    fieldMap[fieldName] = colName;
+                QList<QString> attr;
+                if (metaInfo->method(i).invokeOnGadget(this, qReturnArg(attr))){
+                    fieldMap[fieldName] = attr[0];
+                    if (attr.count() > 1) {
+                        colProperty[attr[0]] = attr[1];
+                    }else{
+                        colProperty[attr[0]] = "";
+                    }
                 }
             }
         }
     }
     return fieldMap;
+}
+
+inline QVariant Entity::getValueByColName(const QString &colName) const
+{
+    QString field{""};
+    if (fieldMap.isEmpty()) {
+        const_cast<Entity*>(this)->getFieldMap();
+    }
+    for(auto item = fieldMap.cbegin(); item != fieldMap.cend(); item++){
+        if (item.value().compare(colName) == 0) {
+            field = item.key();
+            break;
+        }
+    }
+    if (field.isEmpty()) {
+        return QVariant();
+    }
+    auto method = getMethod("get_" + field + "()");
+    auto rtnType = method.returnMetaType();
+    auto result = QVariant::fromMetaType(rtnType);
+    QGenericReturnArgument arg(result.typeName(), result.data());
+    method.invokeOnGadget(const_cast<Entity*>(this), arg);
+    return result;
+}
+
+inline void Entity::setValueByColName(const QString &colName, const QVariant &value)
+{
+    QString field{""};
+    for(auto item = fieldMap.cbegin(); item != fieldMap.cend(); item++){
+        if (item.value().compare(colName) == 0) {
+            field = item.key();
+            break;
+        }
+    }
+    if (field.isEmpty()) {
+        return;
+    }
+    setValue(field, value);
+}
+
+inline QString Entity::getColPropery(const QString &colName)
+{
+    if (colProperty.isEmpty()) {
+        this->getFieldMap();
+    }
+    return colProperty[colName];
 }
 
 inline QMetaMethod Entity::getMethod(const QString &methodName) const
@@ -107,7 +165,7 @@ inline T Entity::getValue(const QString &field) const
 {
     auto method = getMethod("get_" + field + "()");
     T result;
-    method.invokeOnGadget(this, qReturnArg(result));
+    method.invokeOnGadget(const_cast<Entity*>(this), qReturnArg(result));
     return result;
 }
 

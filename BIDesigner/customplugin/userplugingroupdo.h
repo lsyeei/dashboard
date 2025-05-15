@@ -30,12 +30,12 @@ class UserPluginGroupDO : public Entity
 public:
     UserPluginGroupDO(){}
 private:
-    int id;
-    QString name;
+    int id{0};
+    QString name{""};
     QDateTime createTime;
     QDateTime modifyTime;
 
-    TABLE_FIELD(id, id)
+    TABLE_FIELD(id, id, AUTO)
     TABLE_FIELD(name, name)
     TABLE_FIELD(createTime, create_time)
     TABLE_FIELD(modifyTime, modify_time)

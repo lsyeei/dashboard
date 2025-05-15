@@ -34,6 +34,8 @@
 #include <icustomgraphic.h>
 
 QMap<QString, IGraphicPlugin *> GraphicPlugins::pluginMap = QMap<QString, IGraphicPlugin *>{};
+QPointer<UserGraphicPlugins> GraphicPlugins::userGraphics = nullptr;
+
 GraphicPlugins::GraphicPlugins(QWidget *parent)
     : QWidget{parent}
 {
@@ -68,14 +70,16 @@ GraphicPlugins::~GraphicPlugins()
     layout = nullptr;
     selectedPlugin = nullptr;
     if (!pluginMap.isEmpty()) {
-        for (auto plugin : pluginMap.values()){
+        auto plugins = pluginMap.values();
+        foreach (auto plugin, plugins){
             delete plugin;
             plugin = nullptr;
         }
         pluginMap.clear();
     }
     if (!groupWidgetMap.isEmpty()) {
-        for (auto group : groupWidgetMap.values()){
+        auto widgets = groupWidgetMap.values();
+        foreach (auto group, widgets){
             delete group;
             group = nullptr;
         }
@@ -101,7 +105,7 @@ IGraphicPlugin *GraphicPlugins::getPluginById(const QString id)
     if (pluginMap.contains(id)) {
         return pluginMap[id];
     }
-    return nullptr;
+    return userGraphics->getPluginById(id);
 }
 
 ICustomGraphic *GraphicPlugins::createGraphic(const QString &graphicId)
@@ -166,18 +170,7 @@ void GraphicPlugins::graphicItemSelected(const QString item)
 void GraphicPlugins::onAddNewGroup()
 {
     auto groupName = tr("新建分组");
-    createGroupWidget(groupName)->setEditable(true);
-}
-
-void GraphicPlugins::onRemoveGroup()
-{
-    auto obj = sender();
-    auto widget = dynamic_cast<GraphicPluginGroup*>(obj);
-    if (widget) {
-        auto id = widget->getGroupId();
-        layout->removeWidget(groupWidgetMap[id]);
-        groupWidgetMap.remove(id);
-    }
+    userGraphics->addNewGroup(groupName);
 }
 
 // QString GraphicPlugins::genItemKey(const QString &group, const QString &name)
@@ -235,12 +228,10 @@ void GraphicPlugins::loadGraphicPlugin()
 
 void GraphicPlugins::loadUserGraphicPlugin()
 {
-    auto userGraphics = new UserGraphicPlugins(this);
-    auto widgets = userGraphics->load();
+    userGraphics = new UserGraphicPlugins(this);
+    userGraphics->load();
     connect(userGraphics, SIGNAL(graphicItemChanged(IGraphicPlugin*)),
                         this, SIGNAL(graphicItemChanged(IGraphicPlugin*)));
-    // pluginMap["CUSTOM"] = userGraphics;
-    // graphicItemGroup.insert(widgets);
 }
 
 void GraphicPlugins::installPlugin(IGraphicPlugin *graphicItem)
@@ -271,8 +262,6 @@ GraphicPluginGroup * GraphicPlugins::createGroupWidget(QString group)
     groupWidgetMap[groupWidget->getGroupId()] = groupWidget;
     connect(groupWidget, SIGNAL(graphicItemClicked(QString)),
             this, SLOT(graphicItemSelected(QString)));
-    connect(groupWidget, SIGNAL(removeGroup()),
-            this, SLOT(onRemoveGroup()));
 
     return groupWidget;
 }
@@ -283,6 +272,9 @@ void GraphicPlugins::paletteChanged()
     auto windowColor = p.brush(QPalette::Window).color().name();
     auto windowLightColor = p.brush(QPalette::Light).color().name();
     foreach (auto item, groupWidgetMap){
+        item->setStyleSheet("#" + item->getGroupId() + "{border:1px solid "+windowLightColor+"; background:"+windowColor+";}");
+    }
+    foreach (auto item, userGraphics->groupWidgets()){
         item->setStyleSheet("#" + item->getGroupId() + "{border:1px solid "+windowLightColor+"; background:"+windowColor+";}");
     }
 }

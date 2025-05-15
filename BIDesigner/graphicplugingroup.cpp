@@ -20,7 +20,6 @@
 #include "flowlayout.h"
 #include "graphicplugins.h"
 #include "svghelper.h"
-
 #include <QApplication>
 #include <QCryptographicHash>
 #include <QDrag>
@@ -186,6 +185,8 @@ void GraphicPluginGroup::onEditClicked()
     title->hide();
     titleEditor->setText(groupName);
     titleEditor->show();
+    titleEditor->setFocus(Qt::MouseFocusReason);
+    titleEditor->selectAll();
 }
 
 void GraphicPluginGroup::onDeleteClicked()
@@ -195,7 +196,7 @@ void GraphicPluginGroup::onDeleteClicked()
 
 void GraphicPluginGroup::onImportClicked()
 {
-
+    emit importGraphic(userGroupId);
 }
 
 void GraphicPluginGroup::onNameEditEnd()
@@ -205,14 +206,21 @@ void GraphicPluginGroup::onNameEditEnd()
         return;
     }
     title->setText(newName);
+    auto oldName = groupName;
     groupName = newName;
     titleEditor->hide();
     title->show();
+    emit nameChanged(oldName, newName);
 }
 
 QString GraphicPluginGroup::getGroupId() const
 {
     return widgetId;
+}
+
+void GraphicPluginGroup::setUserGroupId(qint32 id)
+{
+    userGroupId = id;
 }
 
 void GraphicPluginGroup::setEditable(bool flag)
@@ -264,6 +272,12 @@ void GraphicPluginGroup::paletteChanged()
 QString GraphicPluginGroup::getGroupName() const
 {
     return groupName;
+}
+
+void GraphicPluginGroup::setGroupName(const QString &name)
+{
+    title->setText(name);
+    groupName = name;
 }
 
 bool GraphicPluginGroup::event(QEvent *event)

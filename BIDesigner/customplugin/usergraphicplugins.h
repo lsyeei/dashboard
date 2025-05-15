@@ -20,45 +20,61 @@
 
 #include <QMap>
 #include <QObject>
+#include "customplugin/userplugintype.h"
 #include "igraphicplugin.h"
 
+class UserPluginDO;
 class QLayout;
 class GraphicPluginGroup;
-class UserGraphicPlugins : public QObject/*,  public IGraphicPlugin*/
+class UserGraphicPlugins : public QObject
 {
     Q_OBJECT
 public:
     UserGraphicPlugins(QWidget *parent);
-    QMap<QString, GraphicPluginGroup *> load();
-
-    // // IGraphicPlugin interface
-    // QString id() const override;
-    // QString name() const override;
-    // QString group() const override;
-    // QString toolTip() const override;
-    // QString whatsThis() const override;
-    // QIcon icon() const override;
-    // ICustomGraphic *createItem() override;
-    // ICustomGraphic *createItem(const QString &xml) override;
-    // QWidget *propertyWidget() override;
+    ~UserGraphicPlugins();
+    bool load();
+    bool addNewGroup(const QString &groupName);
+    QList<GraphicPluginGroup*> groupWidgets();
+    IGraphicPlugin *getPluginById(const QString &pluginId) const;
 
 Q_SIGNALS:
     void graphicItemChanged(IGraphicPlugin *plugin);
 protected Q_SLOTS:
-    void graphicItemSelected(QString itemId);
+    void onGraphicItemSelected(QString itemId);
+    void onRemoveGroup();
+    void onGroupNameChanged(const QString &oldName, const QString &newName);
+    void onImportUserGraphics(qint32 groupId);
+
 private:
     QWidget *parent;
     QLayout *layout;
     // 用户自定义控件索引的最小值
     static const int minIdex{1000};
     // 所有控件集合，key 控件group与name 生成的唯一ID，value 控件对象
-    static QMap<QString, GraphicPluginGroup *> groupWidgetMap;
+    static QHash<GraphicPluginGroup *, qint32> groupWidgetMap;
     // 用户自定义插件集合
     QMap<QString, IGraphicPlugin *> pluginMap;
     // 当前选中的插件
     IGraphicPlugin *selectedPlugin;
-
-    void createGroupWidget(QString group);
+    GraphicPluginGroup *createGroupWidget(const QString &group);
+    /**
+     * @brief suffix2Type 根据文件后缀确定插件类型
+     * @param suffix 后缀名
+     * @return 插件类型
+     */
+    UserPluginType suffix2Type(const QString &suffix);
+    /**
+     * @brief getThumbData 根据文件生成缩略图
+     * @param file 全路径文件
+     * @return 缩略图数据
+     */
+    QByteArray getThumbData(const QString &file);
+    /**
+     * @brief installPlugins 安装图元
+     * @param plugins 图元信息
+     * @param widget 图元组窗口
+     */
+    void installPlugins(QList<UserPluginDO> plugins, GraphicPluginGroup *widget);
 };
 
 #endif // USERGRAPHICPLUGINS_H

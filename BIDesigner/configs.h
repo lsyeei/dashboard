@@ -16,14 +16,19 @@
 * limitations under the License.
 */
 
-#include <QString>
 #ifndef CONFIGS_H
 #define CONFIGS_H
 
+#include <QString>
+
 struct Configs{
+    QString path{"./config/"};
+    QString initSql{"config.sql"};
     QString dbName{"config.dat"};
     QString dbUser{"admin@conf"};
     QString dbPwd{"lsyeei@163.com"};
-} appConfigs;
+    QString userPluginPath{"./plugins/custom/"};
+};
 
+extern Configs appConfigs;
 #endif // CONFIGS_H

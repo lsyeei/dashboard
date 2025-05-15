@@ -38,7 +38,7 @@ private:
     QDateTime createTime;
     QDateTime modifyTime;
 
-    TABLE_FIELD(id, id)
+    TABLE_FIELD(id, id, AUTO)
     TABLE_FIELD(groupId, group_id)
     TABLE_FIELD(name, name)
     TABLE_FIELD(note, note)

@@ -45,11 +45,13 @@ public:
      */
     bool addPlugin(IGraphicPlugin *plugin);
     QString getGroupName() const;
+    void setGroupName(const QString &name);
     // QObject interface
     bool eventFilter(QObject *watched, QEvent *event) override;
     bool event(QEvent *event) override;
 
     QString getGroupId() const;
+    void setUserGroupId(qint32 id);
     /**
      * @brief setEditable 设置是否允许编辑组
      * @param flag true允许编辑组，false 不允许编辑
@@ -66,6 +68,13 @@ Q_SIGNALS:
      * @brief removeGroup 通知父控件移除该组
      */
     void removeGroup();
+    /**
+     * @brief nameChanged 分组名称修改
+     * @param oldName 原名称
+     * @param newName 新名称
+     */
+    void nameChanged(const QString &noldName, const QString &newName);
+    void importGraphic(qint32 userGroupId);
 
 private Q_SLOTS:
 
@@ -101,6 +110,8 @@ private:
     // 拖动起点
     QPointF dragStartPosition;
     bool isFolded{false};
+    // 用户分组的ID
+    qint32 userGroupId{-1};
     /**
      * @brief 根据名称创建ID
      * @param name 名称

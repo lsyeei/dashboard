@@ -87,7 +87,6 @@ private Q_SLOTS:
      * @brief onAddNewGroup 新增图元分组
      */
     void onAddNewGroup();
-    void onRemoveGroup();
 private:
     // 布局方式
     QVBoxLayout *layout;
@@ -98,6 +97,8 @@ private:
     QMap<QString, GraphicPluginGroup *> groupWidgetMap;
     // 当前选中的插件
     IGraphicPlugin *selectedPlugin;
+    // 用户图元控件
+    static QPointer<UserGraphicPlugins> userGraphics;
     /**
      * @brief 加载图元控件G
      */

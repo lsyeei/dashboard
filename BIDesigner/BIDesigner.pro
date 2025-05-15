@@ -41,6 +41,7 @@ SOURCES += \
     bigraphicsscene.cpp \
     bigraphicsview.cpp \
     biundocommand.cpp \
+    configmaster.cpp \
     customplugin/usergraphicplugins.cpp \
     customplugin/abstractuserplugin.cpp \
     customplugin/userimageitem.cpp \
@@ -53,6 +54,7 @@ SOURCES += \
     grouppropertyform.cpp \
     main.cpp \
     mainwindow.cpp \
+    predefgraphicplugins.cpp \
     projectpropertyform.cpp \
     rulerwidget.cpp
 
@@ -99,15 +101,19 @@ HEADERS += \
     bigraphicsscene.h \
     bigraphicsview.h \
     biundocommand.h \
+    configmaster.h \
     configs.h \
     customplugin/usergraphicplugins.h \
     customplugin/userimageitem.h \
     customplugin/userplugindo.h \
     customplugin/abstractuserplugin.h \
     customplugin/userplugingroupdo.h \
+    customplugin/userplugingroupservice.h \
+    customplugin/userpluginservice.h \
     customplugin/userplugintype.h \
     customplugin/usersvgitem.h \
     dbutil/basemapper.h \
+    dbutil/baseservice.h \
     dbutil/entity.h \
     exportdialog.h \
     filetemplate.h \
@@ -119,6 +125,7 @@ HEADERS += \
     igraphicsscene.h \
     mainwindow.h \
     pageproperty.h \
+    predefgraphicplugins.h \
     projectProperty.h \
     projectpropertyform.h \
     rulerwidget.h
@@ -166,3 +173,5 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../comm
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../common/release/common.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../common/debug/common.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../common/libcommon.a
+
+DISTFILES +=
