@@ -29,6 +29,7 @@ class IGraphicPlugin;
 class GraphicPluginGroup;
 class ICustomGraphic;
 class UserGraphicPlugins;
+class PredefGraphicPlugins;
 class GraphicPlugins : public QWidget
 {
     Q_OBJECT
@@ -79,11 +80,6 @@ protected:
 
 private Q_SLOTS:
     /**
-     * @brief 选中图形元件，处理 GraphicItemGroupWidget 触发的点击事件
-     * @param item 元件ID
-     */
-    void graphicItemSelected(const QString item);
-    /**
      * @brief onAddNewGroup 新增图元分组
      */
     void onAddNewGroup();
@@ -91,29 +87,20 @@ private:
     // 布局方式
     QVBoxLayout *layout;
     QPointer<QPushButton> addGroupBtn;
-    // 所有控件集合，key 控件group与name 生成的唯一ID，value 控件对象
-    static QMap<QString, IGraphicPlugin *> pluginMap;
-    // 图元控件组控件，key 组控件ID，value widget对象
-    QMap<QString, GraphicPluginGroup *> groupWidgetMap;
+    QWidget *groupPanel;
     // 当前选中的插件
     IGraphicPlugin *selectedPlugin;
     // 用户图元控件
     static QPointer<UserGraphicPlugins> userGraphics;
+    static QPointer<PredefGraphicPlugins> predefGraphics;
     /**
      * @brief 加载图元控件G
      */
-    void loadGraphicPlugin();
+    void loadPredefGraphicPlugin();
     /**
      * @brief 加载用户自定义控件
      */
     void loadUserGraphicPlugin();
-    /**
-     * @brief 将插件安装到程序
-     * @param graphicItem 插件对象
-     */
-    void installPlugin(IGraphicPlugin *graphicItem);
-    // QString genItemKey(const QString &group, const QString &name);
-    GraphicPluginGroup *createGroupWidget(QString group);
     void paletteChanged();
 };
 

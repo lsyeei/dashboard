@@ -45,6 +45,7 @@ SOURCES += \
     customplugin/usergraphicplugins.cpp \
     customplugin/abstractuserplugin.cpp \
     customplugin/userimageitem.cpp \
+    customplugin/userpluginpropertyform.cpp \
     customplugin/usersvgitem.cpp \
     exportdialog.cpp \
     graphicplugingroup.cpp \
@@ -109,6 +110,7 @@ HEADERS += \
     customplugin/abstractuserplugin.h \
     customplugin/userplugingroupdo.h \
     customplugin/userplugingroupservice.h \
+    customplugin/userpluginpropertyform.h \
     customplugin/userpluginservice.h \
     customplugin/userplugintype.h \
     customplugin/usersvgitem.h \
@@ -132,6 +134,7 @@ HEADERS += \
 
 FORMS += \
     animation/animationform.ui \
+    customplugin/userpluginpropertyform.ui \
     exportdialog.ui \
     graphicproperty.ui \
     grouppropertyform.ui \

@@ -201,9 +201,11 @@ QDataStream &operator<<(QDataStream &stream, const Serializable &data){
                 QVariant value = dataPtr->getValue(jsonInfo["name"]);
                 QMetaProperty fieldType = metaInfo->property(metaInfo->indexOfProperty(jsonInfo["name"].toLocal8Bit()));
                 if (fieldType.metaType().id() == QMetaType::QVariant){
-                    stream << value.metaType().id();
+                    // stream << value.metaType().id();
+                    VariantUtil::streamIn(stream, value);
+                }else{
+                    stream << value;
                 }
-                stream << value;
             }
         }
         metaInfo = metaInfo->superClass();
@@ -224,13 +226,16 @@ QDataStream &operator>>(QDataStream &stream, Serializable &data){
                 QMetaProperty fieldType = metaInfo->property(metaInfo->indexOfProperty(jsonInfo["name"].toLocal8Bit()));
                 QMetaType fieldMeta = fieldType.metaType();
                 if (fieldMeta.id() == QMetaType::QVariant) {
-                    int typeId = 0;
-                    stream >> typeId;
-                    fieldMeta = QMetaType(typeId);
+                    // int typeId = 0;
+                    // stream >> typeId;
+                    // fieldMeta = QMetaType(typeId);
+                    auto value = VariantUtil::streamOut(stream);
+                    dataPtr->setValue(jsonInfo["name"], value);
+                }else{
+                    QVariant value(fieldMeta);
+                    stream >> value;
+                    dataPtr->setValue(jsonInfo["name"], value);
                 }
-                QVariant value(fieldMeta);
-                stream >> value;
-                dataPtr->setValue(jsonInfo["name"], value);
             }
         }
         metaInfo = metaInfo->superClass();

@@ -18,13 +18,42 @@
 #ifndef PREDEFGRAPHICPLUGINS_H
 #define PREDEFGRAPHICPLUGINS_H
 
+#include <QMap>
 #include <QObject>
 
-class PredefGraphicPlugins
+class QLayout;
+class IGraphicPlugin;
+class GraphicPluginGroup;
+class PredefGraphicPlugins : public QObject
 {
     Q_OBJECT
 public:
-    PredefGraphicPlugins();
+    PredefGraphicPlugins(QWidget *parent);
+    ~PredefGraphicPlugins();
+    bool load();
+    QList<GraphicPluginGroup*> groupWidgets();
+    IGraphicPlugin *getPluginById(const QString &pluginId) const;
+    QList<IGraphicPlugin *> plugins() const;
+
+Q_SIGNALS:
+    void graphicItemChanged(IGraphicPlugin *plugin);
+protected Q_SLOTS:
+    void onGraphicItemSelected(QString itemId);
+private:
+    QWidget *parentWidget{nullptr};
+    QLayout *layout{nullptr};
+    // 所有控件集合，key 控件group与name 生成的唯一ID，value 控件对象
+    QMap<QString, IGraphicPlugin *> pluginMap;
+    // 图元控件组控件，key 组控件ID，value widget对象
+    QMap<QString, GraphicPluginGroup *> groupWidgetMap;
+
+    /**
+     * @brief 将插件安装到程序
+     * @param graphicItem 插件对象
+     */
+    void installPlugin(IGraphicPlugin *graphicItem);
+    // QString genItemKey(const QString &group, const QString &name);
+    GraphicPluginGroup *createGroupWidget(QString group);
 };
 
 #endif // PREDEFGRAPHICPLUGINS_H

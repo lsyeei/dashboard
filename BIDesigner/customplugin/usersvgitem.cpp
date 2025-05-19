@@ -24,23 +24,24 @@
 UserSvgItem::UserSvgItem(const QString &classId, const QString &svgPath, QGraphicsItem *parent)
     :AbstractZoneItem(parent), id(classId) {
     // 读取 SVG 文件
-    QByteArray array;
     QFile f(svgPath);
     if (!f.exists()) {
         return;
     }
     f.open(QFile::ReadOnly);
-    QDataStream stream(&f);
-    stream >> array;
+    auto array = f.readAll();
     f.close();
-    QList<QVariant> data;
+    QVariantList data;
     data << id << array;
 
     auto attr = attribute();
     attr->setData(data);
 
     render = new QSvgRenderer(array);
-    // loadPath(array);
+    auto view = render->viewBoxF();
+    setSize({60.0,60.0*view.height()/view.width()});
+
+    initOrgPath();
 }
 
 
@@ -63,18 +64,11 @@ void UserSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     if (render) {
         painter->save();
 
-        auto attr = attribute();
         painter->setRenderHint(QPainter::Antialiasing);
         painter->setRenderHint(QPainter::TextAntialiasing);
         painter->setRenderHint(QPainter::VerticalSubpixelPositioning);
 
-        auto rect = attr->getLogicRect();
-        auto view = render->viewBoxF();
-        SvgPathDevice device(rect.size().toSize());
-        painter->setWindow(rect.toRect());
-        painter->setViewport(view.toRect());
-        painter->rotate(attr->getRotate());
-        render->render(painter);
+        render->render(painter, logicRect);
 
         painter->restore();
     }
@@ -83,42 +77,20 @@ void UserSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
 QPainterPath UserSvgItem::shapePath() const
 {
-    QPainterPath path;
-    auto attr = attribute();
-    auto rect = attr->getLogicRect();
+    auto rect = logicRect;
     auto view = render->viewBoxF();
-    SvgPathDevice device(rect.size().toSize());
-    QPainter painter(&device);
-    painter.setWindow(rect.toRect());
-    painter.setViewport(view.toRect());
-    painter.rotate(attr->getRotate());
-    render->render(&painter);
-    auto list = device.getSvgPath();
-    foreach (auto item, list) {
-        path.addPath(item);
-    }
-    return path;
+    QTransform trans;
+    trans.translate(rect.x(),rect.y());
+    trans.scale(rect.width()/view.width(), rect.height()/view.height());
+    auto shape = trans.map(orgPath);
+    return shape;
 }
-
-// void UserSvgItem::loadPath(QByteArray content)
-// {
-//     render = new QSvgRenderer(content);
-//     auto rect = attribute()->getLogicRect();
-//     render->setViewBox(rect);
-//     SvgPathDevice device(rect.size().toSize());
-//     QPainter painter(&device);
-//     render->render(&painter);
-//     auto list = device.getSvgPath();
-//     foreach (auto item, list) {
-//         path.addPath(item);
-//     }
-// }
-
 
 void UserSvgItem::parseXML(const QString &xml)
 {
     AbstractZoneItem::parseXML(xml);
-    auto data = attribute()->getData();
+    auto attr = attribute();
+    auto data = attr->getData();
     QList<QVariant> list;
     if (data.isValid()) {
         list = data.toList();
@@ -128,5 +100,18 @@ void UserSvgItem::parseXML(const QString &xml)
     }
     if (list.count() > 1) {
         render = new QSvgRenderer(list[1].toByteArray());
+        initOrgPath();
+    }
+}
+
+void UserSvgItem::initOrgPath()
+{
+    auto rect = logicRect;
+    SvgPathDevice device(rect.size().toSize());
+    QPainter painter(&device);
+    render->render(&painter, rect);
+    auto list = device.getSvgPath();
+    foreach (auto item, list) {
+        orgPath.addPath(item);
     }
 }

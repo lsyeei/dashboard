@@ -39,9 +39,13 @@ protected:
     void parseXML(const QString &xml) override;
 private:
     QString id;
-    // QPainterPath path;
-    QSvgRenderer *render;
-    // void loadPath(QByteArray content);
+    // SVG 的原始路径
+    QPainterPath orgPath;
+    QSvgRenderer *render{nullptr};
+    /**
+     * @brief initOrgPath 计算 SVG 的原始路径
+     */
+    void initOrgPath();
 
 };
 

@@ -1,21 +1,21 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #ifndef VARIANTUTIL_H
 #define VARIANTUTIL_H
 
@@ -50,6 +50,18 @@ public:
      * @return 不含类型信息的字符串
      */
     static QString toString(const QVariant &var);
+    /**
+     * @brief streamIn QVariant数据按照可解析格式写入数据流
+     * @param stream 数据流对象
+     * @param value QVariant数据
+     */
+    static void streamIn(QDataStream &stream, const QVariant &value);
+    /**
+     * @brief streamOut 按照写入数据的格式解析数据流
+     * @param stream 数据流对象
+     * @return 解析后的数据
+     */
+    static QVariant streamOut(QDataStream &stream);
 };
 
 inline QJsonValue VariantUtil::toJsonValue(const QVariant &var)
@@ -184,6 +196,84 @@ inline QString VariantUtil::toString(const QVariant &var)
         len = str.length();
     }while(1);
     return str;
+}
+
+inline void VariantUtil::streamIn(QDataStream &stream, const QVariant &value)
+{
+    if (value.metaType().id() == QMetaType::QVariantList ||
+        value.metaType().id() == QMetaType::QByteArrayList) {
+        auto list = value.toList();
+        int count = list.count();
+        stream << value.metaType().id() << count;
+        foreach (auto item, list) {
+            streamIn(stream, item);
+        }
+    }else if(value.metaType().id() == QMetaType::QVariantMap ||
+             value.metaType().id() == QMetaType::QVariantHash){
+        auto map = value.toMap();
+        int count = map.count();
+        stream << value.metaType().id() << count;
+        for(auto item = map.cbegin(); item != map.cend(); item++) {
+            streamIn(stream, item.key());
+            streamIn(stream, item.value());
+        }
+    }else if(value.metaType().id() == QMetaType::QVariantPair){
+        QVariantPair pair = value.value<QVariantPair>();
+        stream << value.metaType().id();
+        streamIn(stream, pair.first);
+        streamIn(stream, pair.second);
+    }else{
+        stream << value.metaType().id();
+        stream << value;
+    }
+}
+
+inline QVariant VariantUtil::streamOut(QDataStream &stream)
+{
+    int typeId = 0;
+    stream >> typeId;
+    if (typeId == QMetaType::QVariantList) {
+        int count{0};
+        stream >> count;
+        QVariantList list;
+        for (int i = 0; i < count; ++i) {
+            list << streamOut(stream);
+        }
+        return list;
+    }else if(typeId == QMetaType::QByteArrayList){
+        int count{0};
+        stream >> count;
+        QByteArrayList list;
+        for (int i = 0; i < count; ++i) {
+            list << streamOut(stream).toByteArray();
+        }
+        return QVariant::fromValue(list);
+    }else if(typeId == QMetaType::QVariantMap){
+        int count{0};
+        stream >> count;
+        QVariantMap map;
+        for (int i = 0; i < count; ++i) {
+            map[streamOut(stream).toString()] = streamOut(stream);
+        }
+        return map;
+    }else if(typeId == QMetaType::QVariantHash){
+        int count{0};
+        stream >> count;
+        QVariantHash hash;
+        for (int i = 0; i < count; ++i) {
+            hash[streamOut(stream).toString()] = streamOut(stream);
+        }
+        return hash;
+    }else if(typeId == QMetaType::QVariantPair){
+        QVariantPair pair;
+        pair.first = streamOut(stream);
+        pair.second = streamOut(stream);
+        return QVariant::fromValue(pair);
+    }
+    auto fieldMeta = QMetaType(typeId);
+    QVariant value(fieldMeta);
+    stream >> value;
+    return value;
 }
 
 #endif // VARIANTUTIL_H

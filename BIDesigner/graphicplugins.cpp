@@ -21,7 +21,7 @@
 #include "customplugin/usergraphicplugins.h"
 #include "igraphicplugin.h"
 #include "graphicplugingroup.h"
-#include "igraphicpluginCollection.h"
+#include "predefgraphicplugins.h"
 #include "qmimedata.h"
 
 #include <QCoreApplication>
@@ -31,24 +31,26 @@
 #include <QMessageBox>
 #include <QPluginLoader>
 #include <QPushButton>
+#include <QScrollArea>
 #include <icustomgraphic.h>
 
-QMap<QString, IGraphicPlugin *> GraphicPlugins::pluginMap = QMap<QString, IGraphicPlugin *>{};
-QPointer<UserGraphicPlugins> GraphicPlugins::userGraphics = nullptr;
+QPointer<UserGraphicPlugins> GraphicPlugins::userGraphics{nullptr};
+QPointer<PredefGraphicPlugins> GraphicPlugins::predefGraphics{nullptr};
 
 GraphicPlugins::GraphicPlugins(QWidget *parent)
     : QWidget{parent}
 {
     setAcceptDrops(true);
     QSizePolicy policy;
-    policy.setVerticalPolicy(QSizePolicy::Fixed);
+    policy.setVerticalPolicy(QSizePolicy::MinimumExpanding);
     policy.setHorizontalPolicy(QSizePolicy::Expanding);
     setSizePolicy(policy);
     setObjectName("groupCollect");
+    setMinimumHeight(100);
 
     layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignTop);
-    layout->setSizeConstraint(QLayout::SetDefaultConstraint);
+    layout->setSizeConstraint(QLayout::SetMinimumSize);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
     setLayout(layout);
@@ -58,10 +60,28 @@ GraphicPlugins::GraphicPlugins(QWidget *parent)
     layout->addWidget(addGroupBtn);
     connect(addGroupBtn.data(), SIGNAL(clicked(bool)), this, SLOT(onAddNewGroup()));
 
+    QScrollArea *scroll = new QScrollArea(this);
+    layout->addWidget(scroll);
+    scroll->setAlignment(Qt::AlignTop);
+    scroll->setWidgetResizable(true);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    groupPanel = new QWidget(scroll);
+    scroll->setWidget(groupPanel);
+    groupPanel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    auto panelLayout = new QVBoxLayout(groupPanel);
+    panelLayout->setAlignment(Qt::AlignTop);
+    panelLayout->setSizeConstraint(QLayout::SetMinimumSize);
+    panelLayout->setContentsMargins(0,0,0,0);
+    panelLayout->setSpacing(0);
+    groupPanel->setLayout(panelLayout);
     // 加载控件
-    loadGraphicPlugin();
+    loadPredefGraphicPlugin();
     // 加载用户图元控件
     loadUserGraphicPlugin();
+
 }
 
 GraphicPlugins::~GraphicPlugins()
@@ -69,22 +89,6 @@ GraphicPlugins::~GraphicPlugins()
     delete layout;
     layout = nullptr;
     selectedPlugin = nullptr;
-    if (!pluginMap.isEmpty()) {
-        auto plugins = pluginMap.values();
-        foreach (auto plugin, plugins){
-            delete plugin;
-            plugin = nullptr;
-        }
-        pluginMap.clear();
-    }
-    if (!groupWidgetMap.isEmpty()) {
-        auto widgets = groupWidgetMap.values();
-        foreach (auto group, widgets){
-            delete group;
-            group = nullptr;
-        }
-        groupWidgetMap.clear();
-    }
 }
 
 bool GraphicPlugins::event(QEvent *event)
@@ -102,10 +106,13 @@ IGraphicPlugin *GraphicPlugins::getSelectedPlugin() const
 
 IGraphicPlugin *GraphicPlugins::getPluginById(const QString id)
 {
-    if (pluginMap.contains(id)) {
-        return pluginMap[id];
+    if (predefGraphics) {
+        auto plugin = predefGraphics->getPluginById(id);
+        if (plugin) {
+            return plugin;
+        }
     }
-    return userGraphics->getPluginById(id);
+    return userGraphics?userGraphics->getPluginById(id):nullptr;
 }
 
 ICustomGraphic *GraphicPlugins::createGraphic(const QString &graphicId)
@@ -119,10 +126,14 @@ ICustomGraphic *GraphicPlugins::createGraphic(const QString &graphicId)
 
 QList<IGraphicPlugin *> GraphicPlugins::getAllPlugins()
 {
-    if (pluginMap.isEmpty()){
-        return QList<IGraphicPlugin *>();
+    QList<IGraphicPlugin *> result;
+    if (predefGraphics) {
+        result << predefGraphics->plugins();
     }
-    return pluginMap.values();
+    if (userGraphics) {
+        result << userGraphics->plugins();
+    }
+    return result;
 }
 
 ICustomGraphic *GraphicPlugins::createGraphic(const QString &graphicId, const QString &xmlText)
@@ -156,19 +167,11 @@ void GraphicPlugins::dragMoveEvent(QDragMoveEvent *event)
     }
 }
 
-void GraphicPlugins::graphicItemSelected(const QString item)
-{
-    // GraphicItemGroupWidget *widget = static_cast<GraphicItemGroupWidget *>(sender());
-    // QString id = genItemKey(widget->getGroupName(), itemName);
-    if (!pluginMap.contains(item)) {
-        return;
-    }
-    selectedPlugin = pluginMap[item];
-    emit graphicItemChanged(pluginMap[item]);
-}
-
 void GraphicPlugins::onAddNewGroup()
 {
+    if (userGraphics == nullptr) {
+        return;
+    }
     auto groupName = tr("新建分组");
     userGraphics->addNewGroup(groupName);
 }
@@ -180,90 +183,20 @@ void GraphicPlugins::onAddNewGroup()
 //     return hash.result().toHex();
 // }
 
-void GraphicPlugins::loadGraphicPlugin()
+void GraphicPlugins::loadPredefGraphicPlugin()
 {
-    QDir pluginsDir(QCoreApplication::applicationDirPath());
-    pluginsDir.setNameFilters({"*.dll", "*.so"});
-#if defined(Q_OS_WIN)
-    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-        pluginsDir.cdUp();
-#elif defined(Q_OS_MAC)
-    if (pluginsDir.dirName() == "MacOS") {
-        pluginsDir.cdUp();
-        pluginsDir.cdUp();
-        pluginsDir.cdUp();
-    }
-#endif
-    if (!pluginsDir.cd("plugins")){
-        QMessageBox::information(this, tr("提示"), tr("未找到插件目录"));
-        return;
-    }
-    const QStringList entries = pluginsDir.entryList(QDir::Files);
-
-    for (const QString &fileName : entries) {
-        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
-        if (!pluginLoader.load()){
-            qDebug() << "库加载失败：" << fileName << "; 错误提示：" << pluginLoader.errorString();
-            continue;
-        }
-        QObject *plugin = pluginLoader.instance();
-        if (plugin) {
-            auto *pluginCollection = qobject_cast<IGraphicPluginCollection *>(plugin);
-            if (pluginCollection){
-                auto pluginList = pluginCollection->graphicPlugins();
-                foreach (auto plugin, pluginList) {
-                    installPlugin(plugin);
-                }
-            }else{
-                IGraphicPlugin *graphicPlugin = qobject_cast<IGraphicPlugin *>(plugin);
-                if (graphicPlugin == nullptr){
-                    pluginLoader.unload();
-                } else {
-                    installPlugin(graphicPlugin);
-                }
-            }
-        }
-    }
+    predefGraphics = new PredefGraphicPlugins(groupPanel);
+    predefGraphics->load();
+    connect(predefGraphics, SIGNAL(graphicItemChanged(IGraphicPlugin*)),
+            this, SIGNAL(graphicItemChanged(IGraphicPlugin*)));
 }
 
 void GraphicPlugins::loadUserGraphicPlugin()
 {
-    userGraphics = new UserGraphicPlugins(this);
+    userGraphics = new UserGraphicPlugins(groupPanel);
     userGraphics->load();
     connect(userGraphics, SIGNAL(graphicItemChanged(IGraphicPlugin*)),
                         this, SIGNAL(graphicItemChanged(IGraphicPlugin*)));
-}
-
-void GraphicPlugins::installPlugin(IGraphicPlugin *graphicItem)
-{
-    QString group = graphicItem->group();
-    GraphicPluginGroup *groupWidget{nullptr};
-    // 如果该组已存在，加入该组，否则新建一组并加入
-    foreach (auto widget, groupWidgetMap) {
-        if (widget->getGroupName().compare(group) == 0) {
-            groupWidget = widget;
-        }
-    }
-    if (groupWidget == nullptr){
-        groupWidget = createGroupWidget(group);
-    }
-    // 将图元加入控件组
-    if (groupWidget->addPlugin(graphicItem)) {
-        QString id = graphicItem->id();
-        pluginMap[id] = graphicItem;
-    }
-}
-
-
-GraphicPluginGroup * GraphicPlugins::createGroupWidget(QString group)
-{
-    GraphicPluginGroup *groupWidget = new GraphicPluginGroup(group, groupWidgetMap.count(), this);
-    layout->addWidget(groupWidget);
-    groupWidgetMap[groupWidget->getGroupId()] = groupWidget;
-    connect(groupWidget, SIGNAL(graphicItemClicked(QString)),
-            this, SLOT(graphicItemSelected(QString)));
-
-    return groupWidget;
 }
 
 void GraphicPlugins::paletteChanged()
@@ -271,10 +204,14 @@ void GraphicPlugins::paletteChanged()
     auto p = palette();
     auto windowColor = p.brush(QPalette::Window).color().name();
     auto windowLightColor = p.brush(QPalette::Light).color().name();
-    foreach (auto item, groupWidgetMap){
-        item->setStyleSheet("#" + item->getGroupId() + "{border:1px solid "+windowLightColor+"; background:"+windowColor+";}");
+    if (predefGraphics) {
+        foreach (auto item, predefGraphics->groupWidgets()){
+            item->setStyleSheet("#" + item->getGroupId() + "{border:1px solid "+windowLightColor+"; background:"+windowColor+";}");
+        }
     }
-    foreach (auto item, userGraphics->groupWidgets()){
-        item->setStyleSheet("#" + item->getGroupId() + "{border:1px solid "+windowLightColor+"; background:"+windowColor+";}");
+    if (userGraphics) {
+        foreach (auto item, userGraphics->groupWidgets()){
+            item->setStyleSheet("#" + item->getGroupId() + "{border:1px solid "+windowLightColor+"; background:"+windowColor+";}");
+        }
     }
 }

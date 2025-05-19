@@ -17,6 +17,7 @@
  */
 
 #include "configmaster.h"
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QSqlQuery>
@@ -72,7 +73,7 @@ ConfigMaster::~ConfigMaster()
 
 void ConfigMaster::connectDB()
 {
-    auto currentPath = QDir::currentPath();
+    auto currentPath = QCoreApplication::applicationDirPath();
     QDir path(currentPath + appConfigs.path);
     if (!path.exists()) {
         path.mkdir(currentPath + appConfigs.path,
@@ -134,7 +135,7 @@ void ConfigMaster::initDbPwd(QSqlQuery *query)
 
 void ConfigMaster::createTables(QSqlQuery *query)
 {
-    auto file = QDir::currentPath() + appConfigs.path + appConfigs.initSql;
+    auto file = QCoreApplication::applicationDirPath() + appConfigs.path + appConfigs.initSql;
     QFile f(file);
     if (!f.exists()) {
         qWarning() << "缺失配置初始化文件:" << file;

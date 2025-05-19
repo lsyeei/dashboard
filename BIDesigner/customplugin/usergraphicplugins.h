@@ -18,6 +18,7 @@
 #ifndef USERGRAPHICPLUGINS_H
 #define USERGRAPHICPLUGINS_H
 
+#include <QHash>
 #include <QMap>
 #include <QObject>
 #include "customplugin/userplugintype.h"
@@ -36,6 +37,7 @@ public:
     bool addNewGroup(const QString &groupName);
     QList<GraphicPluginGroup*> groupWidgets();
     IGraphicPlugin *getPluginById(const QString &pluginId) const;
+    QList<IGraphicPlugin *> plugins() const;
 
 Q_SIGNALS:
     void graphicItemChanged(IGraphicPlugin *plugin);
@@ -46,16 +48,16 @@ protected Q_SLOTS:
     void onImportUserGraphics(qint32 groupId);
 
 private:
-    QWidget *parent;
-    QLayout *layout;
+    QWidget *parentWidget{nullptr};
+    QLayout *layout{nullptr};
     // 用户自定义控件索引的最小值
-    static const int minIdex{1000};
+    const int minIdex{1000};
     // 所有控件集合，key 控件group与name 生成的唯一ID，value 控件对象
-    static QHash<GraphicPluginGroup *, qint32> groupWidgetMap;
+    QHash<GraphicPluginGroup *, qint32> groupWidgetMap;
     // 用户自定义插件集合
     QMap<QString, IGraphicPlugin *> pluginMap;
     // 当前选中的插件
-    IGraphicPlugin *selectedPlugin;
+    // IGraphicPlugin *selectedPlugin;
     GraphicPluginGroup *createGroupWidget(const QString &group);
     /**
      * @brief suffix2Type 根据文件后缀确定插件类型

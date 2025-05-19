@@ -47,6 +47,7 @@ private:
     GraphicsItemGroup *createGroupGraphics(const QString &xml = nullptr);
     UserImageItem *createImgGraphics(const QString &xml = nullptr);
     UserSvgItem *createSvgGraphics(const QString &xml = nullptr);
+    QString appPath();
 };
 
 #endif // ABSTRACTUSERPLUGIN_H

@@ -26,11 +26,10 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QBuffer>
+#include <QCoreApplication>
 #include "configs.h"
 
-QHash<GraphicPluginGroup *, qint32> UserGraphicPlugins::groupWidgetMap = QHash<GraphicPluginGroup *, qint32>();
-
-UserGraphicPlugins::UserGraphicPlugins(QWidget *parent) : parent(parent) {
+UserGraphicPlugins::UserGraphicPlugins(QWidget *parent) : parentWidget(parent) {
     layout = parent->layout();
 }
 
@@ -98,9 +97,14 @@ IGraphicPlugin *UserGraphicPlugins::getPluginById(const QString &pluginId) const
     return pluginMap[pluginId];
 }
 
+QList<IGraphicPlugin *> UserGraphicPlugins::plugins() const
+{
+    return pluginMap.values();
+}
+
 GraphicPluginGroup *UserGraphicPlugins::createGroupWidget(const QString &group)
 {
-    GraphicPluginGroup *groupWidget = new GraphicPluginGroup(group, minIdex + groupWidgetMap.count(), parent);
+    GraphicPluginGroup *groupWidget = new GraphicPluginGroup(group, minIdex + groupWidgetMap.count(), parentWidget);
     groupWidget->setEditable(true);
     layout->addWidget(groupWidget);
     connect(groupWidget, SIGNAL(graphicItemClicked(QString)),
@@ -188,17 +192,17 @@ void UserGraphicPlugins::onGroupNameChanged(const QString &oldName, const QStrin
 
 void UserGraphicPlugins::onImportUserGraphics(qint32 groupId)
 {
-    auto files = QFileDialog::getOpenFileNames(parent, tr("导入图元"), QDir::currentPath(),
+    auto files = QFileDialog::getOpenFileNames(parentWidget, tr("导入图元"), QDir::currentPath(),
                                                "Images (*.svg *.png *.jpg *.bmp *.gif *.jpeg)");
     if (files.isEmpty()) {
         return;
     }
     // 检查用户控件路径是否存在
-    auto pluginPath = QDir::currentPath() + appConfigs.userPluginPath;
+    auto pluginPath = QCoreApplication::applicationDirPath() + appConfigs.userPluginPath;
     QDir dir(pluginPath);
     if (!dir.exists()) {
         if(!dir.mkdir(pluginPath)){
-            QMessageBox::warning(parent, tr("错误"), tr("无法创建路径：") + pluginPath);
+            QMessageBox::warning(parentWidget, tr("错误"), tr("无法创建路径：") + pluginPath);
             return;
         }
     }
@@ -212,7 +216,7 @@ void UserGraphicPlugins::onImportUserGraphics(qint32 groupId)
     auto groupPath = pluginPath + groupName;
     if (!dir.exists(groupPath)) {
         if(!dir.mkdir(groupPath)){
-            QMessageBox::warning(parent, tr("错误"), tr("无法创建路径：") + groupPath);
+            QMessageBox::warning(parentWidget, tr("错误"), tr("无法创建路径：") + groupPath);
             return;
         }
     }

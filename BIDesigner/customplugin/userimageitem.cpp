@@ -24,7 +24,14 @@ UserImageItem::UserImageItem(const QString &classId, const QString &imgPath, QGr
     attr->setData(id);
     auto brush = attr->getBrush();
     brush.setImage(imgPath);
+    brush.setStyle(Qt::TexturePattern);
     attr->setBrush(brush);
+    auto pen = attr->getPen();
+    pen.setStyle(Qt::NoPen);
+    attr->setPen(pen);
+    QPixmap img(imgPath);
+    auto imgSize = img.size();
+    setSize({60.0,60.0*imgSize.height()/imgSize.width()});
 }
 
 UserImageItem::UserImageItem(const QString &xml, QGraphicsItem *parent) : AbstractZoneItem(parent)

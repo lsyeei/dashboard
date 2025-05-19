@@ -16,7 +16,9 @@
 * limitations under the License.
 */
 #include "abstractuserplugin.h"
+#include "configs.h"
 #include "grouppropertyform.h"
+#include "userpluginpropertyform.h"
 #include "usersvgitem.h"
 #include <QBuffer>
 #include <QIcon>
@@ -85,10 +87,10 @@ QWidget *AbstractUserPlugin::propertyWidget()
 {
     switch(info.get_type()){
     case UserPluginType::SVG:
-        // return createSvgGraphics(xml);
+        return new UserPluginPropertyForm();
         break;
     case UserPluginType::IMG:
-        // return createImgGraphics(xml);
+        return new UserPluginPropertyForm();
         break;
     case UserPluginType::GROUP:
         return new GroupPropertyForm();
@@ -119,9 +121,14 @@ UserSvgItem *AbstractUserPlugin::createSvgGraphics(const QString &xml)
     if (!xml.isEmpty()) {
         graphic = new UserSvgItem(xml);
     }else{
-        graphic = new UserSvgItem(id(), info.get_path());
+        graphic = new UserSvgItem(id(), appPath() + info.get_path());
     }
     return graphic;
+}
+
+QString AbstractUserPlugin::appPath()
+{
+    return QCoreApplication::applicationDirPath();
 }
 
 UserImageItem *AbstractUserPlugin::createImgGraphics(const QString &xml)
@@ -130,7 +137,7 @@ UserImageItem *AbstractUserPlugin::createImgGraphics(const QString &xml)
     if (!xml.isEmpty()) {
         graphic = new UserImageItem(xml);
     }else{
-        graphic = new UserImageItem(id(), info.get_path());
+        graphic = new UserImageItem(id(), appPath() + info.get_path());
     }
     return graphic;
 }

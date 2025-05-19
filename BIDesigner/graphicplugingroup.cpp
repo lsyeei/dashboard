@@ -37,6 +37,7 @@
 GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget *parent)
     : QWidget{parent}, groupName(groupName)
 {
+    setParent(parent);
     widgetId = createId(groupName, index);
     setObjectName(widgetId);
     QSizePolicy policy;
@@ -46,7 +47,7 @@ GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget 
 
     layout = new QVBoxLayout (this);
     layout->setObjectName("layout");
-    layout->setSizeConstraint(QLayout::SetDefaultConstraint);
+    layout->setSizeConstraint(QLayout::SetMinimumSize);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
     titleWidget = new QWidget(this);
@@ -81,7 +82,7 @@ GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget 
     contentWidget->setObjectName("contentPanel");
     QSizePolicy contentPolicy;
     contentPolicy.setHorizontalPolicy(QSizePolicy::Expanding);
-    contentPolicy.setVerticalPolicy(QSizePolicy::Fixed);
+    contentPolicy.setVerticalPolicy(QSizePolicy::Minimum);
     contentWidget->setSizePolicy(contentPolicy);
     contentLayout = new FlowLayout(contentWidget);
     contentLayout->setSizeConstraint(QLayout::SetMinimumSize);
