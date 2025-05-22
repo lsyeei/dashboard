@@ -63,6 +63,10 @@ public:
     Entity(){};
     virtual QString getTableName() const = 0;
     virtual QList<QString> getPrimaryKey() const = 0;
+    /**
+     * @brief getFieldMap class field 到 table colum 的映射
+     * @return key 为 class field，value 为 table colum
+     */
     QMap<QString, QString> getFieldMap();
     QVariant getValueByColName(const QString &colName) const;
     void setValueByColName(const QString &colName, const QVariant &value);

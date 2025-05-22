@@ -112,7 +112,7 @@ bool GraphicPluginGroup::addPlugin(IGraphicPlugin *plugin)
     button->setToolTip(plugin->toolTip());
     button->setObjectName("shape_" + plugin->id());
 
-    itemWidgetMap[plugin->id()] = button;
+    pluginMap[plugin->id()] = button;
 
     button->setAcceptDrops(false);
     button->installEventFilter(this);
@@ -160,6 +160,9 @@ void GraphicPluginGroup::createEditBtns()
     importAct = popMenu->addAction(SvgHelper{QString{":/icons/icons/bottom.svg"}}
                                        .toPixmap(SvgHelper::Normal), tr("导入图元"));
     connect(importAct.data(), SIGNAL(triggered(bool)), this, SLOT(onImportClicked()));
+    manageAct = popMenu->addAction(SvgHelper{QString{":/icons/icons/manage.svg"}}
+                                       .toPixmap(SvgHelper::Normal), tr("管理图元"));
+    connect(manageAct.data(), SIGNAL(triggered(bool)), this, SLOT(onManageClicked()));
 }
 
 void GraphicPluginGroup::showEditBtns(bool showFlag)
@@ -200,6 +203,11 @@ void GraphicPluginGroup::onImportClicked()
     emit importGraphic(userGroupId);
 }
 
+void GraphicPluginGroup::onManageClicked()
+{
+    emit manageGraphic(userGroupId);
+}
+
 void GraphicPluginGroup::onNameEditEnd()
 {
     auto newName = titleEditor->text().trimmed();
@@ -233,6 +241,37 @@ void GraphicPluginGroup::setEditable(bool flag)
     editBtn->setVisible(flag);
 }
 
+void GraphicPluginGroup::clearGroup()
+{
+    foreach (auto btn, pluginMap) {
+        delete btn;
+        btn = nullptr;
+    }
+    pluginMap.clear();
+}
+
+bool GraphicPluginGroup::removePlugin(IGraphicPlugin *plugin)
+{
+    auto btn = pluginMap[plugin->id()];
+    if (btn) {
+        delete btn;
+    }else{
+        return false;
+    }
+    pluginMap.remove(plugin->id());
+    return true;
+}
+
+void GraphicPluginGroup::updatePlugin(IGraphicPlugin *plugin)
+{
+    auto btn = pluginMap[plugin->id()];
+    if (btn) {
+        btn->setText(plugin->name());
+        btn->setToolTip(plugin->toolTip());
+        btn->setIcon(plugin->icon());
+    }
+}
+
 QString GraphicPluginGroup::createId(QString name, qint32 index)
 {
     // QCryptographicHash hash(QCryptographicHash::Md5);
@@ -257,7 +296,7 @@ void GraphicPluginGroup::paletteChanged()
     contentWidget->setStyleSheet("#contentPanel{ background-color:"+baseColor+";} QToolButton{border:none;padding:3px;border-radius:5px;}"
                                  "QToolButton:hover{background-color:"+buttonLightColor+"}");
     // 修改图标
-    for (auto item = itemWidgetMap.cbegin(); item != itemWidgetMap.cend(); item++)
+    for (auto item = pluginMap.cbegin(); item != pluginMap.cend(); item++)
     {
         auto plugin = GraphicPlugins::getPluginById(item.key());
         item.value()->setIcon(plugin->icon());

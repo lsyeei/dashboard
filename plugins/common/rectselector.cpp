@@ -115,7 +115,7 @@ void RectSelector::initAdjuster()
     updateCorner();
 
     qreal offset = adjuster["topRight"]->boundingRect().width() + adjuster["rotate"]->boundingRect().width() / 2;
-    adjuster["rotate"]->setPos(viewRect.topRight() + QPointF(offset, -offset));
+    adjuster["rotate"]->setPos(adjusterRect.topRight() + QPointF(offset, -offset));
 }
 
 void RectSelector::updateCorner()

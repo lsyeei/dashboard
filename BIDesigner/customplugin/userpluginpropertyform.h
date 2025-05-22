@@ -43,6 +43,9 @@ private slots:
     void on_roundSize_valueChanged(int arg1);
     void on_rotation_valueChanged(double arg1);
     void posChanged(qint32 left, qint32 top, qint32 width, qint32 height, bool aspectRatio);
+    void lineStyleChanged(Qt::PenStyle style, QColor Color, int width);
+    void on_restoreBtn_clicked();
+
 private:
     Ui::UserPluginPropertyForm *ui;
     AbstractZoneItem *graphicItem;

@@ -36,6 +36,7 @@
         <file>icons/more-line.svg</file>
         <file>icons/bottom.svg</file>
         <file>icons/edit-box.svg</file>
+        <file>icons/manage.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>animation/path/icons/curvedLine.svg</file>

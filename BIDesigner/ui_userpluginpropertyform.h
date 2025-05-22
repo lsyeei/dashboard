@@ -10,16 +10,19 @@
 #define UI_USERPLUGINPROPERTYFORM_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include "bicombobox.h"
+#include "lineproperty.h"
 #include "posproperty.h"
 
 QT_BEGIN_NAMESPACE
@@ -32,6 +35,7 @@ public:
     QLabel *label_2;
     BIComboBox *stateBox;
     PosProperty *posProperty;
+    LineProperty *lineProperty;
     QHBoxLayout *horizontalLayout;
     QCheckBox *roundChecked;
     QSpacerItem *horizontalSpacer;
@@ -40,13 +44,16 @@ public:
     QLabel *label;
     QSpacerItem *horizontalSpacer_2;
     QDoubleSpinBox *rotation;
+    QHBoxLayout *horizontalLayout_4;
+    QPushButton *restoreBtn;
+    QSpacerItem *horizontalSpacer_3;
     QSpacerItem *verticalSpacer;
 
     void setupUi(QWidget *UserPluginPropertyForm)
     {
         if (UserPluginPropertyForm->objectName().isEmpty())
             UserPluginPropertyForm->setObjectName("UserPluginPropertyForm");
-        UserPluginPropertyForm->resize(320, 251);
+        UserPluginPropertyForm->resize(320, 314);
         verticalLayout = new QVBoxLayout(UserPluginPropertyForm);
         verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, 0, 0, 0);
@@ -85,6 +92,11 @@ public:
         posProperty->setAspectRatio(true);
 
         verticalLayout->addWidget(posProperty);
+
+        lineProperty = new LineProperty(UserPluginPropertyForm);
+        lineProperty->setObjectName("lineProperty");
+
+        verticalLayout->addWidget(lineProperty);
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(6);
@@ -140,6 +152,23 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_2);
 
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setObjectName("horizontalLayout_4");
+        restoreBtn = new QPushButton(UserPluginPropertyForm);
+        restoreBtn->setObjectName("restoreBtn");
+        QIcon icon(QIcon::fromTheme(QIcon::ThemeIcon::SystemReboot));
+        restoreBtn->setIcon(icon);
+        restoreBtn->setFlat(true);
+
+        horizontalLayout_4->addWidget(restoreBtn);
+
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_4->addItem(horizontalSpacer_3);
+
+
+        verticalLayout->addLayout(horizontalLayout_4);
+
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
         verticalLayout->addItem(verticalSpacer);
@@ -158,6 +187,7 @@ public:
         roundSize->setSuffix(QCoreApplication::translate("UserPluginPropertyForm", "px", nullptr));
         label->setText(QCoreApplication::translate("UserPluginPropertyForm", "\346\227\213\350\275\254", nullptr));
         rotation->setSuffix(QCoreApplication::translate("UserPluginPropertyForm", "\302\260C", nullptr));
+        restoreBtn->setText(QCoreApplication::translate("UserPluginPropertyForm", "\345\216\237\345\247\213\345\244\247\345\260\217", nullptr));
     } // retranslateUi
 
 };

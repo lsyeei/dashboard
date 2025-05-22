@@ -33,6 +33,7 @@ public:
     bool deleteById(QVariant id);
     bool updateById(const T &data);
     QList<T> selectList();
+    QList<T> selectList(const QString &where);
     bool insert(T *data);
     bool execSql(const QString &sql, bool autoCommit = true);
 private:
@@ -77,8 +78,8 @@ inline bool BaseMapper<T>::deleteById(const T &data)
     if(!isValid()){
         return false;
     }
-    auto obj = dynamic_cast<Entity*>(&data);
-    QString sql = QString("delete * from %1 where ").arg(table);
+    auto obj = dynamic_cast<const Entity*>(&data);
+    QString sql = QString("delete from %1 where ").arg(table);
     for(int i = 0; i< pkList.count(); i++){
         if (i > 0) {
             sql += " and ";
@@ -130,6 +131,10 @@ inline bool BaseMapper<T>::updateById(const T &data)
             }
             values += (values.isEmpty()?"":",") + item.value() + "=";
             values += "'" + value.toString() + "'";
+            break;            
+        case QMetaType::QByteArray:
+            values += values.isEmpty()?"thumb=X'":",thumb=X'";
+            values += QString(value.toByteArray().toHex(0)) + "'";
             break;
         default:
             if (value.toString().isEmpty()) {
@@ -154,12 +159,21 @@ inline bool BaseMapper<T>::updateById(const T &data)
 template<typename T>
 inline QList<T> BaseMapper<T>::selectList()
 {
+    return selectList("");
+}
+
+template<typename T>
+inline QList<T> BaseMapper<T>::selectList(const QString &where)
+{
     QList<T> result;
     if (!isValid()) {
         return result;
     }
     auto cols = fieldMap.values();
     auto sql = QString("select %1 from %2").arg(cols.join(','), table);
+    if (!where.isEmpty()) {
+        sql += " where " + where;
+    }
 
     auto flag = execSql(sql, false);
     if (!flag) {
@@ -289,7 +303,7 @@ inline bool BaseMapper<T>::selectById(QVariant id, T *data)
     }
     auto obj = dynamic_cast<Entity*>(data);
     query.first();
-    for(auto i=fieldMap.cbegin(); i != fieldMap.cend(); i++){qDebug() << i.value() << "=" << query.value(i.value());
+    for(auto i=fieldMap.cbegin(); i != fieldMap.cend(); i++){
         obj->setValue(i.key(),query.value(i.value()));
     }
     return true;

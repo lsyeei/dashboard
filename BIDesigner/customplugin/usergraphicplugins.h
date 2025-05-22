@@ -24,6 +24,7 @@
 #include "customplugin/userplugintype.h"
 #include "igraphicplugin.h"
 
+class UserPluginManageForm;
 class UserPluginDO;
 class QLayout;
 class GraphicPluginGroup;
@@ -34,6 +35,7 @@ public:
     UserGraphicPlugins(QWidget *parent);
     ~UserGraphicPlugins();
     bool load();
+    bool reloadGroup(qint32 groupId);
     bool addNewGroup(const QString &groupName);
     QList<GraphicPluginGroup*> groupWidgets();
     IGraphicPlugin *getPluginById(const QString &pluginId) const;
@@ -46,6 +48,9 @@ protected Q_SLOTS:
     void onRemoveGroup();
     void onGroupNameChanged(const QString &oldName, const QString &newName);
     void onImportUserGraphics(qint32 groupId);
+    void onManageUserGraphics(qint32 groupId);
+    void onPluginChanged(const UserPluginDO &data);
+    void onPluginRemoved(const UserPluginDO &data);
 
 private:
     QWidget *parentWidget{nullptr};
@@ -56,6 +61,7 @@ private:
     QHash<GraphicPluginGroup *, qint32> groupWidgetMap;
     // 用户自定义插件集合
     QMap<QString, IGraphicPlugin *> pluginMap;
+    UserPluginManageForm* form{nullptr};
     // 当前选中的插件
     // IGraphicPlugin *selectedPlugin;
     GraphicPluginGroup *createGroupWidget(const QString &group);
@@ -77,6 +83,12 @@ private:
      * @param widget 图元组窗口
      */
     void installPlugins(QList<UserPluginDO> plugins, GraphicPluginGroup *widget);
+    /**
+     * @brief getGroupWidget 获取指定组的控件
+     * @param groupId 组ID
+     * @return 控件对象
+     */
+    GraphicPluginGroup *getGroupWidget(qint32 groupId);
 };
 
 #endif // USERGRAPHICPLUGINS_H

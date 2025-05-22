@@ -16,7 +16,6 @@
 * limitations under the License.
 */
 #include "abstractuserplugin.h"
-#include "configs.h"
 #include "grouppropertyform.h"
 #include "userpluginpropertyform.h"
 #include "usersvgitem.h"
@@ -29,10 +28,19 @@
 AbstractUserPlugin::AbstractUserPlugin(const QString &groupName, const UserPluginDO &info)
     : groupName(groupName), info(info) {}
 
+void AbstractUserPlugin::updatePluginInfo(const UserPluginDO &data)
+{
+    info = data;
+}
+
+QString AbstractUserPlugin::pluginId(const UserPluginDO &data)
+{
+    return QString("__user-%2-%3").arg(data.get_groupId()).arg(data.get_id());
+}
 
 QString AbstractUserPlugin::id() const
 {
-    return QString("%1-%2-%3").arg(groupName).arg(info.get_name()).arg(info.get_id());
+    return pluginId(info);
 }
 
 QString AbstractUserPlugin::name() const
@@ -47,7 +55,10 @@ QString AbstractUserPlugin::group() const
 
 QString AbstractUserPlugin::toolTip() const
 {
-    return info.get_name();
+    if(info.get_note().isEmpty()){
+        return info.get_name();
+    }
+    return info.get_note();
 }
 
 QString AbstractUserPlugin::whatsThis() const

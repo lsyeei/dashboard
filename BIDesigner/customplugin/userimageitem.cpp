@@ -32,6 +32,8 @@ UserImageItem::UserImageItem(const QString &classId, const QString &imgPath, QGr
     QPixmap img(imgPath);
     auto imgSize = img.size();
     setSize({60.0,60.0*imgSize.height()/imgSize.width()});
+    attr->setExtraP1(imgSize.width());
+    attr->setExtraP2(imgSize.height());
 }
 
 UserImageItem::UserImageItem(const QString &xml, QGraphicsItem *parent) : AbstractZoneItem(parent)
@@ -53,7 +55,7 @@ QPainterPath UserImageItem::shapePath() const
     if (attr->getRound()) {
         arcSize = attr->getArcSize();
     }
-
+    auto pen = attr->getPen();
     path.addRoundedRect(logicRect, arcSize, arcSize);
     return path;
 }

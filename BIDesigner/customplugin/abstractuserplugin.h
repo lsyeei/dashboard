@@ -30,8 +30,10 @@ class AbstractUserPlugin : public IGraphicPlugin
 public:
     AbstractUserPlugin(const QString &groupName, const UserPluginDO &info);
 
-    // IGraphicPlugin interface
 public:
+    void updatePluginInfo(const UserPluginDO &data);
+    static QString pluginId(const UserPluginDO &data);
+    // IGraphicPlugin interface
     QString id() const override;
     QString name() const override;
     QString group() const override;

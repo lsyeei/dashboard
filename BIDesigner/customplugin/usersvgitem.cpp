@@ -37,9 +37,15 @@ UserSvgItem::UserSvgItem(const QString &classId, const QString &svgPath, QGraphi
     auto attr = attribute();
     attr->setData(data);
 
+    auto pen = attr->getPen();
+    pen.setStyle(Qt::NoPen);
+    attr->setPen(pen);
+
     render = new QSvgRenderer(array);
     auto view = render->viewBoxF();
     setSize({60.0,60.0*view.height()/view.width()});
+    attr->setExtraP1(view.width());
+    attr->setExtraP2(view.height());
 
     initOrgPath();
 }
@@ -60,18 +66,30 @@ void UserSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
+    painter->save();
 
+    auto attr = attribute();
+    auto pen = attr->getPen();
+    if(!pen.noPen()){
+        auto arcSize = 0;
+        if (attr->getRound()) {
+            arcSize = attr->getArcSize();
+        }
+        painter->setPen(pen.getPen());
+        painter->drawRoundedRect(logicRect, arcSize, arcSize);
+        painter->setClipping(true);
+        QPainterPath path;
+        auto offset = pen.getWidth()/2;
+        path.addRoundedRect(logicRect.adjusted(offset,offset,-offset,-offset), arcSize, arcSize);
+        painter->setClipPath(path);
+    }
     if (render) {
-        painter->save();
-
         painter->setRenderHint(QPainter::Antialiasing);
         painter->setRenderHint(QPainter::TextAntialiasing);
         painter->setRenderHint(QPainter::VerticalSubpixelPositioning);
-
         render->render(painter, logicRect);
-
-        painter->restore();
     }
+    painter->restore();
 }
 
 
@@ -83,6 +101,15 @@ QPainterPath UserSvgItem::shapePath() const
     trans.translate(rect.x(),rect.y());
     trans.scale(rect.width()/view.width(), rect.height()/view.height());
     auto shape = trans.map(orgPath);
+    auto attr = attribute();
+    auto pen = attr->getPen();
+    if(!pen.noPen()){
+        auto arcSize = 0;
+        if (attr->getRound()) {
+            arcSize = attr->getArcSize();
+        }
+        shape.addRoundedRect(logicRect,arcSize,arcSize);
+    }
     return shape;
 }
 

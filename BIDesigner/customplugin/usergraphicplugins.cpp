@@ -19,6 +19,7 @@
 #include "customplugin/abstractuserplugin.h"
 #include "customplugin/userplugindo.h"
 #include "customplugin/userplugingroupdo.h"
+#include "customplugin/userpluginmanageform.h"
 #include "graphicplugingroup.h"
 #include <QIcon>
 #include <QLayout>
@@ -73,6 +74,20 @@ bool UserGraphicPlugins::load()
     return true;
 }
 
+bool UserGraphicPlugins::reloadGroup(qint32 groupId)
+{
+    GraphicPluginGroup *groupWidget = getGroupWidget(groupId);
+    if (groupWidget == nullptr) {
+        return false;
+    }
+    // 清空原有控件
+    groupWidget->clearGroup();
+    // 重新加载控件
+    auto plugins = ConfigMaster::instance()->userPlugin->list(QString("group_id=").arg(groupId));
+    installPlugins(plugins, groupWidget);
+    return true;
+}
+
 bool UserGraphicPlugins::addNewGroup(const QString &groupName)
 {
     UserPluginGroupDO group;
@@ -114,6 +129,8 @@ GraphicPluginGroup *UserGraphicPlugins::createGroupWidget(const QString &group)
             this, SLOT(onGroupNameChanged(QString,QString)));
     connect(groupWidget, SIGNAL(importGraphic(qint32)),
             this, SLOT(onImportUserGraphics(qint32)));
+    connect(groupWidget, SIGNAL(manageGraphic(qint32)),
+            this, SLOT(onManageUserGraphics(qint32)));
     return groupWidget;
 }
 
@@ -149,6 +166,18 @@ void UserGraphicPlugins::installPlugins(QList<UserPluginDO> plugins, GraphicPlug
         pluginMap[id] = graphic;
         widget->addPlugin(graphic);
     }
+}
+
+GraphicPluginGroup *UserGraphicPlugins::getGroupWidget(qint32 groupId)
+{
+    GraphicPluginGroup *groupWidget{nullptr};
+    for (auto item = groupWidgetMap.begin(); item != groupWidgetMap.end(); item++) {
+        if (item.value() == groupId) {
+            groupWidget = item.key();
+            break;
+        }
+    }
+    return groupWidget;
 }
 
 void UserGraphicPlugins::onGraphicItemSelected(QString itemId)
@@ -207,8 +236,7 @@ void UserGraphicPlugins::onImportUserGraphics(qint32 groupId)
         }
     }
     // 创建控件组目录
-    auto obj = sender();
-    auto groupWidget = dynamic_cast<GraphicPluginGroup*>(obj);
+    auto groupWidget = getGroupWidget(groupId);
     if (groupWidget == nullptr) {
         return;
     }
@@ -240,6 +268,66 @@ void UserGraphicPlugins::onImportUserGraphics(qint32 groupId)
         ConfigMaster::instance()->userPlugin->save(&plugin);
     }
     // 加载新导入的图元控件
-    auto plugins = ConfigMaster::instance()->userPlugin->list();
+    auto plugins = ConfigMaster::instance()->userPlugin->list(QString("group_id=%1").arg(groupId));
     installPlugins(plugins, groupWidget);
+}
+
+void UserGraphicPlugins::onManageUserGraphics(qint32 groupId)
+{
+    if (form == nullptr) {
+        form = new UserPluginManageForm(groupId, parentWidget);
+        connect(form, &UserPluginManageForm::importEvent,
+                this, &UserGraphicPlugins::onImportUserGraphics);
+        connect(form, &UserPluginManageForm::dataChanged,
+                this, &UserGraphicPlugins::onPluginChanged);
+        connect(form, &UserPluginManageForm::remove,
+                this, &UserGraphicPlugins::onPluginRemoved);
+    }else{
+        form->setGroup(groupId);
+    }
+
+    form->show();
+}
+
+void UserGraphicPlugins::onPluginChanged(const UserPluginDO &data)
+{
+    auto id = AbstractUserPlugin::pluginId(data);
+    auto obj = pluginMap[id];
+    if (obj) {
+        auto plugin = dynamic_cast<AbstractUserPlugin*>(obj);
+        if (plugin) {
+            if(!ConfigMaster::instance()->userPlugin->updateById(data)){
+                return;
+            }
+            plugin->updatePluginInfo(data);
+            auto widget = getGroupWidget(data.get_groupId());
+            if (widget) {
+                widget->updatePlugin(plugin);
+            }
+        }
+    }
+}
+
+void UserGraphicPlugins::onPluginRemoved(const UserPluginDO &data)
+{
+    auto id = AbstractUserPlugin::pluginId(data);
+    auto obj = pluginMap[id];
+    if (obj) {
+        auto plugin = dynamic_cast<AbstractUserPlugin*>(obj);
+        if (plugin) {
+            if (!ConfigMaster::instance()->userPlugin->deleteById(data)){
+                return;
+            }
+            // 删除文件
+            auto filePath = QCoreApplication::applicationDirPath() + data.get_path();
+            QFile::remove(filePath);
+            // 从控件组中移除
+            auto widget = getGroupWidget(data.get_groupId());
+            if (widget) {
+                widget->removePlugin(plugin);
+            }
+        }
+        delete obj;
+        pluginMap.remove(id);
+    }
 }

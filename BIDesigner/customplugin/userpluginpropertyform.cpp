@@ -27,6 +27,8 @@ UserPluginPropertyForm::UserPluginPropertyForm(QWidget *parent)
     // 关联事件
     connect(ui->posProperty, SIGNAL(propertyChanged(qint32,qint32,qint32,qint32,bool)),
             this, SLOT(posChanged(qint32,qint32,qint32,qint32,bool)));
+    connect(ui->lineProperty, SIGNAL(propertyChanged(Qt::PenStyle,QColor,int)),
+            this, SLOT(lineStyleChanged(Qt::PenStyle,QColor,int)));
 }
 
 UserPluginPropertyForm::~UserPluginPropertyForm()
@@ -47,6 +49,12 @@ void UserPluginPropertyForm::updateData()
     ui->posProperty->setWidth(width);
     ui->posProperty->setHeight(height);
     ui->posProperty->setAspectRatio(attr.getAspectRatio());
+
+    auto pen = attr.getPen();
+    ui->lineProperty->setShowLine(!pen.noPen());
+    ui->lineProperty->setLineStyle(pen.getStyle());
+    ui->lineProperty->setLineColor(pen.getColor());
+    ui->lineProperty->setLineWidth(pen.getWidth());
 
     QSignalBlocker roundBlocker(ui->roundSize);
     QSignalBlocker roundBlocker2(ui->roundChecked);
@@ -142,3 +150,21 @@ void UserPluginPropertyForm::posChanged(qint32 left, qint32 top, qint32 width, q
     }
     graphicItem->updateAttribute(&attr);
 }
+
+void UserPluginPropertyForm::lineStyleChanged(Qt::PenStyle style, QColor Color, int width)
+{
+    auto pen = attr.getPen();
+    pen.setColor(Color.name());
+    pen.setStyle(style);
+    pen.setWidth(width);
+    attr.setPen(pen);
+    graphicItem->updateAttribute(&attr);
+}
+
+void UserPluginPropertyForm::on_restoreBtn_clicked()
+{
+    attr.setWidth(attr.getExtraP1());
+    attr.setHeight(attr.getExtraP2());
+    graphicItem->updateAttribute(&attr);
+}
+

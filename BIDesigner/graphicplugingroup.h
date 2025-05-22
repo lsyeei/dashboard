@@ -57,6 +57,21 @@ public:
      * @param flag true允许编辑组，false 不允许编辑
      */
     void setEditable(bool flag);
+    /**
+     * @brief clearGroup 清空图元
+     */
+    void clearGroup();
+    /**
+     * @brief removePlugin 删除图元控件
+     * @param plugin 图元对象
+     * @return true 成功，false 失败
+     */
+    bool removePlugin(IGraphicPlugin *plugin);
+    /**
+     * @brief updatePlugin 更新图元控件
+     * @param plugin 图元对象
+     */
+    void updatePlugin(IGraphicPlugin *plugin);
 
 Q_SIGNALS:
     /**
@@ -75,6 +90,7 @@ Q_SIGNALS:
      */
     void nameChanged(const QString &noldName, const QString &newName);
     void importGraphic(qint32 userGroupId);
+    void manageGraphic(qint32 userGroupId);
 
 private Q_SLOTS:
 
@@ -82,6 +98,7 @@ private Q_SLOTS:
     void onEditClicked();
     void onDeleteClicked();
     void onImportClicked();
+    void onManageClicked();
     void onNameEditEnd();
 
 private:
@@ -95,12 +112,13 @@ private:
     QPointer<QAction> renameAct;
     QPointer<QAction> delAct;
     QPointer<QAction> importAct;
+    QPointer<QAction> manageAct;
     QLabel *icon;
     QLabel *title;
     QWidget *contentWidget;
     FlowLayout *contentLayout;
     // 图元集合，key 图元ID，value 图元控件对象
-    QMap<QString, QToolButton *> itemWidgetMap;
+    QMap<QString, QToolButton *> pluginMap;
     // 代表图元的图表大小
     qint16 iconWidth{32};
     // 是否显示图元名称

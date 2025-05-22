@@ -45,6 +45,7 @@ SOURCES += \
     customplugin/usergraphicplugins.cpp \
     customplugin/abstractuserplugin.cpp \
     customplugin/userimageitem.cpp \
+    customplugin/userpluginmanageform.cpp \
     customplugin/userpluginpropertyform.cpp \
     customplugin/usersvgitem.cpp \
     exportdialog.cpp \
@@ -110,6 +111,7 @@ HEADERS += \
     customplugin/abstractuserplugin.h \
     customplugin/userplugingroupdo.h \
     customplugin/userplugingroupservice.h \
+    customplugin/userpluginmanageform.h \
     customplugin/userpluginpropertyform.h \
     customplugin/userpluginservice.h \
     customplugin/userplugintype.h \
@@ -117,6 +119,9 @@ HEADERS += \
     dbutil/basemapper.h \
     dbutil/baseservice.h \
     dbutil/entity.h \
+    dbutil/entitytablemodel.h \
+    dbutil/imagedelegate.h \
+    dbutil/tablemodelevent.h \
     exportdialog.h \
     filetemplate.h \
     graphicplugingroup.h \
@@ -134,6 +139,7 @@ HEADERS += \
 
 FORMS += \
     animation/animationform.ui \
+    customplugin/userpluginmanageform.ui \
     customplugin/userpluginpropertyform.ui \
     exportdialog.ui \
     graphicproperty.ui \
