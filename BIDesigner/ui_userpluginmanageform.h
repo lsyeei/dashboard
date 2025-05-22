@@ -88,7 +88,7 @@ public:
     void retranslateUi(QDialog *userPluginManageForm)
     {
         userPluginManageForm->setWindowTitle(QCoreApplication::translate("UserPluginManageForm", "\347\256\241\347\220\206\345\233\276\345\205\203", nullptr));
-        label->setText(QCoreApplication::translate("UserPluginManageForm", "\346\217\220\347\244\272\357\274\232\345\220\215\347\247\260\345\222\214\346\263\250\351\207\212\345\217\257\344\273\245\345\234\250\345\210\227\350\241\250\344\270\255\344\277\256\346\224\271", nullptr));
+        label->setText(QCoreApplication::translate("UserPluginManageForm", "\346\217\220\347\244\272\357\274\232\345\220\215\347\247\260\345\222\214\345\244\207\346\263\250\345\217\257\344\273\245\345\234\250\345\210\227\350\241\250\344\270\255\344\277\256\346\224\271", nullptr));
         importBtn->setText(QCoreApplication::translate("UserPluginManageForm", "\345\257\274\345\205\245", nullptr));
         delBtn->setText(QCoreApplication::translate("UserPluginManageForm", "\345\210\240\351\231\244", nullptr));
     } // retranslateUi

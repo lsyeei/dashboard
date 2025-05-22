@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>userPluginManageForm</class>
+ <class>UserPluginManageForm</class>
  <widget class="QDialog" name="userPluginManageForm">
   <property name="windowModality">
    <enum>Qt::WindowModality::WindowModal</enum>
