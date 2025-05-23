@@ -72,6 +72,9 @@ MainWindow::MainWindow(QWidget *parent)
     initProjectPropertyForm();
     // 动画属性
     initAnimateForm();
+    // 初始化右键菜单
+    initPopMenu();
+    ui->graphicsView->installEventFilter(this);
 }
 
 MainWindow::~MainWindow()
@@ -85,6 +88,17 @@ bool MainWindow::event(QEvent *event)
         paletteCanged();
     }
     return QMainWindow::event(event);
+}
+
+bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == ui->graphicsView && event->type() == QEvent::ContextMenu) {
+        auto e = dynamic_cast<QContextMenuEvent*>(event);
+        onViewMenuEvent(e);
+        event->accept();
+        return true;
+    }
+    return QObject::eventFilter(watched, event);
 }
 
 void MainWindow::initStatusBar()
@@ -237,6 +251,60 @@ void MainWindow::paletteCanged()
     zoomBtn->setIcon(QIcon(SvgHelper{QString{":/icons/icons/arrow-down.svg"}}.toPixmap(SvgHelper::Normal)));
 }
 
+void MainWindow::initPopMenu()
+{
+    graphicMenu = new QMenu(ui->graphicsView);
+    graphicMenu->addAction(ui->redo);
+    graphicMenu->addAction(ui->undo);
+    graphicMenu->addSeparator();
+    graphicMenu->addAction(ui->doCopy);
+    graphicMenu->addAction(ui->doCut);
+    graphicMenu->addAction(ui->doPast);
+    graphicMenu->addAction(ui->doDelete);
+    graphicMenu->addSeparator();
+    graphicMenu->addAction(ui->doSelectAll);
+    graphicMenu->addAction(ui->doUnselectAll);
+    graphicMenu->addSeparator();
+    auto groupMenu = graphicMenu->addMenu(ui->group->icon(),tr("组合"));
+    groupMenu->addAction(ui->group);
+    groupMenu->addAction(ui->ungroup);
+    auto alignMenu = graphicMenu->addMenu(ui->alignLeft->icon(),tr("对齐"));
+    alignMenu->addAction(ui->alignLeft);
+    alignMenu->addAction(ui->alignRight);
+    alignMenu->addAction(ui->alignHorizon);
+    alignMenu->addAction(ui->alignTop);
+    alignMenu->addAction(ui->alignBottom);
+    alignMenu->addAction(ui->alignVertical);
+    alignMenu->addSeparator();
+    alignMenu->addAction(ui->distributeHorizon);
+    alignMenu->addAction(ui->distributeVertical);
+    auto distMenu = graphicMenu->addMenu(ui->toTop->icon(), tr("排列"));
+    distMenu->addAction(ui->toTop);
+    distMenu->addAction(ui->toBottom);
+    distMenu->addAction(ui->toFront);
+    distMenu->addAction(ui->toBack);
+    graphicMenu->addAction(ui->doExport);
+    graphicMenu->addAction(ui->saveToLib);
+
+    viewMenu = new QMenu(ui->graphicsView);
+    viewMenu->addAction(ui->doPast);
+    viewMenu->addSeparator();
+    viewMenu->addAction(ui->redo);
+    viewMenu->addAction(ui->undo);
+    viewMenu->addSeparator();
+    viewMenu->addAction(ui->doSelectAll);
+    viewMenu->addAction(ui->doUnselectAll);
+    viewMenu->addSeparator();
+    viewMenu->addAction(ui->zoomin);
+    viewMenu->addAction(ui->zoomout);
+    viewMenu->addAction(ui->zoomFitWindow);
+    viewMenu->addAction(ui->zoomFitWidth);
+    viewMenu->addSeparator();
+    viewMenu->addAction(ui->showViewGrid);
+    viewMenu->addAction(ui->showViewRefLine);
+    viewMenu->addAction(ui->showViewRuler);
+}
+
 void MainWindow::initToolBar()
 {
 
@@ -271,7 +339,7 @@ void MainWindow::initMenu()
         menu->addMenu(subMenu);
     }
     // 视图缩放菜单
-    zoomMenu = new QMenu(ui->toolBar);
+    zoomMenu = new QMenu(tr("缩放"),ui->toolBar);
     zoomMenu->addAction(ui->zoom25);
     zoomMenu->addAction(ui->zoom50);
     zoomMenu->addAction(ui->zoom75);
@@ -296,6 +364,11 @@ void MainWindow::setMenuEvent()
     connect(ui->doOpen, SIGNAL(triggered(bool)), this, SLOT(doOpen()));
     connect(ui->doSave, SIGNAL(triggered(bool)), this, SLOT(doSave()));
     connect(ui->doExport, SIGNAL(triggered(bool)), this, SLOT(doExport()));
+    // 编辑
+    connect(ui->doCopy, SIGNAL(triggered(bool)), ui->graphicsView, SLOT(doCopy()));
+    connect(ui->doCut, SIGNAL(triggered(bool)), ui->graphicsView, SLOT(doCut()));
+    connect(ui->doPast, SIGNAL(triggered(bool)), ui->graphicsView, SLOT(doPast()));
+    connect(ui->doDelete, SIGNAL(triggered(bool)), ui->graphicsView, SLOT(doDelete()));
     // 前后次序设置
     connect(ui->toFront, SIGNAL(triggered(bool)), this, SLOT(doZOrder()));
     connect(ui->toBack, SIGNAL(triggered(bool)), this, SLOT(doZOrder()));
@@ -343,6 +416,7 @@ void MainWindow::setMenuEvent()
     connect(ui->zoomDefine, SIGNAL(triggered(bool)), this, SLOT(doZoom()));
 
     connect(ui->doAbout, SIGNAL(triggered(bool)), this, SLOT(showAbout()));
+    connect(ui->saveToLib, SIGNAL(triggered(bool)), this, SLOT(saveToLib()));
 }
 
 void MainWindow::initGraphicsWidget()
@@ -705,7 +779,6 @@ void MainWindow::doExport()
     }
 }
 
-
 void MainWindow::doGroup()
 {
     ui->graphicsView->createGroup();
@@ -821,6 +894,7 @@ void MainWindow::showGrid(bool flag)
     }else{
         ui->showViewGrid->setChecked(flag);
     }
+    ui->graphicsView->setShowGrid(flag);
 }
 
 void MainWindow::showRefLine(bool flag)
@@ -859,4 +933,27 @@ void MainWindow::showAbout()
                     "Email：lsyeei@163.com\r\n\r\n"};
     msg.setWindowModality(Qt::ApplicationModal);
     msg.exec();
+}
+
+void MainWindow::saveToLib()
+{
+    auto items = scene->selectedItems();
+    if (items.isEmpty()) {
+        return;
+    }
+    if(graphicPluginWidget){
+        graphicPluginWidget->saveToLib(items);
+    }
+}
+
+void MainWindow::onViewMenuEvent(QContextMenuEvent *event)
+{
+    auto pt = event->pos();
+    auto item = scene->itemAt(ui->graphicsView->mapToScene(pt),
+                              ui->graphicsView->transform());
+    if (item) {
+        graphicMenu->popup(event->globalPos());
+    }else{
+        viewMenu->popup(event->globalPos());
+    }
 }

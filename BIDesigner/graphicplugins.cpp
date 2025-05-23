@@ -145,6 +145,11 @@ ICustomGraphic *GraphicPlugins::createGraphic(const QString &graphicId, const QS
     return nullptr;
 }
 
+void GraphicPlugins::saveToLib(QList<QGraphicsItem *> items)
+{
+    userGraphics->saveToLib(items);
+}
+
 void GraphicPlugins::dragEnterEvent(QDragEnterEvent *event)
 {
     auto obj = event->source();

@@ -104,7 +104,7 @@ public:
     void modifyItemName(QString name);
     PageProperty getPageProperty() const;
     void setPageProperty(const PageProperty &newPageProperty);
-
+    void setShowGrid(bool flag);
     void setShowScale(bool newShowScale);
 
     void setShowRefLine(bool flag);
@@ -118,6 +118,11 @@ public:
 Q_SIGNALS:
     void mouseMove(QMouseEvent *event);
     void zoomEvent(qint16 zoom);
+public Q_SLOTS:
+    void doCopy();
+    void doCut();
+    void doPast();
+    void doDelete();
 protected:
     // QWidget interface
     void mousePressEvent(QMouseEvent *event) override;
@@ -188,6 +193,7 @@ private:
     bool isDrag{false};
     // 页面属性
     PageProperty pageProperty;
+    Qt::PenStyle lastPenStyle{Qt::DashLine};
     // 显示参考线
     bool showRefLine{true};
     // 通过拖放方式创建
@@ -226,6 +232,6 @@ private:
      */
     QHash<QGraphicsItem *, QPointF> getItemsPos(QList<QGraphicsItem*> items);
     QRegion rubberBandRegion(const QWidget *widget, const QRect &rect) const;
-};
 
+};
 #endif // BIGRAPHICSVIEW_H

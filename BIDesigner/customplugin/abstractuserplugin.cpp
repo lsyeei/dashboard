@@ -16,11 +16,14 @@
 * limitations under the License.
 */
 #include "abstractuserplugin.h"
+#include "bigraphicsscene.h"
+#include "graphicplugins.h"
 #include "grouppropertyform.h"
 #include "userpluginpropertyform.h"
 #include "usersvgitem.h"
 #include <QBuffer>
 #include <QIcon>
+#include <filetemplate.h>
 #include "customplugin/userimageitem.h"
 #include "graphicsitemgroup.h"
 #include "icustomgraphic.h"
@@ -90,6 +93,9 @@ ICustomGraphic *AbstractUserPlugin::createItem(const QString &xml)
     case UserPluginType::GROUP:
         return createGroupGraphics(xml);
         break;
+    case UserPluginType::SYSTEM:
+        return createSystemGraphics(xml);
+        break;
     }
     return nullptr;
 }
@@ -106,6 +112,9 @@ QWidget *AbstractUserPlugin::propertyWidget()
     case UserPluginType::GROUP:
         return new GroupPropertyForm();
         break;
+    case UserPluginType::SYSTEM:
+        return getSystemPropertyForm();
+        break;
     }
     return nullptr;
 }
@@ -117,12 +126,7 @@ GraphicsItemGroup *AbstractUserPlugin::createGroupGraphics(const QString &xml)
     }
 
     // 读取文件
-    QString content;
-    QFile file(info.get_path());
-    file.open(QFile::ReadOnly);
-    QTextStream stream(&file);
-    stream >> content;
-    file.close();
+    QString content = fileContent();
     return new GraphicsItemGroup(content);
 }
 
@@ -137,9 +141,66 @@ UserSvgItem *AbstractUserPlugin::createSvgGraphics(const QString &xml)
     return graphic;
 }
 
+ICustomGraphic *AbstractUserPlugin::createSystemGraphics(const QString &xml)
+{
+    // 读取文件
+    QString content = fileContent();
+    if (!xml.isEmpty()) {
+        content = xml;
+    }
+    auto items = BIGraphicsScene::toItems(content);
+    if (!items.isEmpty()) {
+        return dynamic_cast<ICustomGraphic *>(items[0]);
+    }
+    return nullptr;
+    // QString classId = pluginIdInContent(content);
+    // return GraphicPlugins::createGraphic(classId, content);
+}
+
 QString AbstractUserPlugin::appPath()
 {
     return QCoreApplication::applicationDirPath();
+}
+
+QWidget *AbstractUserPlugin::getSystemPropertyForm()
+{
+    auto graphic = createSystemGraphics(fileContent());
+    if (graphic == nullptr) {
+        return nullptr;
+    }
+
+    auto id = graphic->classId();//pluginIdInContent(fileContent());
+    delete graphic;
+    if (id.isEmpty()) {
+        return nullptr;
+    }
+    auto plugin = GraphicPlugins::getPluginById(id);
+    if (plugin) {
+        return plugin->propertyWidget();
+    }
+    return nullptr;
+}
+
+QString AbstractUserPlugin::fileContent()
+{
+    QString content;
+    QFile file(QCoreApplication::applicationDirPath() + info.get_path());
+    file.open(QFile::ReadOnly);
+    content = QString::fromLocal8Bit(file.readAll());
+    file.close();
+    return content;
+}
+
+QString AbstractUserPlugin::pluginIdInContent(const QString content)
+{
+    typedef XmlTemplate::shapesTemplate::itemTemplate itemTemplate;
+    QRegularExpression reg(QString("%1=\\\"([^\\\"]+)\\\"").arg(itemTemplate::classId));
+    auto result = reg.match(content);
+    QString classId = "";
+    if (result.hasMatch()){
+        classId = result.captured(1);
+    }
+    return classId;
 }
 
 UserImageItem *AbstractUserPlugin::createImgGraphics(const QString &xml)

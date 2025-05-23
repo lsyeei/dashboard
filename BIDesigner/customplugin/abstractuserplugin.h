@@ -49,7 +49,16 @@ private:
     GraphicsItemGroup *createGroupGraphics(const QString &xml = nullptr);
     UserImageItem *createImgGraphics(const QString &xml = nullptr);
     UserSvgItem *createSvgGraphics(const QString &xml = nullptr);
+    ICustomGraphic *createSystemGraphics(const QString &xml = nullptr);
     QString appPath();
+    QWidget *getSystemPropertyForm();
+    QString fileContent();
+    /**
+     * @brief pluginIdInContent 从文本中提起插件ID
+     * @param content 插件文本
+     * @return 插件ID
+     */
+    QString pluginIdInContent(const QString content);
 };
 
 #endif // ABSTRACTUSERPLUGIN_H

@@ -832,6 +832,9 @@
    </property>
   </action>
   <action name="doCut">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditCut"/>
+   </property>
    <property name="text">
     <string>剪切</string>
    </property>
@@ -843,6 +846,9 @@
    </property>
   </action>
   <action name="doCopy">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditCopy"/>
+   </property>
    <property name="text">
     <string>复制</string>
    </property>
@@ -854,6 +860,9 @@
    </property>
   </action>
   <action name="doPast">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditPaste"/>
+   </property>
    <property name="text">
     <string>粘贴</string>
    </property>
@@ -1072,6 +1081,35 @@
    </property>
    <property name="toolTip">
     <string>垂直翻转</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="saveToLib">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/icons/library-add.svg</normaloff>:/icons/icons/library-add.svg</iconset>
+   </property>
+   <property name="text">
+    <string>存到图库</string>
+   </property>
+   <property name="toolTip">
+    <string>保存到图库重复使用</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="doDelete">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditDelete"/>
+   </property>
+   <property name="text">
+    <string>删除</string>
+   </property>
+   <property name="toolTip">
+    <string>删除选中的图元</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

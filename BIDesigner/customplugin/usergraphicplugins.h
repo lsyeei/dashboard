@@ -24,6 +24,7 @@
 #include "customplugin/userplugintype.h"
 #include "igraphicplugin.h"
 
+class QGraphicsItem;
 class UserPluginManageForm;
 class UserPluginDO;
 class QLayout;
@@ -40,6 +41,7 @@ public:
     QList<GraphicPluginGroup*> groupWidgets();
     IGraphicPlugin *getPluginById(const QString &pluginId) const;
     QList<IGraphicPlugin *> plugins() const;
+    void saveToLib(QList<QGraphicsItem *> items);
 
 Q_SIGNALS:
     void graphicItemChanged(IGraphicPlugin *plugin);
@@ -89,6 +91,25 @@ private:
      * @return 控件对象
      */
     GraphicPluginGroup *getGroupWidget(qint32 groupId);
+    /**
+     * @brief savePlugin 将 QGraphicsItem 存为图元
+     * @param groupId 分组 ID
+     * @param item 图元对象
+     * @return 插件信息
+     */
+    UserPluginDO savePlugin(int groupId, QGraphicsItem *item);
+    /**
+     * @brief graphicsItemThumb  QGraphicsItem 的缩略图
+     * @param item 图元对象
+     * @return 缩略图数据
+     */
+    QByteArray graphicsItemThumb(ICustomGraphic *item);
+    /**
+     * @brief getPluginPath 获取指定控件组的路径
+     * @param groupId 组ID
+     * @return 控件组相对当前应用程序的路径
+     */
+    QString getPluginPath(qint32 groupId);
 };
 
 #endif // USERGRAPHICPLUGINS_H

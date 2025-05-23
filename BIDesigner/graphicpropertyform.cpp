@@ -1,21 +1,21 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #include "icustomgraphic.h"
 #include "graphicplugins.h"
 #include "graphicpropertyform.h"
@@ -85,10 +85,12 @@ bool GraphicPropertyForm::setGraphicItem(QGraphicsItem *item)
     if (item == graphicItem) {
         return true;
     }
+    auto biScene = dynamic_cast<BIGraphicsScene*>(item->scene());
+    auto itemName = biScene->itemName(item);
     graphicItem = item;
     auto group = dynamic_cast<GraphicsItemGroup *>(item);
     if (group) {
-        ui->graphicName->setText(group->data(BIGraphicsScene::itemNameIndex).toString());
+        ui->graphicName->setText(itemName);
         QWidget *property = ui->stackedWidget->findChild<QWidget *>("group");
         if (property){
             group->setPropertyWidget(property);
@@ -98,7 +100,7 @@ bool GraphicPropertyForm::setGraphicItem(QGraphicsItem *item)
     } else {
         ICustomGraphic *curItem = dynamic_cast<ICustomGraphic*>(item);
         if (curItem) {
-            ui->graphicName->setText(curItem->data(BIGraphicsScene::itemNameIndex).toString());
+            ui->graphicName->setText(itemName);
             QWidget *property = ui->stackedWidget->findChild<QWidget *>(curItem->classId());
             if (property){
                 curItem->setPropertyWidget(property);

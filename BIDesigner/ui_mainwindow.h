@@ -78,6 +78,8 @@ public:
     QAction *zoomDefine;
     QAction *flipHorizontal;
     QAction *flipVertical;
+    QAction *saveToLib;
+    QAction *doDelete;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QSplitter *splitter_2;
@@ -274,10 +276,16 @@ public:
         doExport->setObjectName("doExport");
         doCut = new QAction(MainWindow);
         doCut->setObjectName("doCut");
+        QIcon icon22(QIcon::fromTheme(QIcon::ThemeIcon::EditCut));
+        doCut->setIcon(icon22);
         doCopy = new QAction(MainWindow);
         doCopy->setObjectName("doCopy");
+        QIcon icon23(QIcon::fromTheme(QIcon::ThemeIcon::EditCopy));
+        doCopy->setIcon(icon23);
         doPast = new QAction(MainWindow);
         doPast->setObjectName("doPast");
+        QIcon icon24(QIcon::fromTheme(QIcon::ThemeIcon::EditPaste));
+        doPast->setIcon(icon24);
         doSelectAll = new QAction(MainWindow);
         doSelectAll->setObjectName("doSelectAll");
         doUnselectAll = new QAction(MainWindow);
@@ -293,14 +301,14 @@ public:
         showViewRuler->setCheckable(true);
         doPreview = new QAction(MainWindow);
         doPreview->setObjectName("doPreview");
-        QIcon icon22;
-        icon22.addFile(QString::fromUtf8(":/icons/icons/preview.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        doPreview->setIcon(icon22);
+        QIcon icon25;
+        icon25.addFile(QString::fromUtf8(":/icons/icons/preview.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        doPreview->setIcon(icon25);
         doPreview->setMenuRole(QAction::MenuRole::NoRole);
         doAbout = new QAction(MainWindow);
         doAbout->setObjectName("doAbout");
-        QIcon icon23(QIcon::fromTheme(QString::fromUtf8("help-about")));
-        doAbout->setIcon(icon23);
+        QIcon icon26(QIcon::fromTheme(QString::fromUtf8("help-about")));
+        doAbout->setIcon(icon26);
         zoom25 = new QAction(MainWindow);
         zoom25->setObjectName("zoom25");
         zoom25->setMenuRole(QAction::MenuRole::NoRole);
@@ -339,16 +347,27 @@ public:
         zoomDefine->setMenuRole(QAction::MenuRole::NoRole);
         flipHorizontal = new QAction(MainWindow);
         flipHorizontal->setObjectName("flipHorizontal");
-        QIcon icon24;
-        icon24.addFile(QString::fromUtf8(":/icons/icons/flip_horizontal.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        flipHorizontal->setIcon(icon24);
+        QIcon icon27;
+        icon27.addFile(QString::fromUtf8(":/icons/icons/flip_horizontal.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        flipHorizontal->setIcon(icon27);
         flipHorizontal->setMenuRole(QAction::MenuRole::NoRole);
         flipVertical = new QAction(MainWindow);
         flipVertical->setObjectName("flipVertical");
-        QIcon icon25;
-        icon25.addFile(QString::fromUtf8(":/icons/icons/flip_vertical.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        flipVertical->setIcon(icon25);
+        QIcon icon28;
+        icon28.addFile(QString::fromUtf8(":/icons/icons/flip_vertical.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        flipVertical->setIcon(icon28);
         flipVertical->setMenuRole(QAction::MenuRole::NoRole);
+        saveToLib = new QAction(MainWindow);
+        saveToLib->setObjectName("saveToLib");
+        QIcon icon29;
+        icon29.addFile(QString::fromUtf8(":/icons/icons/library-add.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        saveToLib->setIcon(icon29);
+        saveToLib->setMenuRole(QAction::MenuRole::NoRole);
+        doDelete = new QAction(MainWindow);
+        doDelete->setObjectName("doDelete");
+        QIcon icon30(QIcon::fromTheme(QIcon::ThemeIcon::EditDelete));
+        doDelete->setIcon(icon30);
+        doDelete->setMenuRole(QAction::MenuRole::NoRole);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         QSizePolicy sizePolicy1(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
@@ -784,6 +803,14 @@ public:
         flipVertical->setText(QCoreApplication::translate("MainWindow", "\345\236\202\347\233\264\347\277\273\350\275\254", nullptr));
 #if QT_CONFIG(tooltip)
         flipVertical->setToolTip(QCoreApplication::translate("MainWindow", "\345\236\202\347\233\264\347\277\273\350\275\254", nullptr));
+#endif // QT_CONFIG(tooltip)
+        saveToLib->setText(QCoreApplication::translate("MainWindow", "\345\255\230\345\210\260\345\233\276\345\272\223", nullptr));
+#if QT_CONFIG(tooltip)
+        saveToLib->setToolTip(QCoreApplication::translate("MainWindow", "\344\277\235\345\255\230\345\210\260\345\233\276\345\272\223\351\207\215\345\244\215\344\275\277\347\224\250", nullptr));
+#endif // QT_CONFIG(tooltip)
+        doDelete->setText(QCoreApplication::translate("MainWindow", "\345\210\240\351\231\244", nullptr));
+#if QT_CONFIG(tooltip)
+        doDelete->setToolTip(QCoreApplication::translate("MainWindow", "\345\210\240\351\231\244\351\200\211\344\270\255\347\232\204\345\233\276\345\205\203", nullptr));
 #endif // QT_CONFIG(tooltip)
         propertyWidget->setTabText(propertyWidget->indexOf(property), QCoreApplication::translate("MainWindow", "Tab 1", nullptr));
         toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));

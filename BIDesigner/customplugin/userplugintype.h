@@ -24,7 +24,9 @@ enum class UserPluginType{
     // jpg、png、bmp等图像
     IMG,
     // 图元组合
-    GROUP
+    GROUP,
+    // 系统图元
+    SYSTEM
 };
 
 #endif // USERPLUGINTYPE_H

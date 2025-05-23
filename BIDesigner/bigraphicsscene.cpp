@@ -559,6 +559,18 @@ void BIGraphicsScene::copyItems()
     clipboard->setText(data);
 }
 
+void BIGraphicsScene::cutItems()
+{
+    auto items = selectedItems();
+    if (items.isEmpty()) {
+        return;
+    }
+    QString data = "<CutItems>" + toXml(items) + "</CutItems>";
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    clipboard->setText(data);
+    deleteItems(items);
+}
+
 QList<QGraphicsItem *> BIGraphicsScene::pastItems(QPointF pos)
 {
     QClipboard *clipboard = QGuiApplication::clipboard();
@@ -567,6 +579,11 @@ QList<QGraphicsItem *> BIGraphicsScene::pastItems(QPointF pos)
         return QList<QGraphicsItem *>{};
     }
     // auto newItems = addItems(text);
+    bool cutFlag = text.startsWith("<CutItems>");
+    bool copyFlag = text.startsWith("<CopyItems>");
+    if (!cutFlag && !copyFlag) {
+        return QList<QGraphicsItem *>{};
+    }
     auto newItems = toItems(text);
     // 修改新图元位置到当前鼠标位置
     QRectF bound;
@@ -582,10 +599,15 @@ QList<QGraphicsItem *> BIGraphicsScene::pastItems(QPointF pos)
     auto offset = pos - center;
     foreach(auto item, newItems){
         // 修改新图元属性
-        setItemId(item, idGenerator->nextIdString());
-        setItemName(item, item->data(itemNameIndex).toByteArray() + "_copy");
+        if (copyFlag) {
+            setItemId(item, idGenerator->nextIdString());
+            setItemName(item, item->data(itemNameIndex).toByteArray() + "_copy");
+        }
         item->setPos(item->pos() + offset);
         updateItem(item);
+    }
+    if (cutFlag) {
+        clipboard->setText("");
     }
 
     return newItems;
@@ -626,6 +648,11 @@ void BIGraphicsScene::redo(QVariant redoData)
 void BIGraphicsScene::setItemName(QGraphicsItem *item, QString name)
 {
     item->setData(itemNameIndex, name);
+}
+
+QString BIGraphicsScene::itemName(QGraphicsItem *item)
+{
+    return item->data(itemNameIndex).toString();
 }
 
 void BIGraphicsScene::setItemId(QGraphicsItem *item, const QString &id)

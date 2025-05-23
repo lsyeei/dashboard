@@ -16,6 +16,7 @@
 * limitations under the License.
 */
 #include "usergraphicplugins.h"
+#include "bigraphicsscene.h"
 #include "customplugin/abstractuserplugin.h"
 #include "customplugin/userplugindo.h"
 #include "customplugin/userplugingroupdo.h"
@@ -28,7 +29,12 @@
 #include <QMessageBox>
 #include <QBuffer>
 #include <QCoreApplication>
+#include <QGraphicsItem>
+#include <QPainter>
 #include "configs.h"
+#include "graphicsitemgroup.h"
+#include "icustomgraphic.h"
+#include "userplugingroupdialog.h"
 
 UserGraphicPlugins::UserGraphicPlugins(QWidget *parent) : parentWidget(parent) {
     layout = parent->layout();
@@ -117,6 +123,26 @@ QList<IGraphicPlugin *> UserGraphicPlugins::plugins() const
     return pluginMap.values();
 }
 
+void UserGraphicPlugins::saveToLib(QList<QGraphicsItem *> items)
+{
+    auto dlg = new UserPluginGroupDialog(parentWidget);
+    connect(dlg, &UserPluginGroupDialog::addNewGroup,
+            this, [&](const QString name){addNewGroup(name);});
+    dlg->exec();
+    auto id = dlg->getGroupId();
+    delete dlg;
+    if (id < 0) {
+        return;
+    }
+    // 生成插件信息
+    QList<UserPluginDO> plugins;
+    foreach (auto item, items) {
+        plugins << savePlugin(id, item);
+    }
+    // 安装插件
+    installPlugins(plugins, getGroupWidget(id));
+}
+
 GraphicPluginGroup *UserGraphicPlugins::createGroupWidget(const QString &group)
 {
     GraphicPluginGroup *groupWidget = new GraphicPluginGroup(group, minIdex + groupWidgetMap.count(), parentWidget);
@@ -180,6 +206,97 @@ GraphicPluginGroup *UserGraphicPlugins::getGroupWidget(qint32 groupId)
     return groupWidget;
 }
 
+UserPluginDO UserGraphicPlugins::savePlugin(int groupId, QGraphicsItem *item)
+{
+    auto graphic = dynamic_cast<ICustomGraphic*>(item);
+    auto biScene = dynamic_cast<BIGraphicsScene*>(item->scene());
+    auto data = "<User>" + biScene->toXml({item}) + "</User>";
+    auto pluginPath = getPluginPath(groupId);
+    auto name = biScene->itemName(item);
+    // 存入文件
+    auto fileName = name + ".g";
+    QDir dir(QCoreApplication::applicationDirPath() + pluginPath);
+    if (dir.exists(dir.absoluteFilePath(fileName))) {
+        name += QString("-%1").arg(QDateTime::currentSecsSinceEpoch());
+        fileName = name + ".g";
+    }
+    QFile file(dir.absoluteFilePath(fileName));
+    file.open(QIODeviceBase::WriteOnly);
+    file.write(data.toLocal8Bit());
+    file.close();
+    // 获取缩略图
+    auto thumb = graphicsItemThumb(graphic);
+    // 存入数据库
+    QString path = pluginPath + fileName;
+    UserPluginType type{UserPluginType::GROUP};
+    if (typeid(*item) != typeid(GraphicsItemGroup)) {
+        type = UserPluginType::SYSTEM;
+    }
+
+    UserPluginDO plugin;
+    plugin.set_groupId(groupId);
+    plugin.set_name(name);
+    plugin.set_thumb(thumb);
+    plugin.set_path(path);
+    plugin.set_type(type);
+    if(!ConfigMaster::instance()->userPlugin->save(&plugin)){
+        file.remove();
+    }
+    return plugin;
+}
+
+QByteArray UserGraphicPlugins::graphicsItemThumb(ICustomGraphic *item)
+{
+    QSize size{48,48};
+    QImage image{size, QImage::Format_ARGB32};
+    image.fill(Qt::transparent);
+    QPainter painter{&image};
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+
+    QRect rect{{0,0},size};
+    QRectF itemRect = item->sceneBoundingRect();
+    BIGraphicsScene tempScene;
+    auto data = "<User>" + tempScene.toXml({item}) + "</User>";
+    tempScene.setSceneRect(0,0,itemRect.width(),itemRect.height());
+    auto items = tempScene.toItems(data);
+    tempScene.addItems(items);
+    tempScene.render(&painter, rect, itemRect);
+
+    QByteArray array;
+    QBuffer buf(&array);
+    image.save(&buf, "png");
+    return array;
+}
+
+QString UserGraphicPlugins::getPluginPath(qint32 groupId)
+{
+    // 检查用户控件路径是否存在
+    auto pluginPath = QCoreApplication::applicationDirPath() + appConfigs.userPluginPath;
+    QDir dir(pluginPath);
+    if (!dir.exists()) {
+        if(!dir.mkdir(pluginPath)){
+            QMessageBox::warning(parentWidget, tr("错误"), tr("无法创建路径：") + pluginPath);
+            return "";
+        }
+    }
+    // 创建控件组目录
+    auto groupWidget = getGroupWidget(groupId);
+    if (groupWidget == nullptr) {
+        return "";
+    }
+    auto groupName = groupWidget->getGroupName();
+    auto groupPath = pluginPath + groupName;
+    if (!dir.exists(groupPath)) {
+        if(!dir.mkdir(groupPath)){
+            QMessageBox::warning(parentWidget, tr("错误"), tr("无法创建路径：") + groupPath);
+            return "";
+        }
+    }
+    return appConfigs.userPluginPath + groupName + "/";
+}
+
 void UserGraphicPlugins::onGraphicItemSelected(QString itemId)
 {
     auto plugin = pluginMap[itemId];
@@ -226,50 +343,32 @@ void UserGraphicPlugins::onImportUserGraphics(qint32 groupId)
     if (files.isEmpty()) {
         return;
     }
-    // 检查用户控件路径是否存在
-    auto pluginPath = QCoreApplication::applicationDirPath() + appConfigs.userPluginPath;
-    QDir dir(pluginPath);
-    if (!dir.exists()) {
-        if(!dir.mkdir(pluginPath)){
-            QMessageBox::warning(parentWidget, tr("错误"), tr("无法创建路径：") + pluginPath);
-            return;
-        }
-    }
-    // 创建控件组目录
-    auto groupWidget = getGroupWidget(groupId);
-    if (groupWidget == nullptr) {
+    auto pluginPath = getPluginPath(groupId);
+    if (pluginPath.isEmpty()){
         return;
     }
-    auto groupName = groupWidget->getGroupName();
-    auto groupPath = pluginPath + groupName;
-    if (!dir.exists(groupPath)) {
-        if(!dir.mkdir(groupPath)){
-            QMessageBox::warning(parentWidget, tr("错误"), tr("无法创建路径：") + groupPath);
-            return;
-        }
-    }
+    QDir dir(QCoreApplication::applicationDirPath() + pluginPath);
     // 拷贝文件到插件目录,生成缩略图，存到配置文件
     QFileInfo info;
-    auto relativePath = appConfigs.userPluginPath + groupName + "/";
     foreach(auto file, files){
         info.setFile(file);
         auto fileName = info.fileName();
         auto suffix = info.suffix();
-        if (dir.exists(groupPath + "/" + fileName)) {
+        if (dir.exists(dir.absoluteFilePath(fileName))) {
             continue;
         }
-        QFile::copy(file, groupPath + "/" + fileName);
+        QFile::copy(file, dir.absoluteFilePath(fileName));
         UserPluginDO plugin;
         plugin.set_groupId(groupId);
         plugin.set_name(info.baseName());
-        plugin.set_path(relativePath + fileName);
+        plugin.set_path(pluginPath + fileName);
         plugin.set_type(suffix2Type(suffix));
         plugin.set_thumb(getThumbData(file));
         ConfigMaster::instance()->userPlugin->save(&plugin);
     }
     // 加载新导入的图元控件
     auto plugins = ConfigMaster::instance()->userPlugin->list(QString("group_id=%1").arg(groupId));
-    installPlugins(plugins, groupWidget);
+    installPlugins(plugins, getGroupWidget(groupId));
 }
 
 void UserGraphicPlugins::onManageUserGraphics(qint32 groupId)

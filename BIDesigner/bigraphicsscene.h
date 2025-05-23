@@ -112,6 +112,10 @@ public:
      */
     void copyItems();
     /**
+     * @brief cutItems 剪切选中的图元
+     */
+    void cutItems();
+    /**
      * @brief 粘贴剪贴板中的图元
      * @param pos 粘贴的中心位置
      * @return 粘贴的图元列表
@@ -139,6 +143,12 @@ public:
      * @param name 图元名称
      */
     void setItemName(QGraphicsItem *item, QString name);
+    /**
+     * @brief itemName 获取图元名称
+     * @param item 图元对象
+     * @return 图元名称
+     */
+    QString itemName(QGraphicsItem *item);
     /**
      * @brief setItemId 设置图元ID
      * @param item 图元对象

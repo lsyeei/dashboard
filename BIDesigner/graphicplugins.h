@@ -23,6 +23,7 @@
 #include <QPointer>
 #include <QWidget>
 
+class QGraphicsItem;
 class QVBoxLayout;
 class QPushButton;
 class IGraphicPlugin;
@@ -66,13 +67,14 @@ public:
      */
     static ICustomGraphic *createGraphic(const QString &graphicId, const QString &xmlText);
 
+    void saveToLib(QList<QGraphicsItem *> items);
+
 Q_SIGNALS:
     /**
      * @brief 选中图形元件后发出事件，供其它模块使用
      * @param currentPlugin 当前图元
      */
     void graphicItemChanged(IGraphicPlugin *currentPlugin);
-
     // QWidget interface
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;

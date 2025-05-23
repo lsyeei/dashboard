@@ -21,6 +21,7 @@
 
 #include "projectpropertyform.h"
 #include <QMainWindow>
+#include <QPointer>
 
 QT_BEGIN_NAMESPACE
 
@@ -48,6 +49,7 @@ public:
     BIGraphicsScene *scene;
     // QObject interface
     bool event(QEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 Q_SIGNALS:
     void singleSelectEvent(QGraphicsItem *item);
@@ -90,27 +92,31 @@ private slots:
     void pagePropertyChanged(const PageProperty &page);
     void onAnimatePlay(bool flag);
     void showAbout();
+    void saveToLib();
 
 private:
     Ui::MainWindow *ui;
     // 图元属性窗口
-    GraphicPropertyForm *propertyWidget;
-    QMenu *menu;
-    QMenu *zoomMenu;
-    QPushButton *menuBtn;
-    QPushButton *zoomBtn;
-    ProjectPropertyForm *projectWidget;
+    GraphicPropertyForm *propertyWidget{nullptr};
+    QMenu *menu{nullptr};
+    QMenu *zoomMenu{nullptr};
+    QPushButton *menuBtn{nullptr};
+    QPushButton *zoomBtn{nullptr};
+    ProjectPropertyForm *projectWidget{nullptr};
     // 控件所在 widget
-    GraphicPlugins * graphicPluginWidget;
+    GraphicPlugins * graphicPluginWidget{nullptr};
     // 状态栏控件
-    QLabel *mouseInfo;
-    QLabel *scaleInfo;
+    QLabel *mouseInfo{nullptr};
+    QLabel *scaleInfo{nullptr};
     QPropertyAnimation *animation{nullptr};
     ProjectProperty projectProperty;
     // 动画
     AnimationForm *animationForm{nullptr};
     bool playFlag{false};
     qreal angle{0};
+    // 右键菜单
+    QPointer<QMenu> graphicMenu;
+    QPointer<QMenu> viewMenu;
     // void drawShape();
     void setScene();
     void initStatusBar();
@@ -145,6 +151,11 @@ private:
      * @brief paletteCanged 系统主题改变
      */
     void paletteCanged();
+    /**
+     * @brief initPopMenu 初始化右键菜单
+     */
+    void initPopMenu();
+    void onViewMenuEvent(QContextMenuEvent *event);
 
 };
 #endif // MAINWINDOW_H

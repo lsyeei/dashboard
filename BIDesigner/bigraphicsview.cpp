@@ -307,6 +307,23 @@ void BIGraphicsView::setPageProperty(const PageProperty &newPageProperty)
     setBackgroundBrush(Qt::NoBrush);
 }
 
+void BIGraphicsView::setShowGrid(bool flag)
+{
+    auto pen = pageProperty.getPenProperty();
+    if (!flag) {
+        lastPenStyle = pen.getStyle();
+        pen.setStyle(Qt::NoPen);
+        pageProperty.setPenProperty(pen);
+    } else {
+        pen.setStyle(lastPenStyle);
+        pageProperty.setPenProperty(pen);
+    }
+    auto biScene = dynamic_cast<BIGraphicsScene *>(scene());
+    biScene->setPainter(pageProperty.getBrushProperty(), pageProperty.getPenProperty());
+    // 刷新
+    setBackgroundBrush(Qt::NoBrush);
+}
+
 void BIGraphicsView::setShowScale(bool newShowScale)
 {
     showScale = newShowScale;
@@ -431,6 +448,38 @@ void BIGraphicsView::setDragMode(DragMode mode)
 {
     // qDebug() << "set drag mode:" << mode;
     // QGraphicsView::setDragMode(mode);
+}
+
+void BIGraphicsView::doCopy()
+{
+    auto biScene = dynamic_cast<BIGraphicsScene *>(scene());
+    biScene->copyItems();
+}
+
+void BIGraphicsView::doCut()
+{
+    auto biScene = dynamic_cast<BIGraphicsScene *>(scene());
+    biScene->copyItems();
+    auto items = biScene->selectedItems();
+    biScene->deleteItems(items);
+    // 生成撤销命令
+    genUndoCommand(DEL, items);
+}
+
+void BIGraphicsView::doPast()
+{
+    auto biScene = dynamic_cast<BIGraphicsScene *>(scene());
+    auto items = biScene->pastItems(mapToScene(mapFromGlobal(QCursor::pos()) - QPoint{scaleWidth, scaleWidth}));
+    // 生成撤销命令
+    genUndoCommand(ADD, items);
+}
+
+void BIGraphicsView::doDelete()
+{
+    auto biScene = dynamic_cast<BIGraphicsScene *>(scene());
+    auto items = biScene->selectedItems();
+    // 生成撤销命令
+    genUndoCommand(DEL, items);
 }
 
 void BIGraphicsView::mousePressEvent(QMouseEvent *event)
@@ -645,9 +694,7 @@ void BIGraphicsView::keyPressEvent(QKeyEvent *event)
             event->accept();
             break;
         case Qt::Key_Delete:
-            // biScene->deleteItems(items);
-            // 生成撤销命令
-            genUndoCommand(DEL, items);
+            doDelete();
             event->accept();
             break;
         default:
@@ -660,19 +707,13 @@ void BIGraphicsView::keyPressEvent(QKeyEvent *event)
         biScene->selectAll(false);
         event->accept();
     } else if(event->matches(QKeySequence::Copy)){
-        biScene->copyItems();
+        doCopy();
         event->accept();
     } else if(event->matches(QKeySequence::Paste)){
-        auto items = biScene->pastItems(mapToScene(mapFromGlobal(QCursor::pos()) - QPoint{scaleWidth, scaleWidth}));
-        // 生成撤销命令
-        genUndoCommand(ADD, items);
+        doPast();
         event->accept();
     } else if(event->matches(QKeySequence::Cut)){
-        biScene->copyItems();
-        auto items = biScene->selectedItems();
-        biScene->deleteItems(items);
-        // 生成撤销命令
-        genUndoCommand(DEL, items);
+        doCut();
         event->accept();
     }
     pressKey.insert(event->key());
@@ -889,6 +930,9 @@ void BIGraphicsView::doZoom()
 void BIGraphicsView::createGraphicsItem(const QPointF &point)
 {
     ICustomGraphic *item = currentGraphicItem->createItem();
+    if (item == nullptr) {
+        return;
+    }
     BIGraphicsScene *localScene = dynamic_cast<BIGraphicsScene *>(scene());
     localScene->addEditableItem(item);
     QPointF pos = point;
