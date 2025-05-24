@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>UserPluginManageForm</class>
- <widget class="QDialog" name="userPluginManageForm">
+ <widget class="QDialog" name="UserPluginManageForm">
   <property name="windowModality">
    <enum>Qt::WindowModality::WindowModal</enum>
   </property>
@@ -20,9 +20,25 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="label">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Policy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>15</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="selectAll">
        <property name="text">
-        <string>提示：名称和备注可以在列表中修改</string>
+        <string>全选</string>
        </property>
       </widget>
      </item>
@@ -40,13 +56,12 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="importBtn">
+      <widget class="QToolButton" name="delBtn">
        <property name="text">
-        <string>导入</string>
+        <string>删除</string>
        </property>
        <property name="icon">
-        <iconset resource="../icons.qrc">
-         <normaloff>:/icons/icons/bottom.svg</normaloff>:/icons/icons/bottom.svg</iconset>
+        <iconset theme="QIcon::ThemeIcon::EditDelete"/>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
@@ -54,12 +69,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="delBtn">
+      <widget class="QToolButton" name="importBtn">
        <property name="text">
-        <string>删除</string>
+        <string>导入</string>
        </property>
        <property name="icon">
-        <iconset theme="QIcon::ThemeIcon::EditClear"/>
+        <iconset theme="QIcon::ThemeIcon::GoDown"/>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
@@ -75,10 +90,15 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>提示：名称和备注可以在列表中修改</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
- <resources>
-  <include location="../icons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

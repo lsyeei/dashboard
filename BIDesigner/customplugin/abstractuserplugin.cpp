@@ -153,8 +153,6 @@ ICustomGraphic *AbstractUserPlugin::createSystemGraphics(const QString &xml)
         return dynamic_cast<ICustomGraphic *>(items[0]);
     }
     return nullptr;
-    // QString classId = pluginIdInContent(content);
-    // return GraphicPlugins::createGraphic(classId, content);
 }
 
 QString AbstractUserPlugin::appPath()
@@ -169,7 +167,7 @@ QWidget *AbstractUserPlugin::getSystemPropertyForm()
         return nullptr;
     }
 
-    auto id = graphic->classId();//pluginIdInContent(fileContent());
+    auto id = graphic->classId();
     delete graphic;
     if (id.isEmpty()) {
         return nullptr;
@@ -189,18 +187,6 @@ QString AbstractUserPlugin::fileContent()
     content = QString::fromLocal8Bit(file.readAll());
     file.close();
     return content;
-}
-
-QString AbstractUserPlugin::pluginIdInContent(const QString content)
-{
-    typedef XmlTemplate::shapesTemplate::itemTemplate itemTemplate;
-    QRegularExpression reg(QString("%1=\\\"([^\\\"]+)\\\"").arg(itemTemplate::classId));
-    auto result = reg.match(content);
-    QString classId = "";
-    if (result.hasMatch()){
-        classId = result.captured(1);
-    }
-    return classId;
 }
 
 UserImageItem *AbstractUserPlugin::createImgGraphics(const QString &xml)

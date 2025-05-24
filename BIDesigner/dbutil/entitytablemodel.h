@@ -65,6 +65,8 @@ public:
      * @return true 成功，false 失败
      */
     bool removeSelected();
+    void selectAll();
+    void deselectAll();
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex &parent) const override;
@@ -237,6 +239,26 @@ inline bool EntityTableModel<T>::removeSelected()
     checkState.clear();
     endResetModel();
     return true;
+}
+
+template<typename T>
+inline void EntityTableModel<T>::selectAll()
+{
+    beginResetModel();
+    for (int i=0; i < modelData.count(); i++){
+        checkState[i] = Qt::Checked;
+    }
+    endResetModel();
+}
+
+template<typename T>
+inline void EntityTableModel<T>::deselectAll()
+{
+    beginResetModel();
+    for (int i=0; i < modelData.count(); i++){
+        checkState[i] = Qt::Unchecked;
+    }
+    endResetModel();
 }
 
 template<typename T>

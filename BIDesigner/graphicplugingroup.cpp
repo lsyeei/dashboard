@@ -27,6 +27,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
+#include <QMessageBox>
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPushButton>
@@ -195,6 +196,9 @@ void GraphicPluginGroup::onEditClicked()
 
 void GraphicPluginGroup::onDeleteClicked()
 {
+    if (QMessageBox::question(this, tr("提示"), "确定要删除吗？") == QMessageBox::No){
+        return;
+    }
     emit removeGroup();
 }
 

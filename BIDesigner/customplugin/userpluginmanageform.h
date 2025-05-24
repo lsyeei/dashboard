@@ -46,6 +46,8 @@ private slots:
 
     void on_importBtn_clicked();
 
+    void on_selectAll_checkStateChanged(const Qt::CheckState &arg1);
+
 private:
     Ui::UserPluginManageForm *ui;
     qint32 groupId{-1};

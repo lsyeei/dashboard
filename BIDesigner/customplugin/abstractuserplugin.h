@@ -53,12 +53,6 @@ private:
     QString appPath();
     QWidget *getSystemPropertyForm();
     QString fileContent();
-    /**
-     * @brief pluginIdInContent 从文本中提起插件ID
-     * @param content 插件文本
-     * @return 插件ID
-     */
-    QString pluginIdInContent(const QString content);
 };
 
 #endif // ABSTRACTUSERPLUGIN_H

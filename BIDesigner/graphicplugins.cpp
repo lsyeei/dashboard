@@ -23,15 +23,16 @@
 #include "graphicplugingroup.h"
 #include "predefgraphicplugins.h"
 #include "qmimedata.h"
-
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDir>
 #include <QDragEnterEvent>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QPluginLoader>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QScrollBar>
 #include <icustomgraphic.h>
 
 QPointer<UserGraphicPlugins> GraphicPlugins::userGraphics{nullptr};
@@ -60,7 +61,7 @@ GraphicPlugins::GraphicPlugins(QWidget *parent)
     layout->addWidget(addGroupBtn);
     connect(addGroupBtn.data(), SIGNAL(clicked(bool)), this, SLOT(onAddNewGroup()));
 
-    QScrollArea *scroll = new QScrollArea(this);
+    scroll = new QScrollArea(this);
     layout->addWidget(scroll);
     scroll->setAlignment(Qt::AlignTop);
     scroll->setWidgetResizable(true);
@@ -177,8 +178,14 @@ void GraphicPlugins::onAddNewGroup()
     if (userGraphics == nullptr) {
         return;
     }
-    auto groupName = tr("新建分组");
+    // tr("新建分组");
+    auto groupName = QInputDialog::getText(this, tr("新建分组"), tr("组名"));
+    if (groupName.isEmpty()) {
+        return;
+    }
     userGraphics->addNewGroup(groupName);
+    auto bar = scroll->verticalScrollBar();
+    bar->setValue(bar->maximum());
 }
 
 // QString GraphicPlugins::genItemKey(const QString &group, const QString &name)

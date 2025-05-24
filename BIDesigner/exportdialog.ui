@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>368</width>
-    <height>212</height>
+    <height>227</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,7 +20,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>导出</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -384,7 +384,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="scopeGroup"/>
   <buttongroup name="formatGroup"/>
+  <buttongroup name="scopeGroup"/>
  </buttongroups>
 </ui>

@@ -23,6 +23,7 @@
 #include <QPointer>
 #include <QWidget>
 
+class QScrollArea;
 class QGraphicsItem;
 class QVBoxLayout;
 class QPushButton;
@@ -90,6 +91,7 @@ private:
     QVBoxLayout *layout;
     QPointer<QPushButton> addGroupBtn;
     QWidget *groupPanel;
+    QScrollArea *scroll;
     // 当前选中的插件
     IGraphicPlugin *selectedPlugin;
     // 用户图元控件

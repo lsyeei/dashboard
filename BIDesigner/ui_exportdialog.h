@@ -71,15 +71,15 @@ public:
     QSpacerItem *horizontalSpacer_2;
     QPushButton *exportBtn;
     QPushButton *cancleBtn;
-    QButtonGroup *scopeGroup;
     QButtonGroup *formatGroup;
+    QButtonGroup *scopeGroup;
 
     void setupUi(QDialog *ExportDialog)
     {
         if (ExportDialog->objectName().isEmpty())
             ExportDialog->setObjectName("ExportDialog");
         ExportDialog->setWindowModality(Qt::WindowModality::WindowModal);
-        ExportDialog->resize(368, 212);
+        ExportDialog->resize(368, 227);
         QSizePolicy sizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -305,7 +305,7 @@ public:
 
     void retranslateUi(QDialog *ExportDialog)
     {
-        ExportDialog->setWindowTitle(QCoreApplication::translate("ExportDialog", "Dialog", nullptr));
+        ExportDialog->setWindowTitle(QCoreApplication::translate("ExportDialog", "\345\257\274\345\207\272", nullptr));
         label_7->setText(QCoreApplication::translate("ExportDialog", "\350\214\203\345\233\264\357\274\232", nullptr));
         allBtn->setText(QCoreApplication::translate("ExportDialog", "\345\205\250\351\203\250\345\233\276\345\205\203", nullptr));
         selectedBtn->setText(QCoreApplication::translate("ExportDialog", "\351\200\211\344\270\255\345\233\276\345\205\203", nullptr));

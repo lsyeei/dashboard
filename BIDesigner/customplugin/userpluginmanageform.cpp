@@ -20,6 +20,7 @@
 #include "ui_userpluginmanageform.h"
 
 #include <ConfigMaster.h>
+#include <QMessageBox>
 #include <QStandardItemModel>
 
 
@@ -86,6 +87,12 @@ void UserPluginManageForm::onUpdateData(QVariant data)
 void UserPluginManageForm::on_delBtn_clicked()
 {
     auto list = model->getSelectedData();
+    if (list.isEmpty()) {
+        return;
+    }
+    if (QMessageBox::question(this, tr("提示"), "确定要删除吗？") == QMessageBox::No){
+        return;
+    }
     foreach (auto item, list) {
         emit remove(item);
     }
@@ -98,5 +105,15 @@ void UserPluginManageForm::on_importBtn_clicked()
 {
     emit importEvent(groupId);
     refreshData();
+}
+
+
+void UserPluginManageForm::on_selectAll_checkStateChanged(const Qt::CheckState &arg1)
+{
+    if (ui->selectAll->isChecked()) {
+        model->selectAll();
+    }else{
+        model->deselectAll();
+    }
 }
 

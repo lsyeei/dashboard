@@ -948,10 +948,11 @@ void MainWindow::saveToLib()
 
 void MainWindow::onViewMenuEvent(QContextMenuEvent *event)
 {
-    auto pt = event->pos();
-    auto item = scene->itemAt(ui->graphicsView->mapToScene(pt),
+    QPoint viewPt = ui->graphicsView->viewport()->mapFromGlobal(event->globalPos());
+    auto item = scene->itemAt(ui->graphicsView->mapToScene(viewPt),
                               ui->graphicsView->transform());
     if (item) {
+        item->setSelected(true);
         graphicMenu->popup(event->globalPos());
     }else{
         viewMenu->popup(event->globalPos());

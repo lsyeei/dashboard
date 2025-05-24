@@ -255,8 +255,17 @@ QByteArray UserGraphicPlugins::graphicsItemThumb(ICustomGraphic *item)
     painter.setRenderHint(QPainter::TextAntialiasing);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    QRect rect{{0,0},size};
+    QRectF rect{{0,0},size};
     QRectF itemRect = item->sceneBoundingRect();
+    auto ratio = itemRect.width() / itemRect.height();
+    if (ratio > 1){
+        auto imgHeight = size.width()/ratio;
+        rect = {0, (size.height() - imgHeight)/2, 1.0*size.width(), imgHeight};
+    } else {
+        auto imgWidth = size.height()*ratio;
+        rect = {(size.width()-imgWidth)/2, 0, imgWidth, 1.0*size.height()};
+    }
+
     BIGraphicsScene tempScene;
     auto data = "<User>" + tempScene.toXml({item}) + "</User>";
     tempScene.setSceneRect(0,0,itemRect.width(),itemRect.height());
