@@ -2,7 +2,7 @@ QT       += core gui concurrent svg xml sql
 QT += core-private
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 # QMAKE_CXXFLAGS += /MP
-# QT += webenginequick
+# QT += webenginewidgets
 
 CONFIG += c++17
 

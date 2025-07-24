@@ -19,6 +19,7 @@
 #include "htmlpropertyform.h"
 #include "rectpropertyform.h"
 #include "textpropertyform.h"
+#include "timepropertyform.h"
 #include "ui_rectpropertyform.h"
 #include "zoneproperty.h"
 #include <QComboBox>
@@ -29,6 +30,7 @@ RectPropertyForm::RectPropertyForm(QWidget *parent)
     ui->setupUi(this);
     textAttr = nullptr;
     htmlAttr = nullptr;
+    timeAttr = nullptr;
     layout()->setAlignment(Qt::AlignTop);
 
     // 关联事件
@@ -107,6 +109,12 @@ void RectPropertyForm::updateData()
     if (htmlAttr != nullptr) {
         htmlAttr->setHtml(attr.getData().toString());
     }
+    if (timeAttr != nullptr) {
+        auto data = attr.getData();
+        if (!data.isNull()) {
+            timeAttr->setData(data.value<TimeProperty>());
+        }
+    }
 }
 
 void RectPropertyForm::hideRound()
@@ -137,6 +145,16 @@ void RectPropertyForm::addHtmlProperty()
     htmlAttr = new HtmlPropertyForm(this);
     ui->textWidget->layout()->addWidget(htmlAttr);
     connect(htmlAttr, SIGNAL(htmlChanged(QString)), this, SLOT(onHtmlChanged(QString)));
+}
+
+void RectPropertyForm::addTimeProperty()
+{
+    if (timeAttr != nullptr) {
+        return;
+    }
+    timeAttr = new TimePropertyForm(this);
+    ui->textWidget->layout()->addWidget(timeAttr);
+    connect(timeAttr, SIGNAL(dataChanged(TimeProperty)), this, SLOT(onTimeStyleChanged(TimeProperty)));
 }
 
 void RectPropertyForm::setGraphicItem(ICustomGraphic *item)
@@ -281,6 +299,15 @@ void RectPropertyForm::onHtmlChanged(const QString &data)
         return;
     }
     attr.setData(data);
+    graphicItem->updateAttribute(&attr);
+}
+
+void RectPropertyForm::onTimeStyleChanged(const TimeProperty &data)
+{
+    if (timeAttr == nullptr) {
+        return;
+    }
+    attr.setData(QVariant::fromValue(data));//qDebug() << "-----------" << data;
     graphicItem->updateAttribute(&attr);
 }
 

@@ -22,12 +22,14 @@
 #include "abstractzoneitem.h"
 #include "ipropertyform.h"
 #include "itextobject.h"
+#include "timeproperty.h"
 #include "zoneproperty.h"
 
 #include <QTextCharFormat>
 
 class TextPropertyForm;
 class HtmlPropertyForm;
+class TimePropertyForm;
 namespace Ui {
 class RectPropertyForm;
 }
@@ -46,6 +48,7 @@ public:
     void hideRound();
     void addTextProperty();
     void addHtmlProperty();
+    void addTimeProperty();
     // ITextObject interface
     void setTextFormat(const QTextFormat &format) override;
     
@@ -81,6 +84,7 @@ private slots:
     void on_stateBox_currentIndexChanged(int index);
     void onTextFormatChanged(const QTextFormat &format);
     void onHtmlChanged(const QString &data);
+    void onTimeStyleChanged(const TimeProperty &data);
 
 private:
     Ui::RectPropertyForm *ui;
@@ -90,6 +94,7 @@ private:
     ZoneProperty attr;
     TextPropertyForm *textAttr{nullptr};
     HtmlPropertyForm *htmlAttr{nullptr};
+    TimePropertyForm *timeAttr{nullptr};
 };
 
 #endif // RECTPROPERTYFORM_H

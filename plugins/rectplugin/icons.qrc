@@ -54,5 +54,7 @@
         <file>html/editor/index.js</file>
         <file>html/editor/style.css</file>
         <file>icons/rectangle.svg</file>
+        <file>icons/time.svg</file>
+        <file>font/lcdNumber.TTF</file>
     </qresource>
 </RCC>

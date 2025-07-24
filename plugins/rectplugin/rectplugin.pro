@@ -58,6 +58,9 @@ SOURCES += \
     star6plugin.cpp \
     star8item.cpp \
     star8plugin.cpp \
+    timeitem.cpp \
+    timeplugin.cpp \
+    timepropertyform.cpp \
     trapeziumitem.cpp \
     trapeziumplugin.cpp \
     triangleitem.cpp \
@@ -118,6 +121,10 @@ HEADERS += \
     star6plugin.h \
     star8item.h \
     star8plugin.h \
+    timeitem.h \
+    timeplugin.h \
+    timeproperty.h \
+    timepropertyform.h \
     trapeziumitem.h \
     trapeziumplugin.h \
     triangleitem.h \
@@ -144,6 +151,7 @@ FORMS += \
     rectpropertyform.ui \
     textpropertyform.ui \
     htmlpropertyform.ui \
+    timepropertyform.ui
 
 RESOURCES += \
     icons.qrc
@@ -186,3 +194,6 @@ else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../common/release/libcommon.a
 # DLLDESTDIR = $$PWD/../../BIDesigner/plugins
 
 DESTDIR = $$PWD/../../BIDesigner/plugins
+
+DISTFILES += \
+    font/lcdNumber.TTF
