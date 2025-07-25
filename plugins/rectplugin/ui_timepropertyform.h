@@ -19,7 +19,6 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QRadioButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QToolButton>
@@ -40,15 +39,17 @@ public:
     QFrame *styleLine;
     QWidget *styleWidget;
     QVBoxLayout *verticalLayout_3;
-    QHBoxLayout *horizontalLayout_8;
-    QCheckBox *hourCheck;
-    QCheckBox *minutesCheck;
-    QCheckBox *secondCheck;
-    QCheckBox *msecondCheck;
+    QComboBox *timeFormat;
     QHBoxLayout *horizontalLayout_7;
-    QRadioButton *hour24Radio;
-    QRadioButton *hour12Radio;
+    QCheckBox *autoCheck;
     QCheckBox *lcdCheck;
+    QHBoxLayout *horizontalLayout_8;
+    QLabel *label_11;
+    QToolButton *alignLeftBtn;
+    QToolButton *alignCenterBtn;
+    QToolButton *alignRightBtn;
+    QToolButton *alignJustifyBtn;
+    QSpacerItem *horizontalSpacer_2;
     QHBoxLayout *horizontalLayout_5;
     QToolButton *expandFont;
     QLabel *label_4;
@@ -86,7 +87,7 @@ public:
     {
         if (TimePropertyForm->objectName().isEmpty())
             TimePropertyForm->setObjectName("TimePropertyForm");
-        TimePropertyForm->resize(288, 292);
+        TimePropertyForm->resize(214, 305);
         verticalLayout_2 = new QVBoxLayout(TimePropertyForm);
         verticalLayout_2->setObjectName("verticalLayout_2");
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
@@ -132,46 +133,17 @@ public:
         verticalLayout_3->setSpacing(6);
         verticalLayout_3->setObjectName("verticalLayout_3");
         verticalLayout_3->setContentsMargins(0, 0, 0, 0);
-        horizontalLayout_8 = new QHBoxLayout();
-        horizontalLayout_8->setObjectName("horizontalLayout_8");
-        hourCheck = new QCheckBox(styleWidget);
-        hourCheck->setObjectName("hourCheck");
-        hourCheck->setChecked(true);
+        timeFormat = new QComboBox(styleWidget);
+        timeFormat->setObjectName("timeFormat");
 
-        horizontalLayout_8->addWidget(hourCheck);
-
-        minutesCheck = new QCheckBox(styleWidget);
-        minutesCheck->setObjectName("minutesCheck");
-        minutesCheck->setChecked(true);
-
-        horizontalLayout_8->addWidget(minutesCheck);
-
-        secondCheck = new QCheckBox(styleWidget);
-        secondCheck->setObjectName("secondCheck");
-        secondCheck->setChecked(true);
-
-        horizontalLayout_8->addWidget(secondCheck);
-
-        msecondCheck = new QCheckBox(styleWidget);
-        msecondCheck->setObjectName("msecondCheck");
-
-        horizontalLayout_8->addWidget(msecondCheck);
-
-
-        verticalLayout_3->addLayout(horizontalLayout_8);
+        verticalLayout_3->addWidget(timeFormat);
 
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setObjectName("horizontalLayout_7");
-        hour24Radio = new QRadioButton(styleWidget);
-        hour24Radio->setObjectName("hour24Radio");
-        hour24Radio->setChecked(true);
+        autoCheck = new QCheckBox(styleWidget);
+        autoCheck->setObjectName("autoCheck");
 
-        horizontalLayout_7->addWidget(hour24Radio);
-
-        hour12Radio = new QRadioButton(styleWidget);
-        hour12Radio->setObjectName("hour12Radio");
-
-        horizontalLayout_7->addWidget(hour12Radio);
+        horizontalLayout_7->addWidget(autoCheck);
 
         lcdCheck = new QCheckBox(styleWidget);
         lcdCheck->setObjectName("lcdCheck");
@@ -180,6 +152,62 @@ public:
 
 
         verticalLayout_3->addLayout(horizontalLayout_7);
+
+        horizontalLayout_8 = new QHBoxLayout();
+        horizontalLayout_8->setObjectName("horizontalLayout_8");
+        label_11 = new QLabel(styleWidget);
+        label_11->setObjectName("label_11");
+        sizePolicy.setHeightForWidth(label_11->sizePolicy().hasHeightForWidth());
+        label_11->setSizePolicy(sizePolicy);
+
+        horizontalLayout_8->addWidget(label_11);
+
+        alignLeftBtn = new QToolButton(styleWidget);
+        alignLeftBtn->setObjectName("alignLeftBtn");
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/icons/align-left.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        alignLeftBtn->setIcon(icon);
+        alignLeftBtn->setCheckable(true);
+        alignLeftBtn->setAutoExclusive(true);
+
+        horizontalLayout_8->addWidget(alignLeftBtn);
+
+        alignCenterBtn = new QToolButton(styleWidget);
+        alignCenterBtn->setObjectName("alignCenterBtn");
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8(":/icons/align-center.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        alignCenterBtn->setIcon(icon1);
+        alignCenterBtn->setCheckable(true);
+        alignCenterBtn->setAutoExclusive(true);
+
+        horizontalLayout_8->addWidget(alignCenterBtn);
+
+        alignRightBtn = new QToolButton(styleWidget);
+        alignRightBtn->setObjectName("alignRightBtn");
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8(":/icons/align-right.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        alignRightBtn->setIcon(icon2);
+        alignRightBtn->setCheckable(true);
+        alignRightBtn->setAutoExclusive(true);
+
+        horizontalLayout_8->addWidget(alignRightBtn);
+
+        alignJustifyBtn = new QToolButton(styleWidget);
+        alignJustifyBtn->setObjectName("alignJustifyBtn");
+        QIcon icon3;
+        icon3.addFile(QString::fromUtf8(":/icons/align-justify.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        alignJustifyBtn->setIcon(icon3);
+        alignJustifyBtn->setCheckable(true);
+        alignJustifyBtn->setAutoExclusive(true);
+
+        horizontalLayout_8->addWidget(alignJustifyBtn);
+
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_8->addItem(horizontalSpacer_2);
+
+
+        verticalLayout_3->addLayout(horizontalLayout_8);
 
 
         verticalLayout_2->addWidget(styleWidget);
@@ -267,17 +295,17 @@ public:
 
         increaseSizeBtn = new QToolButton(fontWidget);
         increaseSizeBtn->setObjectName("increaseSizeBtn");
-        QIcon icon;
-        icon.addFile(QString::fromUtf8(":/icons/increase.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        increaseSizeBtn->setIcon(icon);
+        QIcon icon4;
+        icon4.addFile(QString::fromUtf8(":/icons/increase.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        increaseSizeBtn->setIcon(icon4);
 
         horizontalLayout->addWidget(increaseSizeBtn);
 
         decreaseSizeBtn = new QToolButton(fontWidget);
         decreaseSizeBtn->setObjectName("decreaseSizeBtn");
-        QIcon icon1;
-        icon1.addFile(QString::fromUtf8(":/icons/decrease.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        decreaseSizeBtn->setIcon(icon1);
+        QIcon icon5;
+        icon5.addFile(QString::fromUtf8(":/icons/decrease.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        decreaseSizeBtn->setIcon(icon5);
 
         horizontalLayout->addWidget(decreaseSizeBtn);
 
@@ -337,21 +365,21 @@ public:
         horizontalLayout_3->addWidget(label);
 
         spaceOptions = new QComboBox(fontWidget);
-        QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/icons/tighten2.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        spaceOptions->addItem(icon2, QString());
-        QIcon icon3;
-        icon3.addFile(QString::fromUtf8(":/icons/tighten1.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        spaceOptions->addItem(icon3, QString());
-        QIcon icon4;
-        icon4.addFile(QString::fromUtf8(":/icons/stand.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        spaceOptions->addItem(icon4, QString());
-        QIcon icon5;
-        icon5.addFile(QString::fromUtf8(":/icons/loose1.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
-        spaceOptions->addItem(icon5, QString());
         QIcon icon6;
-        icon6.addFile(QString::fromUtf8(":/icons/loose2.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        icon6.addFile(QString::fromUtf8(":/icons/tighten2.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
         spaceOptions->addItem(icon6, QString());
+        QIcon icon7;
+        icon7.addFile(QString::fromUtf8(":/icons/tighten1.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        spaceOptions->addItem(icon7, QString());
+        QIcon icon8;
+        icon8.addFile(QString::fromUtf8(":/icons/stand.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        spaceOptions->addItem(icon8, QString());
+        QIcon icon9;
+        icon9.addFile(QString::fromUtf8(":/icons/loose1.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        spaceOptions->addItem(icon9, QString());
+        QIcon icon10;
+        icon10.addFile(QString::fromUtf8(":/icons/loose2.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        spaceOptions->addItem(icon10, QString());
         spaceOptions->addItem(QString());
         spaceOptions->setObjectName("spaceOptions");
         sizePolicy2.setHeightForWidth(spaceOptions->sizePolicy().hasHeightForWidth());
@@ -418,7 +446,7 @@ public:
 
         horizontalLayout_4->addWidget(background);
 
-        horizontalSpacer_13 = new QSpacerItem(40, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_13 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_4->addItem(horizontalSpacer_13);
 
@@ -442,13 +470,37 @@ public:
         TimePropertyForm->setWindowTitle(QCoreApplication::translate("TimePropertyForm", "Form", nullptr));
         expandStyle->setText(QCoreApplication::translate("TimePropertyForm", "...", nullptr));
         label_5->setText(QCoreApplication::translate("TimePropertyForm", "\346\240\267\345\274\217", nullptr));
-        hourCheck->setText(QCoreApplication::translate("TimePropertyForm", "\346\227\266", nullptr));
-        minutesCheck->setText(QCoreApplication::translate("TimePropertyForm", "\345\210\206", nullptr));
-        secondCheck->setText(QCoreApplication::translate("TimePropertyForm", "\347\247\222", nullptr));
-        msecondCheck->setText(QCoreApplication::translate("TimePropertyForm", "\346\257\253\347\247\222", nullptr));
-        hour24Radio->setText(QCoreApplication::translate("TimePropertyForm", "24\345\260\217\346\227\266", nullptr));
-        hour12Radio->setText(QCoreApplication::translate("TimePropertyForm", "12\345\260\217\346\227\266", nullptr));
+        autoCheck->setText(QCoreApplication::translate("TimePropertyForm", "\350\207\252\345\212\250\346\233\264\346\226\260", nullptr));
         lcdCheck->setText(QCoreApplication::translate("TimePropertyForm", "\346\266\262\346\231\266\346\225\260\345\255\227", nullptr));
+        label_11->setText(QCoreApplication::translate("TimePropertyForm", "\345\257\271\351\275\220", nullptr));
+#if QT_CONFIG(tooltip)
+        alignLeftBtn->setToolTip(QCoreApplication::translate("TimePropertyForm", "\345\267\246\345\257\271\351\275\220", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        alignLeftBtn->setWhatsThis(QString());
+#endif // QT_CONFIG(whatsthis)
+        alignLeftBtn->setText(QCoreApplication::translate("TimePropertyForm", "...", nullptr));
+#if QT_CONFIG(tooltip)
+        alignCenterBtn->setToolTip(QCoreApplication::translate("TimePropertyForm", "\345\261\205\344\270\255\345\257\271\351\275\220", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        alignCenterBtn->setWhatsThis(QString());
+#endif // QT_CONFIG(whatsthis)
+        alignCenterBtn->setText(QCoreApplication::translate("TimePropertyForm", "...", nullptr));
+#if QT_CONFIG(tooltip)
+        alignRightBtn->setToolTip(QCoreApplication::translate("TimePropertyForm", "\345\217\263\345\257\271\351\275\220", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        alignRightBtn->setWhatsThis(QString());
+#endif // QT_CONFIG(whatsthis)
+        alignRightBtn->setText(QCoreApplication::translate("TimePropertyForm", "...", nullptr));
+#if QT_CONFIG(tooltip)
+        alignJustifyBtn->setToolTip(QCoreApplication::translate("TimePropertyForm", "\344\270\244\347\253\257\345\257\271\351\275\220", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        alignJustifyBtn->setWhatsThis(QString());
+#endif // QT_CONFIG(whatsthis)
+        alignJustifyBtn->setText(QCoreApplication::translate("TimePropertyForm", "...", nullptr));
         expandFont->setText(QCoreApplication::translate("TimePropertyForm", "...", nullptr));
         label_4->setText(QCoreApplication::translate("TimePropertyForm", "\345\255\227\344\275\223", nullptr));
         label_12->setText(QCoreApplication::translate("TimePropertyForm", "\345\244\247\345\260\217", nullptr));

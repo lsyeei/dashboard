@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 #include "timeitem.h"
+#include "qtextcursor.h"
 #include "timeproperty.h"
 #include "zoneproperty.h"
 
@@ -24,24 +25,24 @@
 QString TimeItem::SHAPE_ID = "TIME_2024";
 
 TimeItem::TimeItem(QGraphicsItem *parent) : AbstractTextItem(parent)
-{
-    TimeProperty property;
-    property.setFormat("HH:mm:ss");
-    property.setIsLcd(false);
-    property.setFont(textItem->font());
-    property.setForeground(textItem->defaultTextColor());
-    attribute()->setData(QVariant::fromValue(property));
-    updateTime();
-    connect(timer.data(), SIGNAL(timeout()), this, SLOT(updateTime()));
-    timer->setInterval(1000);
-    timer->start();
-
+{    
     int lcdFontId = QFontDatabase::addApplicationFont("://font/lcdNumber.TTF");
     if (lcdFontId == -1) {
         qDebug() << "字体加载失败！";
     }else{
         families = QFontDatabase::applicationFontFamilies(lcdFontId);
     }
+
+    TimeProperty property;
+    property.setFormat("hh:mm:ss");
+    property.setIsLcd(false);
+    property.setFont(textItem->font());
+    property.setForeground(textItem->defaultTextColor());
+    property.setTime(QDateTime::currentDateTime().toString(property.getFormat()));
+    attribute()->setData(QVariant::fromValue(property));
+    updateTime();
+    connect(timer.data(), SIGNAL(timeout()), this, SLOT(updateTime()));
+    timer->setInterval(1000);
 }
 
 TimeItem::TimeItem(const QString &xml, QGraphicsItem *parent) : TimeItem(parent)
@@ -61,31 +62,55 @@ QString TimeItem::classId() const
 
 void TimeItem::updateTime()
 {
-    QString format{"H:mm:ss"};
     auto attr = attribute();
     auto data = attr->getData();
-    if (!data.isNull()) {
-        auto property = data.value<TimeProperty>();
-        if (!property.getFormat().isEmpty()) {
-            format = property.getFormat();
-        }
-        auto font = property.getFont();
-        if (property.getIsLcd()) {
-            if (!families.isEmpty()) {
-                font.setFamilies(families);
-            }
-        }
-        textItem->setFont(font);
-        textItem->setDefaultTextColor(property.getForeground());
+    if (data.isNull()) {
+        return;
     }
-    auto time = QTime::currentTime();
-    auto txt = time.toString(format);
+    auto property = data.value<TimeProperty>();
+    QString format = property.getFormat();
+    auto txt = property.getTime();
+    if (property.getIsAuto()) {
+        auto locale = QLocale::system();
+        auto time = QDateTime::currentDateTime();
+        txt = locale.toString(time, format);
+    }
     textItem->setPlainText(txt);
+
+    auto font = property.getFont();
+    if (property.getIsLcd()) {
+        if (!families.isEmpty()) {
+            QStringList familyList;
+            familyList << families << font.families();
+            font.setFamilies(familyList);
+        }
+    }
+    textItem->setFont(font);
+    textItem->setDefaultTextColor(property.getForeground());
+    auto cursor = textItem->textCursor();
+    QTextBlockFormat blockFormat;
+    blockFormat.setAlignment(property.getAlignment());
+    cursor.beginEditBlock();
+    cursor.mergeBlockFormat(blockFormat);
+    cursor.endEditBlock();
 }
 void TimeItem::attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr)
 {
     AbstractTextItem::attributeChanged(oldAttr, newAttr);
-    timer->stop();
-    updateTime();
-    timer->start();
+    auto attr = attribute();
+    auto data = attr->getData();
+    if (data.isNull()) {
+        return;
+    }
+    auto property = data.value<TimeProperty>();
+    if (property.getIsAuto()) {
+        timer->stop();
+        updateTime();
+        timer->start();
+    }else{
+        if (timer->isActive()) {
+            timer->stop();
+        }
+        updateTime();
+    }
 }

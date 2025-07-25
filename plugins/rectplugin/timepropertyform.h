@@ -33,6 +33,8 @@ public:
     explicit TimePropertyForm(QWidget *parent = nullptr);
     ~TimePropertyForm();
     void setData(const TimeProperty &property);
+    // QObject interface
+    bool eventFilter(QObject *watched, QEvent *event) override;
 Q_SIGNALS:
     void dataChanged(const TimeProperty &property);
 protected Q_SLOTS:
@@ -46,9 +48,10 @@ private:
     bool noData{true};
     void initUI();
     void initEvent();
-    QString getTimeFormat();
-    void parseTimeFormat(const QString &format);
+    void updateFormatOptions();
+    QString getFormatDate(const QString format);
     TimeProperty attr;
 };
+
 
 #endif // TIMEPROPERTYFORM_H

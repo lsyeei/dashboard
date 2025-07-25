@@ -17,6 +17,8 @@
  */
 #include "timepropertyform.h"
 #include "ui_timepropertyform.h"
+#include <QAbstractItemView>
+#include <QTimeZone>
 
 TimePropertyForm::TimePropertyForm(QWidget *parent)
     : QWidget(parent)
@@ -34,12 +36,12 @@ TimePropertyForm::~TimePropertyForm()
 
 void TimePropertyForm::setData(const TimeProperty &property)
 {
-    QSignalBlocker hourBlocker(ui->hourCheck);
-    QSignalBlocker secondBlocker(ui->secondCheck);
-    QSignalBlocker minutesBlocker(ui->minutesCheck);
-    QSignalBlocker msBlocker(ui->msecondCheck);
-    QSignalBlocker hour24Blocker(ui->hour24Radio);
-    QSignalBlocker hour12Blocker(ui->hour12Radio);
+    QSignalBlocker hourBlocker(ui->timeFormat);
+    QSignalBlocker secondBlocker(ui->autoCheck);
+    QSignalBlocker minutesBlocker(ui->alignCenterBtn);
+    QSignalBlocker msBlocker(ui->alignJustifyBtn);
+    QSignalBlocker hour24Blocker(ui->alignLeftBtn);
+    QSignalBlocker hour12Blocker(ui->alignRightBtn);
     QSignalBlocker lcdBlocker(ui->lcdCheck);
     QSignalBlocker fontFamilyBlocker(ui->fontFamily);
     QSignalBlocker fontSizeBlocker(ui->fontSize);
@@ -52,7 +54,18 @@ void TimePropertyForm::setData(const TimeProperty &property)
     QSignalBlocker foregroundBlocker(ui->foreground);
     QSignalBlocker backgroundBlocker(ui->background);
     attr = property;
-    parseTimeFormat(attr.getFormat());
+    auto index = ui->timeFormat->findData(attr.getFormat());
+    if (index < 0) {
+        index = 0;
+    }
+    ui->timeFormat->setCurrentIndex(index);
+    ui->autoCheck->setChecked(attr.getIsAuto());
+    auto align = attr.getAlignment();
+    ui->alignLeftBtn->setChecked(align & Qt::AlignLeft);
+    ui->alignCenterBtn->setChecked(align & Qt::AlignCenter);
+    ui->alignRightBtn->setChecked(align & Qt::AlignRight);
+    ui->alignJustifyBtn->setChecked(align & Qt::AlignJustify);
+
     auto font = attr.getFont();
     if (!attr.getIsLcd()) {
         ui->fontFamily->setEnabled(true);
@@ -84,6 +97,14 @@ void TimePropertyForm::setData(const TimeProperty &property)
     noData = false;
 }
 
+bool TimePropertyForm::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == ui->timeFormat->view() && event->type() == QEvent::ShowToParent) {
+        updateFormatOptions();
+    }
+    return QWidget::eventFilter(watched, event);
+}
+
 void TimePropertyForm::onValueChanged()
 {
     if (noData) {
@@ -91,16 +112,33 @@ void TimePropertyForm::onValueChanged()
     }
     auto action = sender()->objectName();
     auto font = attr.getFont();
-    if (action.compare("hourCheck") == 0 || action.compare("minutesCheck") == 0 ||
-        action.compare("secondCheck") == 0 || action.compare("msecondCheck") == 0  ||
-        action.compare("hour24Radio") == 0 || action.compare("hour12Radio") == 0) {
-        ui->hour24Radio->setVisible(ui->hourCheck->isChecked());
-        ui->hour12Radio->setVisible(ui->hourCheck->isChecked());
-        attr.setFormat(getTimeFormat());
+    if (action.compare("timeFormat") == 0) {
+        attr.setFormat(ui->timeFormat->currentData().toString());
+        if (!attr.getIsAuto()) {
+            attr.setTime(getFormatDate(attr.getFormat()));
+        }
+    }
+    if (action.compare("autoCheck") == 0) {
+        attr.setIsAuto(ui->autoCheck->isChecked());
+        if (!attr.getIsAuto()) {
+            attr.setTime(getFormatDate(attr.getFormat()));
+        }
     }
     if (action.compare("lcdCheck") == 0) {
         attr.setIsLcd(ui->lcdCheck->isChecked());
         ui->fontFamily->setEnabled(!ui->lcdCheck->isChecked());
+    }
+    if (action.compare("alignLeftBtn") == 0) {
+        attr.setAlignment(Qt::AlignLeft);
+    }
+    if (action.compare("alignCenterBtn") == 0) {
+        attr.setAlignment(Qt::AlignCenter);
+    }
+    if (action.compare("alignRightBtn") == 0) {
+        attr.setAlignment(Qt::AlignRight);
+    }
+    if (action.compare("alignJustifyBtn") == 0) {
+        attr.setAlignment(Qt::AlignJustify);
     }
     if (action.compare("fontFamily") == 0) {
         font.setFamily(ui->fontFamily->currentFont().family());
@@ -205,32 +243,24 @@ void TimePropertyForm::showStyle()
 
 void TimePropertyForm::initUI()
 {
-    QSignalBlocker hourBlocker(ui->hourCheck);
-    QSignalBlocker secondBlocker(ui->secondCheck);
-    QSignalBlocker minutesBlocker(ui->minutesCheck);
-    QSignalBlocker msBlocker(ui->msecondCheck);
-    QSignalBlocker hour24Blocker(ui->hour24Radio);
-    QSignalBlocker hour12Blocker(ui->hour12Radio);
     QSignalBlocker lcdBlocker(ui->lcdCheck);
-    ui->hourCheck->setChecked(true);
-    ui->secondCheck->setChecked(true);
-    ui->minutesCheck->setChecked(true);
-    ui->msecondCheck->setChecked(false);
-    ui->hour24Radio->setChecked(true);
     ui->lcdCheck->setChecked(false);
     ui->background->hide();
     ui->bkColorLabel->hide();
+
+    updateFormatOptions();
 }
 
 void TimePropertyForm::initEvent()
 {
-    connect(ui->hourCheck, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(onValueChanged()));
-    connect(ui->minutesCheck, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(onValueChanged()));
-    connect(ui->secondCheck, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(onValueChanged()));
-    connect(ui->msecondCheck, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(onValueChanged()));
-    connect(ui->hour24Radio, SIGNAL(toggled(bool)), this, SLOT(onValueChanged()));
-    connect(ui->hour12Radio, SIGNAL(toggled(bool)), this, SLOT(onValueChanged()));
+    connect(ui->timeFormat, SIGNAL(currentIndexChanged(int)), this, SLOT(onValueChanged()));
+    connect(ui->autoCheck, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(onValueChanged()));
     connect(ui->lcdCheck, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(onValueChanged()));
+    connect(ui->alignLeftBtn, SIGNAL(toggled(bool)), this, SLOT(onValueChanged()));
+    connect(ui->alignCenterBtn, SIGNAL(toggled(bool)), this, SLOT(onValueChanged()));
+    connect(ui->alignRightBtn, SIGNAL(toggled(bool)), this, SLOT(onValueChanged()));
+    connect(ui->alignJustifyBtn,SIGNAL(toggled(bool)), this, SLOT(onValueChanged()));
+
     connect(ui->fontFamily, SIGNAL(currentIndexChanged(int)), this, SLOT(onValueChanged()));
     connect(ui->fontSize, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged()));
     connect(ui->boldBtn, SIGNAL(toggled(bool)), this, SLOT(onValueChanged()));
@@ -246,47 +276,34 @@ void TimePropertyForm::initEvent()
 
     connect(ui->expandFont, SIGNAL(clicked(bool)), this, SLOT(showFont()));
     connect(ui->expandStyle, SIGNAL(clicked(bool)), this, SLOT(showStyle()));
+
+    ui->timeFormat->view()->installEventFilter(this);
 }
 
-QString TimePropertyForm::getTimeFormat()
+void TimePropertyForm::updateFormatOptions()
 {
-    QString format;
-    QString h{""}, m{""}, s{""}, ms{""};
-    h = ui->hourCheck->isChecked()?"hh":"";
-    m = ui->minutesCheck->isChecked()?"mm":"";
-    s = ui->secondCheck->isChecked()?"ss":"";
-    ms = ui->msecondCheck->isChecked()?"zzz":"";
-    if (!h.isEmpty()) {
-        format = h;
+    auto index = ui->timeFormat->currentIndex();
+    if (index < 0) {
+        index = 0;
     }
-    if (!m.isEmpty()) {
-        if (format.isEmpty()) {
-            format = m;
-        }else{
-            format += ":" + m;
-        }
+    ui->timeFormat->clear();
+    QList<QString> formatList;
+    formatList << "yyyy/M/d ddd" << "yyyy年M月d日" << "yyyy年M月d日 ddd"
+               << "yyyy/M/d" << "yyyy-M-d ddd" << "yyyy-M-d" << "yyyy-MM-dd"
+               << "yy.MM.dd" << "yyyy年M月" << "yyyy年M月d日 h时mm分"
+               << "yyyy年M月d日 hh:mm:ss" << "yyyy年M月d日 ddd  hh时mm分ss秒"
+               << "hh:mm" << "hh:mm:ss" << "hh时mm分 AP" << "hh时mm分ss秒 AP"
+               << "yyyy年"  << "MM月" << "dddd";
+
+    foreach (auto format, formatList) {
+        ui->timeFormat->addItem(getFormatDate(format), format);
     }
-    if (!s.isEmpty()) {
-        if (format.isEmpty()) {
-            format = s;
-        }else{
-            format += ":" + s;
-        }
-    }
-    if (!ms.isEmpty()) {
-        if (format.isEmpty()) {
-            format = ms;
-        }else{
-            format += "." + ms;
-        }
-    }
-    if (!h.isEmpty() && ui->hour12Radio->isChecked()) {
-        format += " Ap";
-    }
-    return format;
+    ui->timeFormat->setCurrentIndex(index);
 }
 
-void TimePropertyForm::parseTimeFormat(const QString &format)
+QString TimePropertyForm::getFormatDate(const QString format)
 {
-
+    auto locale = QLocale::system();
+    auto data = QDateTime::currentDateTime();
+    return locale.toString(data, format);
 }

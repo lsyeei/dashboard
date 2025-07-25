@@ -27,14 +27,23 @@ public:
     TimeProperty(){}
     ~TimeProperty(){}
 private:
-    QString format{"h:mm"};
+    QString time;
+    QString format{"hh:mm"};
+    // 自动刷新
+    bool isAuto{false};
+    // LCD 样式
     bool isLCD{false};
+    // 对齐
+    Qt::AlignmentFlag alignment{Qt::AlignCenter};
     QFont font;
-    QColor foreground;
-    QColor background;
+    QColor foreground{Qt::white};
+    QColor background{Qt::white};
 
+    JSONFIELD(time, Time)
     JSONFIELD(format, Format)
+    JSONFIELD(isAuto, IsAuto)
     JSONFIELD(isLCD, IsLcd)
+    JSONFIELD(alignment, Alignment)
     JSONFIELD(font, Font)
     JSONFIELD(foreground, Foreground)
     JSONFIELD(background, Background)
