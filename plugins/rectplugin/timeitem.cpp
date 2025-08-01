@@ -17,7 +17,6 @@
  */
 #include "timeitem.h"
 #include "qtextcursor.h"
-#include "timeproperty.h"
 #include "zoneproperty.h"
 
 #include <QFontDatabase>
@@ -94,15 +93,9 @@ void TimeItem::updateTime()
     cursor.mergeBlockFormat(blockFormat);
     cursor.endEditBlock();
 }
-void TimeItem::attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr)
+
+void TimeItem::propertyChanged(const TimeProperty &property)
 {
-    AbstractTextItem::attributeChanged(oldAttr, newAttr);
-    auto attr = attribute();
-    auto data = attr->getData();
-    if (data.isNull()) {
-        return;
-    }
-    auto property = data.value<TimeProperty>();
     if (property.getIsAuto()) {
         timer->stop();
         updateTime();
@@ -113,4 +106,30 @@ void TimeItem::attributeChanged(const BaseProperty &oldAttr, const BaseProperty 
         }
         updateTime();
     }
+}
+void TimeItem::attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr)
+{
+    AbstractTextItem::attributeChanged(oldAttr, newAttr);
+    auto data = attribute()->getData();
+    if (data.isNull()) {
+        return;
+    }
+    propertyChanged(data.value<TimeProperty>());
+}
+
+
+QString TimeItem::toXml() const
+{
+    return AbstractZoneItem::toXml();
+}
+
+void TimeItem::parseXML(const QString &xml)
+{
+    AbstractZoneItem::parseXML(xml);
+    auto data = attribute()->getData();
+    if (data.isNull()) {
+        return;
+    }
+    textItem->setTextWidth(attribute()->getWidth());
+    propertyChanged(data.value<TimeProperty>());
 }

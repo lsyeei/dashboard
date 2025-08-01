@@ -15,18 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "timeplugin.h"
-#include "svghelper.h"
-#include "rectpropertyform.h"
-#include "timeitem.h"
-#include "timepropertyform.h"
+#ifndef ISUBWIDGET_H
+#define ISUBWIDGET_H
 
-TimePlugin::TimePlugin() {}
-METHOD_DEFINE(TimePlugin, "时间", "通用", "系统时间", "系统时间", :/icons/time.svg, TimeItem, RectPropertyForm)
+#include <QWidget>
 
-QWidget *TimePlugin::propertyWidget()
+class ISubWidget : public QWidget
 {
-    auto widget = new RectPropertyForm();
-    widget->addSubWidget(new TimePropertyForm());
-    return widget;
-}
+    Q_OBJECT
+public:
+    ISubWidget(QWidget* parent = nullptr):QWidget(parent){};
+    virtual void setData(const QVariant &data)=0;
+Q_SIGNALS:
+    void dataChanged(const QVariant &data);
+};
+
+#endif // ISUBWIDGET_H

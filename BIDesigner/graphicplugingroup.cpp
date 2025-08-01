@@ -61,7 +61,7 @@ GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget 
     titleWidget->setObjectName("titlePanel");
     QSizePolicy titlePolicy;
     titlePolicy.setHorizontalPolicy(QSizePolicy::Expanding);
-    titlePolicy.setVerticalPolicy(QSizePolicy::Preferred);
+    titlePolicy.setVerticalPolicy(QSizePolicy::Fixed);
     titleWidget->setSizePolicy(titlePolicy);
     titleLayout = new QHBoxLayout(titleWidget);
     titleLayout->setContentsMargins(5,6,5,6);
@@ -83,13 +83,14 @@ GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget 
     contentWidget->setObjectName("contentPanel");
     QSizePolicy contentPolicy;
     contentPolicy.setHorizontalPolicy(QSizePolicy::Expanding);
-    contentPolicy.setVerticalPolicy(QSizePolicy::Minimum);
+    contentPolicy.setVerticalPolicy(QSizePolicy::MinimumExpanding);
     contentWidget->setSizePolicy(contentPolicy);
     contentLayout = new FlowLayout(contentWidget);
     contentLayout->setSizeConstraint(QLayout::SetMinimumSize);
     contentLayout->setAlignment(Qt::AlignTop);
     contentLayout->setVerticalSpacing(6);
     contentLayout->setHorizontalSpacing(6);
+    contentWidget->installEventFilter(this);
 
     paletteChanged();
 }
@@ -143,10 +144,9 @@ void GraphicPluginGroup::createEditBtns()
 
     QIcon menuIcon(SvgHelper{QString{":/icons/icons/more-line.svg"}}.toPixmap(SvgHelper::Normal));
     editBtn = new QPushButton(menuIcon, tr(""));
-    editBtn->setIconSize({18,18});
+    editBtn->setIconSize({12,12});
     editBtn->setFlat(true);
-    editBtn->setMaximumWidth(20);
-    editBtn->setMaximumHeight(18);
+    editBtn->setMinimumSize({20, 18});
     connect(editBtn.data(), &QPushButton::clicked,
             this, [&](){popMenu->popup(QCursor::pos());});
 
@@ -372,5 +372,13 @@ bool GraphicPluginGroup::eventFilter(QObject *watched, QEvent *event)
             }
         }
     }
+    // if(watched == contentWidget && event->type() == QEvent::Paint){
+    //    // 显示单组控件区域，观察调整该区域策略效果
+    //     QPainter paint(contentWidget);
+    //     paint.begin(contentWidget);
+    //     paint.setPen(QPen{Qt::red, 2});
+    //     paint.drawRect(contentWidget->rect());
+    //     paint.end();
+    // }
     return QWidget::eventFilter(watched, event);
 }

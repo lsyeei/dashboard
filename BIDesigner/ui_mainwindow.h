@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 6.8.0
+** Created by: Qt User Interface Compiler version 6.8.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -397,7 +397,7 @@ public:
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(graphicItems->sizePolicy().hasHeightForWidth());
         graphicItems->setSizePolicy(sizePolicy2);
-        graphicItems->setMinimumSize(QSize(150, 0));
+        graphicItems->setMinimumSize(QSize(250, 0));
         graphicItems->setAutoFillBackground(false);
         graphicItems->setStyleSheet(QString::fromUtf8(""));
         verticalLayout_4 = new QVBoxLayout(graphicItems);

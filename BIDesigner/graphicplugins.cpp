@@ -82,7 +82,7 @@ GraphicPlugins::GraphicPlugins(QWidget *parent)
     loadPredefGraphicPlugin();
     // 加载用户图元控件
     loadUserGraphicPlugin();
-
+    panelLayout->addStretch();
 }
 
 GraphicPlugins::~GraphicPlugins()

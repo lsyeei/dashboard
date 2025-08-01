@@ -1,5 +1,6 @@
 QT       += core gui xml svg
-# QT  += webenginewidgets
+QT  += webenginewidgets
+QT += concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -71,8 +72,12 @@ SOURCES += \
     htmlitem.cpp \
     htmlitemplugin.cpp \
     htmlpropertyform.cpp \
+    webitem.cpp \
+    webplugin.cpp \
+    webpropertyform.cpp
 
 HEADERS += \
+    ../common/isubwidget.h \
     ../common/pointstyle.h \
     ../common/adjustpoint.h \
     ../common/abstractselector.h \
@@ -135,6 +140,10 @@ HEADERS += \
     htmlitem.h \
     htmlitemplugin.h \
     htmlpropertyform.h \
+    webitem.h \
+    webplugin.h \
+    webproperty.h \
+    webpropertyform.h
 
 INCLUDEPATH += \
     ../interface \
@@ -151,7 +160,8 @@ FORMS += \
     rectpropertyform.ui \
     textpropertyform.ui \
     htmlpropertyform.ui \
-    timepropertyform.ui
+    timepropertyform.ui \
+    webpropertyform.ui
 
 RESOURCES += \
     icons.qrc
@@ -196,4 +206,4 @@ else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../common/release/libcommon.a
 DESTDIR = $$PWD/../../BIDesigner/plugins
 
 DISTFILES += \
-    font/lcdNumber.TTF
+    icons/web.svg

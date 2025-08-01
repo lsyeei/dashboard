@@ -1,0 +1,42 @@
+-ID:/Qt/6.8.3/msvc2022_64/mkspecs/win32-msvc
+-IE:/project/dashboard/BIDesigner
+-IE:/project/dashboard/plugins/interface
+-IE:/project/dashboard/common
+-IE:/project/dashboard/plugins/common
+-IE:/project/dashboard/BIWidgets/colorpickerwidget
+-IE:/project/dashboard/BIWidgets/fillpropertywidget
+-IE:/project/dashboard/BIWidgets/linepropertywidget
+-IE:/project/dashboard/BIWidgets/pospropertywidget
+-IE:/project/dashboard/BIWidgets/bicomboboxwidget
+-ID:/Qt/6.8.3/msvc2022_64/include
+-ID:/Qt/6.8.3/msvc2022_64/include/QtSvg
+-ID:/Qt/6.8.3/msvc2022_64/include/QtWebEngineWidgets
+-ID:/Qt/6.8.3/msvc2022_64/include/QtPrintSupport
+-ID:/Qt/6.8.3/msvc2022_64/include/QtWidgets
+-ID:/Qt/6.8.3/msvc2022_64/include/QtWebEngineQuick
+-ID:/Qt/6.8.3/msvc2022_64/include/QtWebEngineCore
+-ID:/Qt/6.8.3/msvc2022_64/include/QtQuick
+-ID:/Qt/6.8.3/msvc2022_64/include/QtOpenGL
+-ID:/Qt/6.8.3/msvc2022_64/include/QtGui
+-ID:/Qt/6.8.3/msvc2022_64/include/QtConcurrent
+-ID:/Qt/6.8.3/msvc2022_64/include/QtXml
+-ID:/Qt/6.8.3/msvc2022_64/include/QtSql
+-ID:/Qt/6.8.3/msvc2022_64/include/QtCore/6.8.3
+-ID:/Qt/6.8.3/msvc2022_64/include/QtCore/6.8.3/QtCore
+-ID:/Qt/6.8.3/msvc2022_64/include/QtQmlMeta
+-ID:/Qt/6.8.3/msvc2022_64/include/QtQmlModels
+-ID:/Qt/6.8.3/msvc2022_64/include/QtQmlWorkerScript
+-ID:/Qt/6.8.3/msvc2022_64/include/QtWebChannel
+-ID:/Qt/6.8.3/msvc2022_64/include/QtQml
+-ID:/Qt/6.8.3/msvc2022_64/include/QtNetwork
+-ID:/Qt/6.8.3/msvc2022_64/include/QtQmlIntegration
+-ID:/Qt/6.8.3/msvc2022_64/include/QtPositioning
+-ID:/Qt/6.8.3/msvc2022_64/include/QtCore
+-ID:/Qt/6.8.3/msvc2022_64/include/QtWebChannelQuick
+-IC:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.39.33519\include
+-IC:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\VS\include
+-IC:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt
+-IC:\Program Files (x86)\Windows Kits\10\\include\10.0.22621.0\\um
+-IC:\Program Files (x86)\Windows Kits\10\\include\10.0.22621.0\\shared
+-IC:\Program Files (x86)\Windows Kits\10\\include\10.0.22621.0\\winrt
+-IC:\Program Files (x86)\Windows Kits\10\\include\10.0.22621.0\\cppwinrt

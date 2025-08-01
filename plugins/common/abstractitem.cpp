@@ -23,7 +23,7 @@
 #include <QXmlStreamWriter>
 
 AbstractItem::AbstractItem(QGraphicsItem *parent)
-    : QGraphicsItem(parent)
+    : ICustomGraphic(parent)
 {
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
     setCacheMode(QGraphicsItem::DeviceCoordinateCache);

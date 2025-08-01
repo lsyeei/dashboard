@@ -1,29 +1,37 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+/**
+ * 实现类通过定义宏 BASE_FOR_GROUP 明确父类。
+ * BASE_FOR_GROUP 指定父类为 QGraphicsItemGroup
+ * 未定义宏，默认父类为 QGraphicsItem
+ */
 #ifndef ICUSTOMGRAPHIC_H
 #define ICUSTOMGRAPHIC_H
 
-#include "qgraphicsitem.h"
-// #include <QObject>
+#ifdef BASE_FOR_GROUP
+#include <QGraphicsItemGroup>
+#else
+#include <QGraphicsItem>
+#endif
+
 class QXmlStreamWriter;
-class QGraphicsItem;
-class QGraphicsItemGroup;
+
 class ICustomGraphic :
 #ifdef BASE_FOR_GROUP
     virtual public QGraphicsItemGroup
@@ -32,6 +40,12 @@ class ICustomGraphic :
 #endif
 {
 public:
+
+#ifdef BASE_FOR_GROUP
+    ICustomGraphic(QGraphicsItem *parent = nullptr):QGraphicsItemGroup(parent){}
+#else
+    ICustomGraphic(QGraphicsItem *parent = nullptr):QGraphicsItem(parent){}
+#endif
     virtual ~ICustomGraphic() = default;
     /**
      * @brief id 获取子类标识

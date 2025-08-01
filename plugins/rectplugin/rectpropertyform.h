@@ -21,20 +21,16 @@
 
 #include "abstractzoneitem.h"
 #include "ipropertyform.h"
-#include "itextobject.h"
-#include "timeproperty.h"
 #include "zoneproperty.h"
 
 #include <QTextCharFormat>
 
-class TextPropertyForm;
-class HtmlPropertyForm;
-class TimePropertyForm;
+class ISubWidget;
 namespace Ui {
 class RectPropertyForm;
 }
 
-class RectPropertyForm : public IPropertyForm, public ITextObject
+class RectPropertyForm : public IPropertyForm
 {
     Q_OBJECT
 
@@ -46,11 +42,9 @@ public:
     ICustomGraphic *getGraphicItem() override;
     void updateData() override;
     void hideRound();
-    void addTextProperty();
-    void addHtmlProperty();
-    void addTimeProperty();
+    void addSubWidget(ISubWidget *widget);
     // ITextObject interface
-    void setTextFormat(const QTextFormat &format) override;
+    ISubWidget *getSubWidget();
     
 Q_SIGNALS:
     /**
@@ -82,9 +76,7 @@ private slots:
     void on_stateBox_itemRemoved(const QString &name, const QVariant &data);
 
     void on_stateBox_currentIndexChanged(int index);
-    void onTextFormatChanged(const QTextFormat &format);
-    void onHtmlChanged(const QString &data);
-    void onTimeStyleChanged(const TimeProperty &data);
+    void onSubWidgetDataChanged(const QVariant &data);
 
 private:
     Ui::RectPropertyForm *ui;
@@ -92,9 +84,7 @@ private:
     AbstractZoneItem *graphicItem{nullptr};
     // 属性
     ZoneProperty attr;
-    TextPropertyForm *textAttr{nullptr};
-    HtmlPropertyForm *htmlAttr{nullptr};
-    TimePropertyForm *timeAttr{nullptr};
+    QScopedPointer<ISubWidget> subWidget;
 };
 
 #endif // RECTPROPERTYFORM_H

@@ -16,21 +16,16 @@
 * limitations under the License.
 */
 
-#include "htmlpropertyform.h"
 #include "rectpropertyform.h"
-#include "textpropertyform.h"
-#include "timepropertyform.h"
 #include "ui_rectpropertyform.h"
 #include "zoneproperty.h"
 #include <QComboBox>
+#include "isubwidget.h"
 
 RectPropertyForm::RectPropertyForm(QWidget *parent)
     : IPropertyForm(parent), ui(new Ui::RectPropertyForm)
 {
     ui->setupUi(this);
-    textAttr = nullptr;
-    htmlAttr = nullptr;
-    timeAttr = nullptr;
     layout()->setAlignment(Qt::AlignTop);
 
     // 关联事件
@@ -106,13 +101,10 @@ void RectPropertyForm::updateData()
         ui->stateBox->setCurrentItem(index);
     }
 
-    if (htmlAttr != nullptr) {
-        htmlAttr->setHtml(attr.getData().toString());
-    }
-    if (timeAttr != nullptr) {
+    if (!subWidget.isNull()) {
         auto data = attr.getData();
         if (!data.isNull()) {
-            timeAttr->setData(data.value<TimeProperty>());
+            subWidget->setData(data);
         }
     }
 }
@@ -127,34 +119,16 @@ void RectPropertyForm::hideRound()
     }
 }
 
-void RectPropertyForm::addTextProperty()
+void RectPropertyForm::addSubWidget(ISubWidget *widget)
 {
-    if (textAttr != nullptr) {
-        return;
-    }
-    textAttr = new TextPropertyForm(this);
-    ui->textWidget->layout()->addWidget(textAttr);
-    connect(textAttr, SIGNAL(textFormatChanged(QTextFormat)), this, SLOT(onTextFormatChanged(QTextFormat)));
+    subWidget.reset(widget);
+    ui->textWidget->layout()->addWidget(widget);
+    connect(widget, SIGNAL(dataChanged(QVariant)), this, SLOT(onSubWidgetDataChanged(QVariant)));
 }
 
-void RectPropertyForm::addHtmlProperty()
+ISubWidget *RectPropertyForm::getSubWidget()
 {
-    if (htmlAttr != nullptr) {
-        return;
-    }
-    htmlAttr = new HtmlPropertyForm(this);
-    ui->textWidget->layout()->addWidget(htmlAttr);
-    connect(htmlAttr, SIGNAL(htmlChanged(QString)), this, SLOT(onHtmlChanged(QString)));
-}
-
-void RectPropertyForm::addTimeProperty()
-{
-    if (timeAttr != nullptr) {
-        return;
-    }
-    timeAttr = new TimePropertyForm(this);
-    ui->textWidget->layout()->addWidget(timeAttr);
-    connect(timeAttr, SIGNAL(dataChanged(TimeProperty)), this, SLOT(onTimeStyleChanged(TimeProperty)));
+    return subWidget.data();
 }
 
 void RectPropertyForm::setGraphicItem(ICustomGraphic *item)
@@ -270,13 +244,11 @@ void RectPropertyForm::on_stateBox_itemModified(int index)
     graphicItem->modifyAttribute(id.toInt(), name);
 }
 
-
 void RectPropertyForm::on_stateBox_itemRemoved(const QString &name, const QVariant &data)
 {
     Q_UNUSED(name)
     graphicItem->removeAttribute(data.toInt());
 }
-
 
 void RectPropertyForm::on_stateBox_currentIndexChanged(int index)
 {
@@ -284,39 +256,8 @@ void RectPropertyForm::on_stateBox_currentIndexChanged(int index)
     graphicItem->changeAttribute(id.toInt());
 }
 
-void RectPropertyForm::onTextFormatChanged(const QTextFormat &format)
+void RectPropertyForm::onSubWidgetDataChanged(const QVariant &data)
 {
-        auto obj = dynamic_cast<ITextObject*>(graphicItem);
-        if (obj == nullptr) {
-            return;
-        }
-        obj->setTextFormat(format);
-}
-
-void RectPropertyForm::onHtmlChanged(const QString &data)
-{
-    if (htmlAttr == nullptr) {
-        return;
-    }
     attr.setData(data);
     graphicItem->updateAttribute(&attr);
-}
-
-void RectPropertyForm::onTimeStyleChanged(const TimeProperty &data)
-{
-    if (timeAttr == nullptr) {
-        return;
-    }
-    attr.setData(QVariant::fromValue(data));//qDebug() << "-----------" << data;
-    graphicItem->updateAttribute(&attr);
-}
-
-void RectPropertyForm::setTextFormat(const QTextFormat &format)
-{
-    if (textAttr == nullptr) {
-        return;
-    }
-    textAttr->blockSignals(true);
-    textAttr->setTextFormat(format);
-    textAttr->blockSignals(false);
 }

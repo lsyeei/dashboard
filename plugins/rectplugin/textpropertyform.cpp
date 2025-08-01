@@ -22,7 +22,7 @@
 #include <QFontDatabase>
 
 TextPropertyForm::TextPropertyForm(QWidget *parent)
-    : QWidget(parent)
+    : ISubWidget(parent)
     , ui(new Ui::TextPropertyForm)
 {
     ui->setupUi(this);
@@ -97,8 +97,13 @@ void TextPropertyForm::setBlockFormat(const QTextBlockFormat &format)
     ui->textIndent->setValue(format.textIndent());
 }
 
-void TextPropertyForm::setTextFormat(const QTextFormat &format)
+void TextPropertyForm::setData(const QVariant &data)
 {
+    if (data.isNull() || !data.canConvert<QTextFormat>()) {
+        return;
+    }
+    auto format = data.value<QTextFormat>();
+
     if (format.isBlockFormat()) {
         setBlockFormat(format.toBlockFormat());
     }
@@ -175,7 +180,8 @@ void TextPropertyForm::onCharFormatChanged()
         charFormat.setBackground(brush);
     }
     charFormat.setFont(font, QTextCharFormat::FontPropertiesSpecifiedOnly);
-    emit textFormatChanged(charFormat);
+
+    emit dataChanged(QVariant::fromValue((charFormat)));
 }
 
 void TextPropertyForm::setFontSize()
@@ -262,7 +268,8 @@ void TextPropertyForm::onBlockFormatChanged()
     if (action.compare("bottomMargin") == 0) {
         blockFormat.setBottomMargin(ui->bottomMargin->value());
     }
-    emit textFormatChanged(blockFormat);
+
+    emit dataChanged(QVariant::fromValue((blockFormat)));
 }
 
 void TextPropertyForm::setLineHeight()
@@ -295,7 +302,8 @@ void TextPropertyForm::setLineHeight()
         }
     }
     blockFormat.setLineHeight(value, QTextBlockFormat::LineDistanceHeight);
-    emit textFormatChanged(blockFormat);
+
+    emit dataChanged(QVariant::fromValue((blockFormat)));
 }
 
 void TextPropertyForm::showBlock()
@@ -342,7 +350,8 @@ void TextPropertyForm::onListFormatChanged()
         }
         ui->numberListBtn->setChecked(false);
     }
-    emit textFormatChanged(format);
+
+    emit dataChanged(QVariant::fromValue((format)));
 }
 
 void TextPropertyForm::initFontFamilies()

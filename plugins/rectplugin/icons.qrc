@@ -56,5 +56,6 @@
         <file>icons/rectangle.svg</file>
         <file>icons/time.svg</file>
         <file>font/lcdNumber.TTF</file>
+        <file>icons/web.svg</file>
     </qresource>
 </RCC>

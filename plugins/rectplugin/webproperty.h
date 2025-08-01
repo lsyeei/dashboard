@@ -15,18 +15,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "timeplugin.h"
-#include "svghelper.h"
-#include "rectpropertyform.h"
-#include "timeitem.h"
-#include "timepropertyform.h"
+#ifndef WEBPROPERTY_H
+#define WEBPROPERTY_H
 
-TimePlugin::TimePlugin() {}
-METHOD_DEFINE(TimePlugin, "时间", "通用", "系统时间", "系统时间", :/icons/time.svg, TimeItem, RectPropertyForm)
+#include "serializable.h"
 
-QWidget *TimePlugin::propertyWidget()
+enum class PageType{
+    // url 地址或本地文件地址
+    URL,
+    FILE,
+    // html或js代码
+    CODE
+};
+
+class WebProperty:public Serializable
 {
-    auto widget = new RectPropertyForm();
-    widget->addSubWidget(new TimePropertyForm());
-    return widget;
-}
+    Q_GADGET
+    SERIALIZE(WebProperty)
+public:
+    explicit WebProperty(){}
+private:
+    // true 控件允许拖动（此时网页内容不可操作），false 控件不允许拖动（此时可以操作网页内容）
+    bool dragFlag{true};
+    PageType type;
+    QString content;
+    JSONFIELD(type, Type)
+    JSONFIELD(dragFlag, DragFlag)
+    JSONFIELD(content, Content)
+};
+Q_DECLARE_METATYPE(WebProperty)
+#endif // WEBPROPERTY_H

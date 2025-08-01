@@ -18,6 +18,7 @@
 #ifndef TIMEITEM_H
 #define TIMEITEM_H
 
+#include "timeproperty.h"
 #include <QObject>
 #include <abstracttextitem.h>
 #include <QTimer>
@@ -33,15 +34,20 @@ public:
     explicit TimeItem(const QString &xml, QGraphicsItem *parent = nullptr);
     ~TimeItem();
     QString classId() const override;
+    // ICustomGraphic interface
+    QString toXml() const override;
     // AbstractItem interface
 protected:
     void attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr) override;
+    // AbstractItem interface
+    void parseXML(const QString &xml) override;
 protected Q_SLOTS:
     void updateTime();
 private:
     QScopedPointer<QTimer> timer{new QTimer()};
     QStringList families;
 
+    void propertyChanged(const TimeProperty &property);
 };
 
 #endif // TIMEITEM_H

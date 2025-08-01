@@ -16,6 +16,7 @@
 * limitations under the License.
 */
 
+#include "QtWebEngineWidgets/qwebengineview.h"
 #include "animation/path/imovepath.h"
 #include "filetemplate.h"
 #include "bigraphicsscene.h"
@@ -57,9 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->scrollArea->setBackgroundRole(QPalette::Base);
     setCentralWidget(ui->centralwidget);
     // 加载图元控件
-    graphicPluginWidget = new GraphicPlugins(ui->graphicItems);
-    ui->graphicItems->layout()->setAlignment(Qt::AlignTop);
-    ui->graphicItems->layout()->addWidget(graphicPluginWidget);
+    loadPlugin();
     // 设置场景
     setScene();
     // 配置工具栏
@@ -75,6 +74,13 @@ MainWindow::MainWindow(QWidget *parent)
     // 初始化右键菜单
     initPopMenu();
     ui->graphicsView->installEventFilter(this);
+    // QThread::create([]{
+    //     // auto *webView = new QWebEngineView(this);
+    //     // webView->resize({12,12});
+    //     // webView->hide();
+
+    // });
+
 }
 
 MainWindow::~MainWindow()
@@ -471,8 +477,6 @@ void MainWindow::setScene()
             this, SLOT(graphicsViewMouseMove(QMouseEvent*)));
     connect(ui->graphicsView, SIGNAL(zoomEvent(qint16)),
             this, SLOT(graphicsViewZoomed(qint16)));
-    connect(graphicPluginWidget, SIGNAL(graphicItemChanged(IGraphicPlugin*)),
-            ui->graphicsView, SLOT(graphicItemChangedHandler(IGraphicPlugin*)));
     // 监听图元选中状态，同步切换属性设置页面
     connect(scene, SIGNAL(selectionChanged()), this, SLOT(onSceneSelectionChanged()), Qt::QueuedConnection);
     connect(this, SIGNAL(singleSelectEvent(QGraphicsItem*)),
@@ -957,4 +961,13 @@ void MainWindow::onViewMenuEvent(QContextMenuEvent *event)
     }else{
         viewMenu->popup(event->globalPos());
     }
+}
+
+void MainWindow::loadPlugin()
+{
+    graphicPluginWidget = new GraphicPlugins(ui->graphicItems);
+    ui->graphicItems->layout()->setAlignment(Qt::AlignTop);
+    ui->graphicItems->layout()->addWidget(graphicPluginWidget);
+    connect(graphicPluginWidget, SIGNAL(graphicItemChanged(IGraphicPlugin*)),
+            ui->graphicsView, SLOT(graphicItemChangedHandler(IGraphicPlugin*)));
 }

@@ -21,7 +21,7 @@
 #include <QTimeZone>
 
 TimePropertyForm::TimePropertyForm(QWidget *parent)
-    : QWidget(parent)
+    : ISubWidget(parent)
     , ui(new Ui::TimePropertyForm)
 {
     ui->setupUi(this);
@@ -34,8 +34,11 @@ TimePropertyForm::~TimePropertyForm()
     delete ui;
 }
 
-void TimePropertyForm::setData(const TimeProperty &property)
+void TimePropertyForm::setData(const QVariant &data)
 {
+    if (data.isNull()) {
+        return;
+    }
     QSignalBlocker hourBlocker(ui->timeFormat);
     QSignalBlocker secondBlocker(ui->autoCheck);
     QSignalBlocker minutesBlocker(ui->alignCenterBtn);
@@ -53,7 +56,7 @@ void TimePropertyForm::setData(const TimeProperty &property)
     QSignalBlocker spaceOptionsBlocker(ui->spaceOptions);
     QSignalBlocker foregroundBlocker(ui->foreground);
     QSignalBlocker backgroundBlocker(ui->background);
-    attr = property;
+    attr = data.value<TimeProperty>();
     auto index = ui->timeFormat->findData(attr.getFormat());
     if (index < 0) {
         index = 0;
@@ -168,7 +171,7 @@ void TimePropertyForm::onValueChanged()
     if (action.compare("background") == 0) {
         attr.setBackground(ui->background->getColor());
     }
-    emit dataChanged(attr);
+    emit dataChanged(QVariant::fromValue(attr));
 }
 
 void TimePropertyForm::setFontSize()
@@ -243,6 +246,7 @@ void TimePropertyForm::showStyle()
 
 void TimePropertyForm::initUI()
 {
+    layout()->setAlignment(Qt::AlignTop);
     QSignalBlocker lcdBlocker(ui->lcdCheck);
     ui->lcdCheck->setChecked(false);
     ui->background->hide();

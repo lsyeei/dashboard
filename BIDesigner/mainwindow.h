@@ -156,6 +156,6 @@ private:
      */
     void initPopMenu();
     void onViewMenuEvent(QContextMenuEvent *event);
-
+    void loadPlugin();
 };
 #endif // MAINWINDOW_H

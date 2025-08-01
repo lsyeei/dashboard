@@ -17,6 +17,7 @@
 */
 
 #include "rectpropertyform.h"
+#include "isubwidget.h"
 #include "textitem.h"
 
 #include <QTextList>
@@ -27,7 +28,7 @@ QString TextItem::SHAPE_ID = "TEXT_2024";
 TextItem::TextItem(QGraphicsItem *parent)
     : AbstractTextItem(parent)
 {
-    // textItem->installEventFilter(this);
+    textItem->installEventFilter(this);
 }
 
 TextItem::TextItem(const QString &xml, QGraphicsItem *parent)
@@ -60,18 +61,19 @@ void TextItem::cursorSelectChanged()
 {
     auto cursor = textItem->textCursor();
     auto form = dynamic_cast<RectPropertyForm*>(propertyForm);
+    auto textForm = form->getSubWidget();
     // 获取文字格式
     auto charFormat = cursor.charFormat();
     auto blockFormat = cursor.blockFormat();
-    form->setTextFormat(charFormat);
-    form->setTextFormat(blockFormat);
+    textForm->setData(QVariant::fromValue(charFormat));
+    textForm->setData(QVariant::fromValue(blockFormat));
     auto list = cursor.currentList();
 
     QTextListFormat listFormat;
     if (list) {
         listFormat = list->format();
     }
-    form->setTextFormat(listFormat);
+    textForm->setData(QVariant::fromValue(listFormat));
 }
 
 void TextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
@@ -184,4 +186,29 @@ void TextItem::setTextColor(const QColor &newTextColor)
     cursor.mergeCharFormat(format);
     cursor.clearSelection();
     updateItem();
+}
+
+
+void TextItem::attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr)
+{
+    AbstractTextItem::attributeChanged(oldAttr, newAttr);
+    auto data = attribute()->getData();
+    if (data.isNull() || !data.canConvert<QTextFormat>()){
+        return;
+    }
+    setTextFormat(data.value<QTextFormat>());
+}
+
+
+void TextItem::parseXML(const QString &xml)
+{
+    AbstractZoneItem::parseXML(xml);
+    auto data = attribute()->getData();
+    auto width = attribute()->getWidth();
+    if (data.isValid()) {
+        textItem->setHtml(data.toString());
+        textItem->setTextWidth(width);
+    }
+    // 清空data字段用于和form传递字体及段落格式
+    attribute()->setData(QVariant());
 }

@@ -143,8 +143,8 @@ public:
         fillProperty->setObjectName("fillProperty");
         sizePolicy.setHeightForWidth(fillProperty->sizePolicy().hasHeightForWidth());
         fillProperty->setSizePolicy(sizePolicy);
-        fillProperty->setMinimumSize(QSize(0, 80));
-        fillProperty->setMaximumSize(QSize(16777215, 80));
+        fillProperty->setMinimumSize(QSize(0, 79));
+        fillProperty->setMaximumSize(QSize(16777215, 79));
         fillProperty->setProperty("fill", QVariant(true));
         fillProperty->setBrushStyle(Qt::BrushStyle::SolidPattern);
 
@@ -220,7 +220,7 @@ public:
         textWidget->setSizePolicy(sizePolicy);
         verticalLayout_2 = new QVBoxLayout(textWidget);
         verticalLayout_2->setObjectName("verticalLayout_2");
-        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout_2->setContentsMargins(0, 6, 0, 6);
 
         verticalLayout->addWidget(textWidget);

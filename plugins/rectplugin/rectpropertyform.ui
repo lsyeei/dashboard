@@ -159,13 +159,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>80</height>
+       <height>79</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>80</height>
+       <height>79</height>
       </size>
      </property>
      <property name="fill" stdset="0">
@@ -324,7 +324,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="sizeConstraint">
-       <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
+       <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
       </property>
       <property name="leftMargin">
        <number>0</number>

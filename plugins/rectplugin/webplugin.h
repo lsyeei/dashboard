@@ -15,18 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "timeplugin.h"
-#include "svghelper.h"
-#include "rectpropertyform.h"
-#include "timeitem.h"
-#include "timepropertyform.h"
+#ifndef WEBPLUGIN_H
+#define WEBPLUGIN_H
+#define PROPERTY_WIDGET_IMPL
 
-TimePlugin::TimePlugin() {}
-METHOD_DEFINE(TimePlugin, "时间", "通用", "系统时间", "系统时间", :/icons/time.svg, TimeItem, RectPropertyForm)
+#include <QObject>
+#include "igraphicplugin.h"
+#include "pluginhelper.h"
 
-QWidget *TimePlugin::propertyWidget()
+class QWebEnginePage;
+class WebPlugin : public QObject, public IGraphicPlugin
 {
-    auto widget = new RectPropertyForm();
-    widget->addSubWidget(new TimePropertyForm());
-    return widget;
-}
+    Q_OBJECT
+    Q_INTERFACES(IGraphicPlugin)
+public:
+    WebPlugin();
+    ~WebPlugin();
+    PLUGIN_INTERFACE
+private:
+    QWebEnginePage *page{nullptr};
+};
+
+#endif // WEBPLUGIN_H

@@ -37,7 +37,6 @@ public:
     // AbstractItem interface
 protected:
     void attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr) override;
-
 };
 
 #endif // HTMLITEM_H

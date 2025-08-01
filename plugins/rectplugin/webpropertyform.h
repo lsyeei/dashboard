@@ -15,43 +15,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TIMEPROPERTYFORM_H
-#define TIMEPROPERTYFORM_H
+#ifndef WEBPROPERTYFORM_H
+#define WEBPROPERTYFORM_H
 
+#include "webproperty.h"
 #include "isubwidget.h"
-#include "timeproperty.h"
-#include <QWidget>
+#include "ksyntaxhighlighting/repository.h"
 
-namespace Ui {
-class TimePropertyForm;
+namespace KSyntaxHighlighting
+{
+class SyntaxHighlighter;
 }
 
-class TimePropertyForm : public ISubWidget
+namespace Ui {
+class WebPropertyForm;
+}
+
+class WebPropertyForm : public ISubWidget
 {
     Q_OBJECT
 
 public:
-    explicit TimePropertyForm(QWidget *parent = nullptr);
-    ~TimePropertyForm();
+    explicit WebPropertyForm(QWidget *parent = nullptr);
+    ~WebPropertyForm();
     // ISubWidget interface
     void setData(const QVariant &data) override;
-    // QObject interface
-    bool eventFilter(QObject *watched, QEvent *event) override;
+    // void setProperty(const WebProperty &value);
+// Q_SIGNALS:
+//     void dataChanged(const WebProperty &value);
 protected Q_SLOTS:
     void onValueChanged();
-    void setFontSize();
-    void setLetterSpace();
-    void showFont();
-    void showStyle();
+    void onSelectFile();
 private:
-    Ui::TimePropertyForm *ui;
-    bool noData{true};
+    Ui::WebPropertyForm *ui;
+    WebProperty attr;
+    KSyntaxHighlighting::Repository m_repository;
+    KSyntaxHighlighting::SyntaxHighlighter *m_highlighter;
+
     void initUI();
-    void initEvent();
-    void updateFormatOptions();
-    QString getFormatDate(const QString format);
-    TimeProperty attr;
+    void setEditorHighlight();
+
 };
 
-
-#endif // TIMEPROPERTYFORM_H
+#endif // WEBPROPERTYFORM_H

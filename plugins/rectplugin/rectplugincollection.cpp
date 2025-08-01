@@ -39,11 +39,13 @@
 #include "textplugin.h"
 #include "htmlitemplugin.h"
 #include "timeplugin.h"
+#include "webplugin.h"
 
 RectPluginCollection::RectPluginCollection()
 {
     pluginList.append(new TextPlugin());
     pluginList.append(new HtmlItemPlugin());
+    pluginList.append(new WebPlugin());
     pluginList.append(new TimePlugin());
     pluginList.append(new Rectplugin());
     pluginList.append(new CirclePlugin());
