@@ -19,7 +19,6 @@
 #include "colorpicker.h"
 #include "colorpickerprivate.h"
 #include <QPainter>
-// #include <QFontDatabase>
 #include <QMouseEvent>
 #include <QColorDialog>
 #include <QDebug>
@@ -34,12 +33,7 @@ ColorPickerPrivate::ColorPickerPrivate(ColorPicker *parent) :
 ColorPicker::ColorPicker(QWidget *parent) :
     QWidget(parent), d_ptr(new ColorPickerPrivate(this))
 {
-    Q_D(ColorPicker);
-    // setMinimumSize(d->minSize);
-    resize(d->defaultSize);
-    // int familyId = QFontDatabase::addApplicationFont(":/icons/fontawesome-webfont.ttf");
-    // fontFamily = QFontDatabase::applicationFontFamilies(familyId).at(0);
-
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
 
 ColorPicker::~ColorPicker()
@@ -72,16 +66,9 @@ QSize ColorPicker::minimumSizeHint() const
     return d->minSize;
 }
 
-int ColorPicker::heightForWidth(int width) const
-{
-    Q_D(const ColorPicker);
-    qreal height = width * d->minSize.height() / d->minSize.width();
-    return qRound(height);
-}
-
 bool ColorPicker::hasHeightForWidth() const
 {
-    return true;
+    return false;
 }
 
 void ColorPicker::paintEvent(QPaintEvent *event)
@@ -107,17 +94,14 @@ void ColorPicker::paintEvent(QPaintEvent *event)
         group = QPalette::Disabled;
     }
     //绘制
-    // QPen pen(QColor(0xD8D8D8));
     QPen pen(p.brush(group, QPalette::Shadow).color());
     pen.setWidth(1);
     pen.setStyle(Qt::SolidLine);
     pen.setCapStyle(Qt::FlatCap);
     pen.setJoinStyle(Qt::BevelJoin);
     painter.setPen(pen);
-    // QBrush brush(d->normalColor);
     QBrush brush = p.brush(group, QPalette::Button);
     if (d->isHover){
-        // brush.setColor(d->hoverColor);
         brush = p.brush(group, QPalette::Light);
     }
     brush.setStyle(Qt::SolidPattern);
@@ -126,20 +110,12 @@ void ColorPicker::paintEvent(QPaintEvent *event)
     painter.drawRoundedRect(logicRect, radius, radius);
 
     // 绘制颜色样例
-    // pen.setColor(Qt::white);
     painter.setPen(pen);
     brush.setColor(d->color);
     painter.setBrush(brush);
     painter.drawRect(8, 8, 48, 28);
 
     // 绘制图标
-    // pen.setColor((d->isHover?Qt::black:Qt::gray);
-    // painter.setPen(pen);
-    // QFont font(fontFamily);
-    // font.setPixelSize(16);
-    // painter.setFont(font);
-    // painter.drawText(QRectF{60, 8, 22, 22}, Qt::AlignVCenter | Qt::AlignCenter, "\uf040");
-    // d->icon.setFillColor(d->isHover ? Qt::black : Qt::gray);
     d->icon.setFillColor(d->isHover ? p.brush(group, QPalette::Highlight).color()
                                     : p.brush(group, QPalette::ButtonText).color());
     d->icon.render(&painter, QRect{62, 11, 22, 22});
@@ -180,12 +156,14 @@ void ColorPicker::leaveEvent(QEvent *event)
 void ColorPicker::resizeEvent(QResizeEvent *event)
 {
     Q_D(ColorPicker);
-    int width = event->size().width();
-    // setFixedSize({width, heightForWidth(width)});
-    d->hintSize = {width, heightForWidth(width)};
-    QRect rect = this->geometry();
-    rect.setHeight(d->hintSize.height());
-    this->setGeometry(rect);
+    QRect rect = geometry();
+    int height = event->size().height();
+    int width = d->hintSize.width() * height / d->hintSize.height();
+    if (width != event->size().width()) {
+        rect.setWidth(width);
+        setGeometry(rect);
+        updateGeometry();
+    }
     QWidget::resizeEvent(event);
 }
 
@@ -195,6 +173,3 @@ void ColorPickerPrivate::pickerColor()
     QColor newColor = QColorDialog::getColor(color, q, u8"选择颜色");
     q->setColor(newColor);
 }
-
-
-

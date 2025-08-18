@@ -25,26 +25,25 @@
 #include "bigraphicsview.h"
 #include "bigraphicsscene.h"
 
+#include <QResizeEvent>
+
 GraphicPropertyForm::GraphicPropertyForm(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::GraphicProperty)
 {
     ui->setupUi(this);
-
+    layout()->setAlignment(Qt::AlignTop);
     // 组属性
     auto groupForm = new GroupPropertyForm();
     groupForm->setObjectName("group");
-    ui->stackedWidget->addWidget(groupForm);
+    widgets["group"] = groupForm;
     // 图元属性
     auto plugins = GraphicPlugins::getAllPlugins();
-    int index = 0;
     foreach (auto plugin, plugins) {
         auto widget = plugin->propertyWidget();
         widget->setObjectName(plugin->id());
-        index = ui->stackedWidget->addWidget(widget);
-        ui->stackedWidget->setCurrentIndex(index);
+        widgets[plugin->id()] = widget;
     }
-    connect(ui->stackedWidget, SIGNAL(currentChanged(int)), this, SLOT(stackedWidgetChanged(int)));
     // 图元名称修改
     connect(ui->graphicName, SIGNAL(editingFinished()), this, SLOT(graphicItemNameChanged()));
 }
@@ -61,20 +60,6 @@ void GraphicPropertyForm::graphicItemNameChanged()
     }
 }
 
-void GraphicPropertyForm::stackedWidgetChanged(int index)
-{
-    Q_UNUSED(index)
-    auto widget = ui->stackedWidget->currentWidget();
-    if (widget == nullptr){
-        return;
-    }
-    QSize size = widget->size();
-    if (size.isEmpty() || size.width() < 0 || size.height() < 0){
-        return;
-    }
-    ui->stackedWidget->resize(size);
-}
-
 void GraphicPropertyForm::setView(BIGraphicsView *newView)
 {
     view = newView;
@@ -89,27 +74,34 @@ bool GraphicPropertyForm::setGraphicItem(QGraphicsItem *item)
     auto itemName = biScene->itemName(item);
     graphicItem = item;
     auto group = dynamic_cast<GraphicsItemGroup *>(item);
+
+    if (current) {
+        current->hide();
+        layout() ->removeWidget(current);
+    }
     if (group) {
         ui->graphicName->setText(itemName);
-        QWidget *property = ui->stackedWidget->findChild<QWidget *>("group");
+        QWidget *property = widgets["group"];
         if (property){
             group->setPropertyWidget(property);
-            ui->stackedWidget->setCurrentWidget(property);
+            layout()->addWidget(property);
+            property->show();
+            current = property;
             return true;
         }
     } else {
         ICustomGraphic *curItem = dynamic_cast<ICustomGraphic*>(item);
         if (curItem) {
             ui->graphicName->setText(itemName);
-            QWidget *property = ui->stackedWidget->findChild<QWidget *>(curItem->classId());
+            QWidget *property = widgets[curItem->classId()];
             if (property){
                 curItem->setPropertyWidget(property);
-                // ui->stackedWidget->setCurrentIndex(ui->stackedWidget->indexOf(property));
-                ui->stackedWidget->setCurrentWidget(property);
+                layout()->addWidget(property);
+                property->show();
+                current = property;
                 return true;
             }
         }
     }
     return false;
 }
-

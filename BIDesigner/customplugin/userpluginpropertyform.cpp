@@ -24,6 +24,7 @@ UserPluginPropertyForm::UserPluginPropertyForm(QWidget *parent)
     , ui(new Ui::UserPluginPropertyForm)
 {
     ui->setupUi(this);
+    layout()->setAlignment(Qt::AlignTop);
     // 关联事件
     connect(ui->posProperty, SIGNAL(propertyChanged(qint32,qint32,qint32,qint32,bool)),
             this, SLOT(posChanged(qint32,qint32,qint32,qint32,bool)));
@@ -35,7 +36,6 @@ UserPluginPropertyForm::~UserPluginPropertyForm()
 {
     delete ui;
 }
-
 
 void UserPluginPropertyForm::updateData()
 {
@@ -167,4 +167,3 @@ void UserPluginPropertyForm::on_restoreBtn_clicked()
     attr.setHeight(attr.getExtraP2());
     graphicItem->updateAttribute(&attr);
 }
-

@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>239</width>
-    <height>145</height>
+    <width>196</width>
+    <height>148</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -30,7 +30,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="sizeConstraint">
-    <enum>QLayout::SizeConstraint::SetFixedSize</enum>
+    <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -46,13 +46,16 @@
    </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+     <property name="spacing">
+      <number>4</number>
+     </property>
      <property name="sizeConstraint">
-      <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+      <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
      </property>
      <item>
       <widget class="QCheckBox" name="fillChecked">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -74,7 +77,7 @@
      <item>
       <widget class="QComboBox" name="brushStyle1">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -96,7 +99,7 @@
      <item>
       <widget class="ColorPicker" name="baseColor">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -106,14 +109,14 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0">
      <property name="sizeConstraint">
       <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
      </property>
      <item>
       <widget class="QRadioButton" name="gradientChecked">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -140,9 +143,12 @@
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Policy::Fixed</enum>
+       </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
+         <width>10</width>
          <height>0</height>
         </size>
        </property>
@@ -175,7 +181,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
      <property name="sizeConstraint">
-      <enum>QLayout::SizeConstraint::SetFixedSize</enum>
+      <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
      </property>
      <property name="rightMargin">
       <number>0</number>

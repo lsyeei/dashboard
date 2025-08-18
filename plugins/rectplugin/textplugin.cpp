@@ -17,16 +17,10 @@
 */
 
 #include "textplugin.h"
-#include "rectpropertyform.h"
 #include "textitem.h"
 #include "svghelper.h"
-#include "textpropertyform.h"
+#include "formfactory.h"
 
 TextPlugin::TextPlugin() {}
-METHOD_DEFINE(TextPlugin, "文字", "通用", "文字", "显示文字", :/icons/text.svg, TextItem, RectPropertyForm)
-
-QWidget *TextPlugin ::propertyWidget() {
-    auto widget = new RectPropertyForm();
-    widget->addSubWidget(new TextPropertyForm());
-    return widget;
-}
+METHOD_DEFINE(TextPlugin, "文字", "通用", "文字", "显示文字",
+              :/icons/text.svg, TextItem, FormType::TEXT)

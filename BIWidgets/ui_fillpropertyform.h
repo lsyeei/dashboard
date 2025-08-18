@@ -45,8 +45,8 @@ public:
     {
         if (FillPropertyForm->objectName().isEmpty())
             FillPropertyForm->setObjectName("FillPropertyForm");
-        FillPropertyForm->resize(239, 145);
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+        FillPropertyForm->resize(196, 148);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(FillPropertyForm->sizePolicy().hasHeightForWidth());
@@ -55,14 +55,15 @@ public:
         FillPropertyForm->setAutoFillBackground(false);
         verticalLayout = new QVBoxLayout(FillPropertyForm);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetFixedSize);
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setSpacing(4);
         horizontalLayout->setObjectName("horizontalLayout");
-        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
+        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMaximumSize);
         fillChecked = new QCheckBox(FillPropertyForm);
         fillChecked->setObjectName("fillChecked");
-        QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Maximum);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(fillChecked->sizePolicy().hasHeightForWidth());
@@ -74,7 +75,7 @@ public:
 
         brushStyle1 = new QComboBox(FillPropertyForm);
         brushStyle1->setObjectName("brushStyle1");
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Maximum, QSizePolicy::Policy::Fixed);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(brushStyle1->sizePolicy().hasHeightForWidth());
@@ -87,11 +88,8 @@ public:
 
         baseColor = new ColorPicker(FillPropertyForm);
         baseColor->setObjectName("baseColor");
-        QSizePolicy sizePolicy3(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(baseColor->sizePolicy().hasHeightForWidth());
-        baseColor->setSizePolicy(sizePolicy3);
+        sizePolicy1.setHeightForWidth(baseColor->sizePolicy().hasHeightForWidth());
+        baseColor->setSizePolicy(sizePolicy1);
 
         horizontalLayout->addWidget(baseColor);
 
@@ -103,46 +101,48 @@ public:
         horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         gradientChecked = new QRadioButton(FillPropertyForm);
         gradientChecked->setObjectName("gradientChecked");
-        sizePolicy3.setHeightForWidth(gradientChecked->sizePolicy().hasHeightForWidth());
-        gradientChecked->setSizePolicy(sizePolicy3);
+        sizePolicy1.setHeightForWidth(gradientChecked->sizePolicy().hasHeightForWidth());
+        gradientChecked->setSizePolicy(sizePolicy1);
         gradientChecked->setMinimumSize(QSize(0, 22));
         gradientChecked->setChecked(false);
         gradientChecked->setAutoExclusive(false);
 
         horizontalLayout_2->addWidget(gradientChecked);
 
-        horizontalSpacer_2 = new QSpacerItem(40, 0, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(10, 0, QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer_2);
 
         gradientBtn = new QPushButton(FillPropertyForm);
         gradientBtn->setObjectName("gradientBtn");
-        sizePolicy.setHeightForWidth(gradientBtn->sizePolicy().hasHeightForWidth());
-        gradientBtn->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(gradientBtn->sizePolicy().hasHeightForWidth());
+        gradientBtn->setSizePolicy(sizePolicy1);
         gradientBtn->setMinimumSize(QSize(90, 0));
         gradientBtn->setText(QString::fromUtf8(""));
         gradientBtn->setFlat(true);
 
         horizontalLayout_2->addWidget(gradientBtn);
 
-        horizontalLayout_2->setStretch(0, 1);
 
         verticalLayout->addLayout(horizontalLayout_2);
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName("horizontalLayout_3");
-        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetFixedSize);
+        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout_3->setContentsMargins(-1, -1, 0, -1);
         imageChecked = new QRadioButton(FillPropertyForm);
         imageChecked->setObjectName("imageChecked");
-        sizePolicy.setHeightForWidth(imageChecked->sizePolicy().hasHeightForWidth());
-        imageChecked->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(imageChecked->sizePolicy().hasHeightForWidth());
+        imageChecked->setSizePolicy(sizePolicy1);
         imageChecked->setAutoExclusive(false);
 
         horizontalLayout_3->addWidget(imageChecked);
 
         fileName = new QLabel(FillPropertyForm);
         fileName->setObjectName("fileName");
+        QSizePolicy sizePolicy3(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
         sizePolicy3.setHeightForWidth(fileName->sizePolicy().hasHeightForWidth());
         fileName->setSizePolicy(sizePolicy3);
         fileName->setMinimumSize(QSize(102, 77));

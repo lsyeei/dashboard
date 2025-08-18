@@ -37,12 +37,8 @@ public:
 
     QTextCharFormat getCharFormat() const;
     QTextBlockFormat getBlockFormat() const;
-    // void setTextFormat(const QTextFormat &format);
     // ISubWidget interface
     void setData(const QVariant &data) override;
-
-// Q_SIGNALS:
-//     void textFormatChanged(const QTextFormat &format);
 
 private Q_SLOTS:
     void onCharFormatChanged();

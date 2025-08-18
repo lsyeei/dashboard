@@ -48,8 +48,8 @@ public:
     {
         if (WebPropertyForm->objectName().isEmpty())
             WebPropertyForm->setObjectName("WebPropertyForm");
-        WebPropertyForm->resize(234, 330);
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::MinimumExpanding);
+        WebPropertyForm->resize(256, 330);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(WebPropertyForm->sizePolicy().hasHeightForWidth());
@@ -57,10 +57,15 @@ public:
         WebPropertyForm->setMinimumSize(QSize(0, 330));
         verticalLayout = new QVBoxLayout(WebPropertyForm);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMaximumSize);
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout->setContentsMargins(0, 9, 0, 9);
         line = new QFrame(WebPropertyForm);
         line->setObjectName("line");
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(line->sizePolicy().hasHeightForWidth());
+        line->setSizePolicy(sizePolicy1);
         line->setFrameShape(QFrame::Shape::HLine);
         line->setFrameShadow(QFrame::Shadow::Sunken);
 
@@ -68,6 +73,8 @@ public:
 
         moveCheck = new QCheckBox(WebPropertyForm);
         moveCheck->setObjectName("moveCheck");
+        sizePolicy1.setHeightForWidth(moveCheck->sizePolicy().hasHeightForWidth());
+        moveCheck->setSizePolicy(sizePolicy1);
         moveCheck->setChecked(true);
 
         verticalLayout->addWidget(moveCheck);
@@ -78,16 +85,25 @@ public:
         horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         urlRadio = new QRadioButton(WebPropertyForm);
         urlRadio->setObjectName("urlRadio");
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(urlRadio->sizePolicy().hasHeightForWidth());
+        urlRadio->setSizePolicy(sizePolicy2);
 
         horizontalLayout->addWidget(urlRadio);
 
         fileRadio = new QRadioButton(WebPropertyForm);
         fileRadio->setObjectName("fileRadio");
+        sizePolicy2.setHeightForWidth(fileRadio->sizePolicy().hasHeightForWidth());
+        fileRadio->setSizePolicy(sizePolicy2);
 
         horizontalLayout->addWidget(fileRadio);
 
         codeRadio = new QRadioButton(WebPropertyForm);
         codeRadio->setObjectName("codeRadio");
+        sizePolicy2.setHeightForWidth(codeRadio->sizePolicy().hasHeightForWidth());
+        codeRadio->setSizePolicy(sizePolicy2);
 
         horizontalLayout->addWidget(codeRadio);
 
@@ -100,25 +116,22 @@ public:
 
         urlWidget = new QWidget(WebPropertyForm);
         urlWidget->setObjectName("urlWidget");
-        QSizePolicy sizePolicy1(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(urlWidget->sizePolicy().hasHeightForWidth());
         urlWidget->setSizePolicy(sizePolicy1);
         horizontalLayout_2 = new QHBoxLayout(urlWidget);
         horizontalLayout_2->setSpacing(0);
         horizontalLayout_2->setObjectName("horizontalLayout_2");
+        horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
         urlEdit = new QLineEdit(urlWidget);
         urlEdit->setObjectName("urlEdit");
+        sizePolicy1.setHeightForWidth(urlEdit->sizePolicy().hasHeightForWidth());
+        urlEdit->setSizePolicy(sizePolicy1);
 
         horizontalLayout_2->addWidget(urlEdit);
 
         fileBtn = new QPushButton(urlWidget);
         fileBtn->setObjectName("fileBtn");
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(fileBtn->sizePolicy().hasHeightForWidth());
         fileBtn->setSizePolicy(sizePolicy2);
         fileBtn->setMaximumSize(QSize(24, 24));
@@ -130,7 +143,7 @@ public:
 
         codeEdit = new QTextEdit(WebPropertyForm);
         codeEdit->setObjectName("codeEdit");
-        QSizePolicy sizePolicy3(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::MinimumExpanding);
+        QSizePolicy sizePolicy3(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::MinimumExpanding);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
         sizePolicy3.setHeightForWidth(codeEdit->sizePolicy().hasHeightForWidth());
@@ -141,12 +154,15 @@ public:
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName("horizontalLayout_3");
+        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         updateBtn = new QPushButton(WebPropertyForm);
         updateBtn->setObjectName("updateBtn");
+        sizePolicy2.setHeightForWidth(updateBtn->sizePolicy().hasHeightForWidth());
+        updateBtn->setSizePolicy(sizePolicy2);
 
         horizontalLayout_3->addWidget(updateBtn);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_3->addItem(horizontalSpacer);
 

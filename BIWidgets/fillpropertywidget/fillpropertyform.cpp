@@ -1,21 +1,21 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #include "fillpropertyform.h"
 #include "gradientparamdialog.h"
 #include "ui_fillpropertyform.h"
@@ -207,6 +207,15 @@ bool FillPropertyForm::eventFilter(QObject *watched, QEvent *event)
         // view 大小改变时重新初始化
         initBrushStyle1();
     }
+    if(watched == ui->brushStyle1)
+    {
+        if (event->type() == QEvent::Show){
+            initBrushStyle1();
+        }
+        if (event->type() == QEvent::Resize){
+            brushStyleResize();
+        }
+    }
     if(watched == ui->fileName && event->type() == QEvent::MouseButtonPress)
     {
         QMouseEvent *mouseEvent = (QMouseEvent *)event;
@@ -218,13 +227,9 @@ bool FillPropertyForm::eventFilter(QObject *watched, QEvent *event)
     if (watched == ui->gradientBtn && event->type() == QEvent::Paint) {
         paintGraientBtn();
         event->accept();
+        return true;
     }
     return QWidget::eventFilter(watched, event);
-}
-
-void FillPropertyForm::resizeEvent(QResizeEvent *event)
-{
-    emit sizeChanged(event->size());
 }
 
 void FillPropertyForm::on_fillChecked_toggled(bool checked)
@@ -252,9 +257,9 @@ void FillPropertyForm::on_baseColor_colorChanged(const QColor &oldColor, const Q
 {
     Q_UNUSED(oldColor)
     baseColor = newColor;
-    if (!ui->imageChecked && !ui->gradientChecked) {
-        initBrushStyle1();
-    }
+    // if (!ui->imageChecked->isChecked() && !ui->gradientChecked->isChecked()) {
+    //     initBrushStyle1();
+    // }
     emit valueChanged();
 }
 
@@ -330,22 +335,16 @@ void FillPropertyForm::showHide() {
         ui->imageChecked->hide();
         ui->fileName->hide();
     }
-    ui->fillChecked->blockSignals(true);
+    QSignalBlocker fillBlock(ui->fillChecked);
+    QSignalBlocker gradientBlock(ui->gradientChecked);
+    QSignalBlocker imageBlock(ui->imageChecked);
     ui->fillChecked->setChecked(isFill);
-    ui->fillChecked->blockSignals(false);
 
     ui->gradientChecked->setAutoExclusive(false);
-    ui->gradientChecked->blockSignals(true);
     ui->gradientChecked->setChecked(isGradient);
-    ui->gradientChecked->blockSignals(false);
 
     ui->imageChecked->setAutoExclusive(false);
-    ui->imageChecked->blockSignals(true);
     ui->imageChecked->setChecked(isImage);
-    ui->imageChecked->blockSignals(false);
-
-    // 触发窗口改变大小
-    emit sizeChanged(size());
 }
 
 void FillPropertyForm::onGradientParamChanged()
@@ -356,30 +355,17 @@ void FillPropertyForm::onGradientParamChanged()
     emit gradientChanged();
 }
 
-void FillPropertyForm::setSizePolicy(QWidget *obj, bool retainSize) {
-    QSizePolicy policy = obj->sizePolicy();
-    policy.setRetainSizeWhenHidden(retainSize);
-    obj->setSizePolicy(policy);
-}
-
-
-void FillPropertyForm::init() {
+void FillPropertyForm::init()
+{
     screenRatio = QApplication::primaryScreen()->devicePixelRatio();
-
-    setSizePolicy(ui->brushStyle1, false);
-    setSizePolicy(ui->gradientChecked, false);
-    setSizePolicy(ui->imageChecked, false);
-    setSizePolicy(ui->baseColor, false);
-    setSizePolicy(ui->fileName, false);
-    // hideAll();
+    layout()->setAlignment(Qt::AlignTop);
 
     // 设置comboBox的视图为自定义视图，拦截view的事件
     QAbstractItemView* view =ui->brushStyle1->view();
     if (view) {
         view->installEventFilter(this);
     }
-
-    initBrushStyle1();
+    ui->brushStyle1->installEventFilter(this);
 
     ui->fileName->installEventFilter(this);
 
@@ -388,16 +374,14 @@ void FillPropertyForm::init() {
     showHide();
 }
 
-
 void FillPropertyForm::initBrushStyle1()
 {
     QComboBox *style1 = ui->brushStyle1;
-
-    qint16 width = style1->sizeHint().width() - 8;
+    auto size = style1->size();
+    qint16 width = size.width() - size.height();
     qint16 height = style1->iconSize().height();
     int index = style1->currentIndex();
     style1->clear();
-
     for (int i = 1; i < 15; i++)
     {
         QPixmap pixmap(width * screenRatio, height * screenRatio);
@@ -429,6 +413,20 @@ void FillPropertyForm::initBrushStyle1()
     }
 }
 
+void FillPropertyForm::brushStyleResize()
+{
+    auto width = ui->horizontalLayout->contentsRect().width() - ui->fillChecked->width() -
+                 ui->baseColor->width() -
+                 ui->horizontalLayout->layout()->spacing()*2-1;
+    if (width < 75) {
+        width = 75;
+    }
+    auto size = ui->brushStyle1->size();
+    qint16 iconWidth = width - size.height();
+    qint16 iconHeight = ui->brushStyle1->iconSize().height();
+    ui->brushStyle1->setIconSize({iconWidth, iconHeight});
+}
+
 void FillPropertyForm::changeImage()
 {
     QString fileName = QFileDialog::getOpenFileName(this,tr("选择图片"),
@@ -441,7 +439,6 @@ void FillPropertyForm::changeImage()
     emit valueChanged();
 }
 
-
 void FillPropertyForm::hideAll()
 {
     ui->brushStyle1->hide();
@@ -450,14 +447,6 @@ void FillPropertyForm::hideAll()
     ui->baseColor->hide();
     ui->gradientBtn->hide();
     ui->fileName->hide();
-}
-
-
-void FillPropertyForm::setConstraint(QLayout::SizeConstraint constraint)
-{
-    auto localLayout = layout();
-    localLayout->setSizeConstraint(constraint);
-    setLayout(localLayout);
 }
 
 void FillPropertyForm::paintGraientBtn()
@@ -473,4 +462,3 @@ void FillPropertyForm::paintGraientBtn()
     painter.drawRect(rect);
     painter.end();
 }
-

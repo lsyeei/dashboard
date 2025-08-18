@@ -30,10 +30,10 @@ int main(int argc, char *argv[])
     // 关闭代理
     QNetworkProxyFactory::setUseSystemConfiguration(false);
     // 启用 ANGLE
-    QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+    // QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     // 指定 DirectX 11,使用 DirectX/Vulkan 替代 OpenGL
-    qputenv("QT_ANGLE_PLATFORM", "d3d11");
+    // qputenv("QT_ANGLE_PLATFORM", "d3d11");
     // 激活 Chromium 硬件加速参数 通过环境变量启用 GPU 光栅化与多线程渲染
     qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
             "--ignore-gpu-blacklist --enable-gpu-rasterization --num-raster-threads=4");

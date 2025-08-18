@@ -84,15 +84,7 @@ bool PosPropertyPlugin::isContainer() const
 QString PosPropertyPlugin::domXml() const
 {
     return QLatin1String(R"(<widget class="PosProperty" name="posProperty">
-    <property name="geometry">
-       <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>220</width>
-         <height>120</height>
-       </rect>
-     </property>
-</widget>)");
+            </widget>)");
 }
 
 QString PosPropertyPlugin::includeFile() const

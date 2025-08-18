@@ -20,6 +20,7 @@
 #include "ui_rectpropertyform.h"
 #include "zoneproperty.h"
 #include <QComboBox>
+#include <QResizeEvent>
 #include "isubwidget.h"
 
 RectPropertyForm::RectPropertyForm(QWidget *parent)
@@ -27,7 +28,6 @@ RectPropertyForm::RectPropertyForm(QWidget *parent)
 {
     ui->setupUi(this);
     layout()->setAlignment(Qt::AlignTop);
-
     // 关联事件
     connect(ui->posProperty, SIGNAL(propertyChanged(qint32,qint32,qint32,qint32,bool)),
             this, SLOT(posChanged(qint32,qint32,qint32,qint32,bool)));
@@ -122,7 +122,7 @@ void RectPropertyForm::hideRound()
 void RectPropertyForm::addSubWidget(ISubWidget *widget)
 {
     subWidget.reset(widget);
-    ui->textWidget->layout()->addWidget(widget);
+    ui->extendWidget->layout()->addWidget(widget);
     connect(widget, SIGNAL(dataChanged(QVariant)), this, SLOT(onSubWidgetDataChanged(QVariant)));
 }
 
@@ -206,6 +206,9 @@ void RectPropertyForm::lineStyleChanged(Qt::PenStyle style, QColor Color, int wi
 
 void RectPropertyForm::brushChanged(Qt::BrushStyle brushStyle, const QColor &baseColor, const QString imageFile)
 {
+    if (graphicItem == nullptr) {
+        return;
+    }
     auto brush = attr.getBrush();
     brush.setStyle(brushStyle);
     brush.setColor(baseColor.rgb());

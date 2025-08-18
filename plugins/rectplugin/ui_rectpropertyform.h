@@ -49,14 +49,15 @@ public:
     QLabel *label;
     QSpacerItem *rotateSpacer;
     QDoubleSpinBox *rotation;
-    QWidget *textWidget;
+    QWidget *extendWidget;
     QVBoxLayout *verticalLayout_2;
 
     void setupUi(QWidget *RectPropertyForm)
     {
         if (RectPropertyForm->objectName().isEmpty())
             RectPropertyForm->setObjectName("RectPropertyForm");
-        RectPropertyForm->resize(320, 492);
+        RectPropertyForm->setEnabled(true);
+        RectPropertyForm->resize(223, 524);
         QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -66,14 +67,15 @@ public:
         verticalLayout = new QVBoxLayout(RectPropertyForm);
         verticalLayout->setSpacing(6);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout->setContentsMargins(0, -1, 0, 0);
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setSpacing(0);
         horizontalLayout_3->setObjectName("horizontalLayout_3");
+        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label_2 = new QLabel(RectPropertyForm);
         label_2->setObjectName("label_2");
-        QSizePolicy sizePolicy1(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Preferred);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
@@ -98,6 +100,8 @@ public:
 
         line_4 = new QFrame(RectPropertyForm);
         line_4->setObjectName("line_4");
+        sizePolicy2.setHeightForWidth(line_4->sizePolicy().hasHeightForWidth());
+        line_4->setSizePolicy(sizePolicy2);
         line_4->setFrameShadow(QFrame::Shadow::Sunken);
         line_4->setLineWidth(1);
         line_4->setFrameShape(QFrame::Shape::HLine);
@@ -106,14 +110,16 @@ public:
 
         posProperty = new PosProperty(RectPropertyForm);
         posProperty->setObjectName("posProperty");
-        sizePolicy2.setHeightForWidth(posProperty->sizePolicy().hasHeightForWidth());
-        posProperty->setSizePolicy(sizePolicy2);
-        posProperty->setMinimumSize(QSize(0, 0));
+        sizePolicy.setHeightForWidth(posProperty->sizePolicy().hasHeightForWidth());
+        posProperty->setSizePolicy(sizePolicy);
+        posProperty->setMinimumSize(QSize(142, 123));
 
         verticalLayout->addWidget(posProperty);
 
         line_2 = new QFrame(RectPropertyForm);
         line_2->setObjectName("line_2");
+        sizePolicy2.setHeightForWidth(line_2->sizePolicy().hasHeightForWidth());
+        line_2->setSizePolicy(sizePolicy2);
         line_2->setFrameShape(QFrame::Shape::HLine);
         line_2->setFrameShadow(QFrame::Shadow::Sunken);
 
@@ -123,8 +129,8 @@ public:
         lineProperty->setObjectName("lineProperty");
         sizePolicy.setHeightForWidth(lineProperty->sizePolicy().hasHeightForWidth());
         lineProperty->setSizePolicy(sizePolicy);
-        lineProperty->setMinimumSize(QSize(0, 60));
-        lineProperty->setMaximumSize(QSize(16777215, 60));
+        lineProperty->setMinimumSize(QSize(0, 0));
+        lineProperty->setMaximumSize(QSize(16777215, 16777215));
         lineProperty->setShowLine(true);
 
         verticalLayout->addWidget(lineProperty);
@@ -141,10 +147,11 @@ public:
 
         fillProperty = new FillProperty(RectPropertyForm);
         fillProperty->setObjectName("fillProperty");
+        fillProperty->setEnabled(true);
         sizePolicy.setHeightForWidth(fillProperty->sizePolicy().hasHeightForWidth());
         fillProperty->setSizePolicy(sizePolicy);
-        fillProperty->setMinimumSize(QSize(0, 79));
-        fillProperty->setMaximumSize(QSize(16777215, 79));
+        fillProperty->setMinimumSize(QSize(173, 79));
+        fillProperty->setMaximumSize(QSize(16777215, 16777215));
         fillProperty->setProperty("fill", QVariant(true));
         fillProperty->setBrushStyle(Qt::BrushStyle::SolidPattern);
 
@@ -152,6 +159,8 @@ public:
 
         line_3 = new QFrame(RectPropertyForm);
         line_3->setObjectName("line_3");
+        sizePolicy2.setHeightForWidth(line_3->sizePolicy().hasHeightForWidth());
+        line_3->setSizePolicy(sizePolicy2);
         line_3->setFrameShape(QFrame::Shape::HLine);
         line_3->setFrameShadow(QFrame::Shadow::Sunken);
 
@@ -191,8 +200,11 @@ public:
         horizontalLayout_2->setContentsMargins(-1, 0, -1, 0);
         label = new QLabel(RectPropertyForm);
         label->setObjectName("label");
-        sizePolicy1.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
-        label->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy3(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Preferred);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy3);
 
         horizontalLayout_2->addWidget(label);
 
@@ -214,16 +226,16 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_2);
 
-        textWidget = new QWidget(RectPropertyForm);
-        textWidget->setObjectName("textWidget");
-        sizePolicy.setHeightForWidth(textWidget->sizePolicy().hasHeightForWidth());
-        textWidget->setSizePolicy(sizePolicy);
-        verticalLayout_2 = new QVBoxLayout(textWidget);
+        extendWidget = new QWidget(RectPropertyForm);
+        extendWidget->setObjectName("extendWidget");
+        sizePolicy.setHeightForWidth(extendWidget->sizePolicy().hasHeightForWidth());
+        extendWidget->setSizePolicy(sizePolicy);
+        verticalLayout_2 = new QVBoxLayout(extendWidget);
         verticalLayout_2->setObjectName("verticalLayout_2");
         verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout_2->setContentsMargins(0, 6, 0, 6);
 
-        verticalLayout->addWidget(textWidget);
+        verticalLayout->addWidget(extendWidget);
 
 
         retranslateUi(RectPropertyForm);

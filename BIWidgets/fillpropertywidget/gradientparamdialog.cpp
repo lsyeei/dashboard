@@ -1,21 +1,21 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #include "gradientparamdialog.h"
 #include "hoverpoints.h"
 #include "ui_gradientparamdialog.h"
@@ -200,6 +200,7 @@ void GradientParamDialog::paintPreView()
 
 void GradientParamDialog::onGradientStopsChanged(QGradientStops stops)
 {
+    Q_UNUSED(stops)
     updatePreView();
     QSignalBlocker presetBlocker(ui->presets);
     ui->presets->setCurrentIndex(0);
@@ -284,6 +285,7 @@ void GradientParamDialog::closeEvent(QCloseEvent *event)
 
 void GradientParamDialog::initUI()
 {
+    layout()->setAlignment(Qt::AlignTop);
     hoverPoint = new HoverPoints(ui->preview, HoverPoints::CircleShape);
     hoverPoint->setEditable(false);
     hoverPoint->setConnectionType(HoverPoints::NoConnection);

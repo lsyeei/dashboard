@@ -132,7 +132,7 @@ void WebPropertyForm::initUI()
     layout()->setAlignment(Qt::AlignTop);
     ui->codeRadio->setChecked(true);
     ui->urlWidget->hide();
-    connect(ui->moveCheck, SIGNAL(stateChanged(int)), this, SLOT(onValueChanged()));
+    connect(ui->moveCheck, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(onValueChanged()));
     connect(ui->urlRadio, SIGNAL(toggled(bool)), this, SLOT(onValueChanged()));
     connect(ui->fileRadio, SIGNAL(toggled(bool)), this, SLOT(onValueChanged()));
     connect(ui->codeRadio, SIGNAL(toggled(bool)), this, SLOT(onValueChanged()));

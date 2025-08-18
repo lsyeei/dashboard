@@ -26,6 +26,7 @@ ProjectPropertyForm::ProjectPropertyForm(QWidget *parent)
     , ui(new Ui::ProjectPropertyForm)
 {
     ui->setupUi(this);
+    layout()->setAlignment(Qt::AlignTop);
     connect(ui->projectName, SIGNAL(editingFinished()), this, SLOT(projectPropertyChanged()));
     connect(ui->author, SIGNAL(editingFinished()), this, SLOT(projectPropertyChanged()));
     connect(ui->pageName, SIGNAL(editingFinished()), this, SLOT(pagePropertyChanged()));

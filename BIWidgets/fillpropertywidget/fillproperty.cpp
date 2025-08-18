@@ -1,21 +1,21 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #include "fillproperty.h"
 #include "fillpropertyform.h"
 #include <QResizeEvent>
@@ -25,18 +25,16 @@
 FillProperty::FillProperty(QWidget *parent) :
     QWidget(parent), form(new FillPropertyForm(this))
 {
-
-    QVBoxLayout layout = QVBoxLayout(this);
-    layout.setAlignment(Qt::AlignTop);
-    layout.setSizeConstraint(QLayout::SetDefaultConstraint);
-    layout.setContentsMargins(0,0,0,0);
-    layout.addWidget(form.data());
-    setLayout(&layout);
-
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    auto layout = new QVBoxLayout(this);
+    layout->setAlignment(Qt::AlignTop);
+    layout->setSizeConstraint(QLayout::SetMinimumSize);
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(form.data());
+    setLayout(layout);
     // 处理属性值改变
     connect(form.data(), SIGNAL(valueChanged()), this, SLOT(formValueChanged()));
     connect(form.data(), SIGNAL(gradientChanged()), this, SLOT(gradientValueChanged()));
-    connect(form.data(), SIGNAL(sizeChanged(QSize)), this, SLOT(formSizeChanged(QSize)));
 }
 
 FillProperty::~FillProperty()
@@ -128,7 +126,6 @@ void FillProperty::setGradientStops(const QGradientStops &newGradientStops)
 void FillProperty::setGradientSpread(QGradient::Spread spread)
 {
     form->setGradientSpread(spread);
-
 }
 
 QGradient::Spread FillProperty::gradientSpread()
@@ -144,22 +141,6 @@ void FillProperty::setControlPoint(const QPainterPath &path, const QPolygonF &po
 QPolygonF FillProperty::controlPoint()
 {
     return form->getControlPoint();
-}
-
-QSize FillProperty::sizeHint() const
-{
-    return {240, 145};
-}
-
-QSize FillProperty::minimumSizeHint() const
-{
-    return {240, 145};
-}
-
-void FillProperty::resizeEvent(QResizeEvent *event)
-{
-    form->setFixedSize(event->size());
-    QWidget::resizeEvent(event);
 }
 
 void FillProperty::formValueChanged()
@@ -178,13 +159,7 @@ void FillProperty::formValueChanged()
     emit propertyChanged(style, baseColor, image);
 }
 
-
 void FillProperty::gradientValueChanged()
 {
     emit gradientChanged(form->getStyle(), form->getGradientStops(), form->getGradientSpread(), form->getControlPoint());
-}
-
-void FillProperty::formSizeChanged(QSize size)
-{
-    setFixedHeight(size.height());
 }

@@ -39,24 +39,36 @@ public:
     {
         if (HtmlPropertyForm->objectName().isEmpty())
             HtmlPropertyForm->setObjectName("HtmlPropertyForm");
-        HtmlPropertyForm->resize(239, 240);
+        HtmlPropertyForm->resize(201, 266);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(HtmlPropertyForm->sizePolicy().hasHeightForWidth());
+        HtmlPropertyForm->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(HtmlPropertyForm);
         verticalLayout->setObjectName("verticalLayout");
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout->setContentsMargins(0, -1, 0, -1);
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
+        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label = new QLabel(HtmlPropertyForm);
         label->setObjectName("label");
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
-        label->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy1);
 
         horizontalLayout->addWidget(label);
 
         line = new QFrame(HtmlPropertyForm);
         line->setObjectName("line");
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(line->sizePolicy().hasHeightForWidth());
+        line->setSizePolicy(sizePolicy2);
         line->setFrameShape(QFrame::Shape::HLine);
         line->setFrameShadow(QFrame::Shadow::Sunken);
 
@@ -67,18 +79,28 @@ public:
 
         textEdit = new QTextEdit(HtmlPropertyForm);
         textEdit->setObjectName("textEdit");
+        QSizePolicy sizePolicy3(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(textEdit->sizePolicy().hasHeightForWidth());
+        textEdit->setSizePolicy(sizePolicy3);
 
         verticalLayout->addWidget(textEdit);
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
+        horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         updateBtn = new QPushButton(HtmlPropertyForm);
         updateBtn->setObjectName("updateBtn");
+        sizePolicy1.setHeightForWidth(updateBtn->sizePolicy().hasHeightForWidth());
+        updateBtn->setSizePolicy(sizePolicy1);
 
         horizontalLayout_2->addWidget(updateBtn);
 
         eidtBtn = new QPushButton(HtmlPropertyForm);
         eidtBtn->setObjectName("eidtBtn");
+        sizePolicy1.setHeightForWidth(eidtBtn->sizePolicy().hasHeightForWidth());
+        eidtBtn->setSizePolicy(sizePolicy1);
 
         horizontalLayout_2->addWidget(eidtBtn);
 

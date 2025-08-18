@@ -58,13 +58,6 @@ public:
      */
     virtual void setSize(const QSizeF &size) = 0;
     /**
-     * @brief 获取插件的属性配置窗口
-     * @param parent 属性配置窗口的父窗口
-     * @param relateItem 属性配置窗口关联的控件对象
-     * @return
-     */
-    // virtual QWidget *propertyWidget(QWidget *parent) = 0;
-    /**
      * @brief 设置插件的属性窗口
      * @param widget 属性窗口
      */

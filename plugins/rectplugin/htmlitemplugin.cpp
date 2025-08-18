@@ -18,16 +18,9 @@
 
 #include "htmlitemplugin.h"
 #include "htmlitem.h"
-#include "htmlpropertyform.h"
-#include "rectpropertyform.h"
 #include "svghelper.h"
+#include "formfactory.h"
 
 HtmlItemPlugin::HtmlItemPlugin() {}
 
-METHOD_DEFINE(HtmlItemPlugin, "html", "通用", "HTML文本", "显示HTML文本", :/icons/html.svg, HtmlItem, RectPropertyForm)
-
-QWidget *HtmlItemPlugin::propertyWidget() {
-    auto form = new RectPropertyForm();
-    form->addSubWidget(new HtmlPropertyForm());
-    return form;
-}
+METHOD_DEFINE(HtmlItemPlugin, "html", "通用", "HTML文本", "显示HTML文本", :/icons/html.svg, HtmlItem, FormType::HTML)

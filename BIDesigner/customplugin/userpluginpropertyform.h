@@ -52,7 +52,6 @@ private:
     ZoneProperty attr;
     void initUI();
     void initEvent();
-
 };
 
 #endif // USERPLUGINPROPERTYFORM_H

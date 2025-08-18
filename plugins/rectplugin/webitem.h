@@ -43,7 +43,6 @@ protected:
     QPainterPath shapePath() const override;
     // QGraphicsItem interface
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-    // void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
     void attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr) override;
     // AbstractZoneItem interface
 protected slots:

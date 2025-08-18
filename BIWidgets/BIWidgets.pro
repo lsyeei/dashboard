@@ -15,6 +15,7 @@ CONFIG      += c++17
 CONFIG += debug_and_release
 
 DEFINES =  COLOR_PICKER_LIB
+QMAKE_CXXFLAGS += /MP
 
 target.path = $$[QT_INSTALL_PLUGINS]/designer
 INSTALLS    += target

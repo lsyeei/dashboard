@@ -6,15 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>212</width>
-    <height>122</height>
+    <width>200</width>
+    <height>136</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -24,26 +30,29 @@
     <number>0</number>
    </property>
    <property name="sizeConstraint">
-    <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
+    <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
    </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>5</number>
    </property>
    <property name="rightMargin">
     <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>5</number>
    </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+     </property>
      <item>
       <widget class="QLabel" name="posLabel">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -67,14 +76,17 @@
        <property name="buttonSymbols">
         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
        </property>
+       <property name="showGroupSeparator" stdset="0">
+        <bool>false</bool>
+       </property>
        <property name="suffix">
         <string> px</string>
        </property>
        <property name="minimum">
-        <number>-2147483647</number>
+        <number>-99999</number>
        </property>
        <property name="maximum">
-        <number>2147483647</number>
+        <number>999999</number>
        </property>
       </widget>
      </item>
@@ -96,10 +108,10 @@
         <string> px</string>
        </property>
        <property name="minimum">
-        <number>-2147483647</number>
+        <number>-99999</number>
        </property>
        <property name="maximum">
-        <number>2147483647</number>
+        <number>999999</number>
        </property>
       </widget>
      </item>
@@ -107,6 +119,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="sizeConstraint">
+      <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+     </property>
      <property name="bottomMargin">
       <number>0</number>
      </property>
@@ -186,13 +201,16 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="sizeConstraint">
+      <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+     </property>
      <property name="topMargin">
       <number>6</number>
      </property>
      <item>
       <widget class="QLabel" name="label">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -220,7 +238,7 @@
         <string> px</string>
        </property>
        <property name="maximum">
-        <number>2147483647</number>
+        <number>999999</number>
        </property>
       </widget>
      </item>
@@ -242,7 +260,7 @@
         <string> px</string>
        </property>
        <property name="maximum">
-        <number>2147483647</number>
+        <number>999999</number>
        </property>
       </widget>
      </item>
@@ -250,6 +268,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="sizeConstraint">
+      <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+     </property>
      <property name="topMargin">
       <number>0</number>
      </property>
@@ -271,6 +292,12 @@
      </item>
      <item>
       <widget class="QLabel" name="widthLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>宽</string>
        </property>
@@ -281,6 +308,12 @@
      </item>
      <item>
       <widget class="QLabel" name="heightLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>高</string>
        </property>
@@ -295,6 +328,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <property name="spacing">
       <number>0</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
      </property>
      <property name="topMargin">
       <number>6</number>

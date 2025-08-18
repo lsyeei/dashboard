@@ -570,7 +570,7 @@ void BIGraphicsView::mouseMoveEvent(QMouseEvent *event)
     if (!isDrag && !dragItemPos.isEmpty() && event->buttons().testFlag(Qt::LeftButton)){
         // 测试是否拖动
         auto item = dragItemPos.begin();
-        if (item.key()->pos() != item.value()) {
+        if (item.key() && item.key()->pos() != item.value()) {
             isDrag = true;
         }
     }
@@ -812,7 +812,6 @@ void BIGraphicsView::paintEvent(QPaintEvent *event)
 void BIGraphicsView::scrollContentsBy(int dx, int dy)
 {
     QGraphicsView::scrollContentsBy(dx,dy);
-    // qDebug() << "scroll x=" << dx << ";y=" << dy;
     updateRuler(size());
 }
 
@@ -843,14 +842,7 @@ void BIGraphicsView::drawBackground(QPainter *painter, const QRectF &rect)
     } catch(...){
         qDebug() << "The scene is not subclass of BIGraphicsScene, can not draw scene background.";
     }
-
-    // QGraphicsView::drawBackground(painter, rect);
 }
-
-// void BIGraphicsView::setNextDrawPlugin(IGraphicPlugin *plugin)
-// {
-//     graphicItemChangedHandler(plugin);
-// }
 
 void BIGraphicsView::graphicItemChangedHandler(IGraphicPlugin *graphicItem)
 {
@@ -1002,7 +994,6 @@ void BIGraphicsView::genUndoCommand(UndoAction action, QList<QGraphicsItem *> it
     BIUndoCommand *command = new BIUndoCommand(dynamic_cast<UndoObject *>(scene()), undoData, redoData, tips);
     undoStack.push(command);
 }
-
 
 QHash<QGraphicsItem *, QPointF> BIGraphicsView::getItemsPos(QList<QGraphicsItem *> items)
 {

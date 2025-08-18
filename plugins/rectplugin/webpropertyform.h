@@ -40,9 +40,6 @@ public:
     ~WebPropertyForm();
     // ISubWidget interface
     void setData(const QVariant &data) override;
-    // void setProperty(const WebProperty &value);
-// Q_SIGNALS:
-//     void dataChanged(const WebProperty &value);
 protected Q_SLOTS:
     void onValueChanged();
     void onSelectFile();

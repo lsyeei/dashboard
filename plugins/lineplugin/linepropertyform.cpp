@@ -1,21 +1,21 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #include "linepropertyform.h"
 #include "abstractlineitem.h"
 #include "endtypefactory.h"
@@ -127,7 +127,6 @@ void LinePropertyForm::setGraphicItem(ICustomGraphic *graphic)
         return;
     }
     graphicItem = obj;
-
     // 初始化页面数据
     updateData();
 }
@@ -222,22 +221,17 @@ void LinePropertyForm::onFlowAnimationChanged()
 
 void LinePropertyForm::initUI()
 {
+    layout()->setAlignment(Qt::AlignTop);
     ui->linePen->setAlwaysShow(true);
     ui->cornerSzie->setDisabled(true);
     ui->roundCorner->setChecked(false);
     ui->corner->hide();
-    auto startType = EndTypeFactory::instance()->getEndTypeList(LineEndType::Start);
-    ui->startTypeOptions->addItem("", "");
-    for(auto type=startType.begin(); type!=startType.end(); type++){
-        ui->startTypeOptions->addItem(type.value(), "", type.key());
-    }
-    auto endType = EndTypeFactory::instance()->getEndTypeList(LineEndType::End);
-    ui->endTypeOptions->addItem("", "");
-    for(auto type=endType.begin(); type!=endType.end(); type++){
-        ui->endTypeOptions->addItem(type.value(), "", type.key());
-    }
+    ui->startTypeOptions->clear();
+    ui->endTypeOptions->clear();
     ui->flowAnimation->setChecked(false);
     ui->animationParam->hide();
+    // 初始化线端箭头
+    initArrowType();
 }
 
 void LinePropertyForm::initEvent()
@@ -258,6 +252,24 @@ void LinePropertyForm::initEvent()
     connect(ui->stateBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onStateIndexChanged(int)));
     connect(ui->centerX, SIGNAL(valueChanged(int)), this, SLOT(onPosChanged(int)));
     connect(ui->centerY, SIGNAL(valueChanged(int)), this, SLOT(onPosChanged(int)));
+}
+
+void LinePropertyForm::initArrowType()
+{
+    if (ui->startTypeOptions->count() <= 0) {
+        auto startType = EndTypeFactory::instance()->getEndTypeList(LineEndType::Start);
+        ui->startTypeOptions->addItem("", "");
+        for(auto type=startType.begin(); type!=startType.end(); type++){
+            ui->startTypeOptions->addItem(type.value(), "", type.key());
+        }
+    }
+    if (ui->endTypeOptions->count() <= 0) {
+        auto endType = EndTypeFactory::instance()->getEndTypeList(LineEndType::End);
+        ui->endTypeOptions->addItem("", "");
+        for(auto type=endType.begin(); type!=endType.end(); type++){
+            ui->endTypeOptions->addItem(type.value(), "", type.key());
+        }
+    }
 }
 
 void LinePropertyForm::onStateAdded(int index)

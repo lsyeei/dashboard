@@ -85,6 +85,8 @@ private:
     // 属性
     ZoneProperty attr;
     QScopedPointer<ISubWidget> subWidget;
+
+
 };
 
 #endif // RECTPROPERTYFORM_H

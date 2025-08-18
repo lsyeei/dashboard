@@ -14,7 +14,6 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -28,20 +27,20 @@ public:
     QHBoxLayout *horizontalLayout;
     QLabel *label;
     QLineEdit *graphicName;
-    QStackedWidget *stackedWidget;
 
     void setupUi(QWidget *GraphicProperty)
     {
         if (GraphicProperty->objectName().isEmpty())
             GraphicProperty->setObjectName("GraphicProperty");
         GraphicProperty->resize(220, 285);
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(GraphicProperty->sizePolicy().hasHeightForWidth());
         GraphicProperty->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(GraphicProperty);
         verticalLayout->setObjectName("verticalLayout");
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         commonProperty = new QWidget(GraphicProperty);
         commonProperty->setObjectName("commonProperty");
         QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
@@ -52,10 +51,11 @@ public:
         horizontalLayout = new QHBoxLayout(commonProperty);
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName("horizontalLayout");
+        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         label = new QLabel(commonProperty);
         label->setObjectName("label");
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Preferred);
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
@@ -73,24 +73,8 @@ public:
 
         verticalLayout->addWidget(commonProperty);
 
-        stackedWidget = new QStackedWidget(GraphicProperty);
-        stackedWidget->setObjectName("stackedWidget");
-        QSizePolicy sizePolicy3(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Ignored);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(stackedWidget->sizePolicy().hasHeightForWidth());
-        stackedWidget->setSizePolicy(sizePolicy3);
-        stackedWidget->setMinimumSize(QSize(0, 0));
-        stackedWidget->setFrameShape(QFrame::Shape::NoFrame);
-        stackedWidget->setLineWidth(0);
-
-        verticalLayout->addWidget(stackedWidget);
-
 
         retranslateUi(GraphicProperty);
-
-        stackedWidget->setCurrentIndex(-1);
-
 
         QMetaObject::connectSlotsByName(GraphicProperty);
     } // setupUi

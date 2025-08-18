@@ -36,7 +36,7 @@ public:
     {
         if (LinePropertyForm->objectName().isEmpty())
             LinePropertyForm->setObjectName("LinePropertyForm");
-        LinePropertyForm->resize(239, 56);
+        LinePropertyForm->resize(200, 56);
         QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -46,14 +46,14 @@ public:
         LinePropertyForm->setAutoFillBackground(false);
         verticalLayout = new QVBoxLayout(LinePropertyForm);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
         horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         lineChecked = new QCheckBox(LinePropertyForm);
         lineChecked->setObjectName("lineChecked");
-        QSizePolicy sizePolicy1(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::MinimumExpanding, QSizePolicy::Policy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(lineChecked->sizePolicy().hasHeightForWidth());
@@ -67,12 +67,12 @@ public:
 
         lineColor = new ColorPicker(LinePropertyForm);
         lineColor->setObjectName("lineColor");
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(lineColor->sizePolicy().hasHeightForWidth());
         lineColor->setSizePolicy(sizePolicy2);
-        lineColor->setMinimumSize(QSize(45, 22));
+        lineColor->setMinimumSize(QSize(0, 0));
         lineColor->setMaximumSize(QSize(16777215, 16777215));
 
         horizontalLayout->addWidget(lineColor, 0, Qt::AlignmentFlag::AlignVCenter);
@@ -85,11 +85,8 @@ public:
         horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         lineStyle = new QComboBox(LinePropertyForm);
         lineStyle->setObjectName("lineStyle");
-        QSizePolicy sizePolicy3(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(lineStyle->sizePolicy().hasHeightForWidth());
-        lineStyle->setSizePolicy(sizePolicy3);
+        sizePolicy2.setHeightForWidth(lineStyle->sizePolicy().hasHeightForWidth());
+        lineStyle->setSizePolicy(sizePolicy2);
         lineStyle->setMinimumSize(QSize(0, 0));
         lineStyle->setMaximumSize(QSize(16777215, 16777215));
         lineStyle->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToMinimumContentsLengthWithIcon);
@@ -99,11 +96,8 @@ public:
 
         lineWidth = new QSpinBox(LinePropertyForm);
         lineWidth->setObjectName("lineWidth");
-        QSizePolicy sizePolicy4(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Fixed);
-        sizePolicy4.setHorizontalStretch(0);
-        sizePolicy4.setVerticalStretch(0);
-        sizePolicy4.setHeightForWidth(lineWidth->sizePolicy().hasHeightForWidth());
-        lineWidth->setSizePolicy(sizePolicy4);
+        sizePolicy2.setHeightForWidth(lineWidth->sizePolicy().hasHeightForWidth());
+        lineWidth->setSizePolicy(sizePolicy2);
         lineWidth->setMinimumSize(QSize(0, 0));
         lineWidth->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
         lineWidth->setButtonSymbols(QAbstractSpinBox::ButtonSymbols::NoButtons);

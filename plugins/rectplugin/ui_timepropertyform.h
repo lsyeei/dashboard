@@ -74,11 +74,11 @@ public:
     QLabel *label;
     QComboBox *spaceOptions;
     QDoubleSpinBox *letterSpace;
-    QSpacerItem *horizontalSpacer_4;
     QHBoxLayout *horizontalLayout_4;
     QLabel *label_2;
     ColorPicker *foreground;
     QSpacerItem *horizontalSpacer_6;
+    QHBoxLayout *horizontalLayout_9;
     QLabel *bkColorLabel;
     ColorPicker *background;
     QSpacerItem *horizontalSpacer_13;
@@ -87,13 +87,20 @@ public:
     {
         if (TimePropertyForm->objectName().isEmpty())
             TimePropertyForm->setObjectName("TimePropertyForm");
-        TimePropertyForm->resize(214, 305);
+        TimePropertyForm->resize(200, 305);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(TimePropertyForm->sizePolicy().hasHeightForWidth());
+        TimePropertyForm->setSizePolicy(sizePolicy);
         verticalLayout_2 = new QVBoxLayout(TimePropertyForm);
         verticalLayout_2->setObjectName("verticalLayout_2");
+        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setSpacing(0);
         horizontalLayout_6->setObjectName("horizontalLayout_6");
+        horizontalLayout_6->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         expandStyle = new QToolButton(TimePropertyForm);
         expandStyle->setObjectName("expandStyle");
         expandStyle->setMaximumSize(QSize(16, 16));
@@ -104,11 +111,11 @@ public:
 
         label_5 = new QLabel(TimePropertyForm);
         label_5->setObjectName("label_5");
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Preferred);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
-        label_5->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
+        label_5->setSizePolicy(sizePolicy1);
 
         horizontalLayout_6->addWidget(label_5);
 
@@ -118,6 +125,11 @@ public:
 
         styleLine = new QFrame(TimePropertyForm);
         styleLine->setObjectName("styleLine");
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(styleLine->sizePolicy().hasHeightForWidth());
+        styleLine->setSizePolicy(sizePolicy2);
         styleLine->setFrameShape(QFrame::Shape::HLine);
         styleLine->setFrameShadow(QFrame::Shadow::Sunken);
 
@@ -129,24 +141,32 @@ public:
 
         styleWidget = new QWidget(TimePropertyForm);
         styleWidget->setObjectName("styleWidget");
+        sizePolicy.setHeightForWidth(styleWidget->sizePolicy().hasHeightForWidth());
+        styleWidget->setSizePolicy(sizePolicy);
         verticalLayout_3 = new QVBoxLayout(styleWidget);
         verticalLayout_3->setSpacing(6);
         verticalLayout_3->setObjectName("verticalLayout_3");
         verticalLayout_3->setContentsMargins(0, 0, 0, 0);
         timeFormat = new QComboBox(styleWidget);
         timeFormat->setObjectName("timeFormat");
+        timeFormat->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToMinimumContentsLengthWithIcon);
 
         verticalLayout_3->addWidget(timeFormat);
 
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setObjectName("horizontalLayout_7");
+        horizontalLayout_7->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         autoCheck = new QCheckBox(styleWidget);
         autoCheck->setObjectName("autoCheck");
+        sizePolicy2.setHeightForWidth(autoCheck->sizePolicy().hasHeightForWidth());
+        autoCheck->setSizePolicy(sizePolicy2);
 
         horizontalLayout_7->addWidget(autoCheck);
 
         lcdCheck = new QCheckBox(styleWidget);
         lcdCheck->setObjectName("lcdCheck");
+        sizePolicy2.setHeightForWidth(lcdCheck->sizePolicy().hasHeightForWidth());
+        lcdCheck->setSizePolicy(sizePolicy2);
 
         horizontalLayout_7->addWidget(lcdCheck);
 
@@ -155,10 +175,11 @@ public:
 
         horizontalLayout_8 = new QHBoxLayout();
         horizontalLayout_8->setObjectName("horizontalLayout_8");
+        horizontalLayout_8->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label_11 = new QLabel(styleWidget);
         label_11->setObjectName("label_11");
-        sizePolicy.setHeightForWidth(label_11->sizePolicy().hasHeightForWidth());
-        label_11->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(label_11->sizePolicy().hasHeightForWidth());
+        label_11->setSizePolicy(sizePolicy1);
 
         horizontalLayout_8->addWidget(label_11);
 
@@ -202,7 +223,7 @@ public:
 
         horizontalLayout_8->addWidget(alignJustifyBtn);
 
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_8->addItem(horizontalSpacer_2);
 
@@ -215,7 +236,7 @@ public:
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setSpacing(0);
         horizontalLayout_5->setObjectName("horizontalLayout_5");
-        horizontalLayout_5->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        horizontalLayout_5->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         expandFont = new QToolButton(TimePropertyForm);
         expandFont->setObjectName("expandFont");
         expandFont->setMaximumSize(QSize(16, 16));
@@ -226,23 +247,17 @@ public:
 
         label_4 = new QLabel(TimePropertyForm);
         label_4->setObjectName("label_4");
-        QSizePolicy sizePolicy1(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Preferred);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(label_4->sizePolicy().hasHeightForWidth());
         label_4->setSizePolicy(sizePolicy1);
 
         horizontalLayout_5->addWidget(label_4);
 
-        horizontalSpacer_10 = new QSpacerItem(6, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_10 = new QSpacerItem(6, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_5->addItem(horizontalSpacer_10);
 
         fontLine = new QFrame(TimePropertyForm);
         fontLine->setObjectName("fontLine");
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(fontLine->sizePolicy().hasHeightForWidth());
         fontLine->setSizePolicy(sizePolicy2);
         fontLine->setFrameShape(QFrame::Shape::HLine);
@@ -256,28 +271,26 @@ public:
 
         fontWidget = new QWidget(TimePropertyForm);
         fontWidget->setObjectName("fontWidget");
-        QSizePolicy sizePolicy3(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(fontWidget->sizePolicy().hasHeightForWidth());
-        fontWidget->setSizePolicy(sizePolicy3);
+        sizePolicy.setHeightForWidth(fontWidget->sizePolicy().hasHeightForWidth());
+        fontWidget->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(fontWidget);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout->setContentsMargins(0, 0, 0, 9);
         fontFamily = new QFontComboBox(fontWidget);
         fontFamily->setObjectName("fontFamily");
+        fontFamily->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToMinimumContentsLengthWithIcon);
 
         verticalLayout->addWidget(fontFamily);
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName("horizontalLayout");
-        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetFixedSize);
+        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label_12 = new QLabel(fontWidget);
         label_12->setObjectName("label_12");
-        sizePolicy.setHeightForWidth(label_12->sizePolicy().hasHeightForWidth());
-        label_12->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(label_12->sizePolicy().hasHeightForWidth());
+        label_12->setSizePolicy(sizePolicy1);
         label_12->setMargin(0);
 
         horizontalLayout->addWidget(label_12);
@@ -309,7 +322,7 @@ public:
 
         horizontalLayout->addWidget(decreaseSizeBtn);
 
-        horizontalSpacer_5 = new QSpacerItem(6, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_5 = new QSpacerItem(6, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer_5);
 
@@ -317,9 +330,13 @@ public:
         verticalLayout->addLayout(horizontalLayout);
 
         horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setSpacing(2);
         horizontalLayout_2->setObjectName("horizontalLayout_2");
+        horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         boldBtn = new QToolButton(fontWidget);
         boldBtn->setObjectName("boldBtn");
+        sizePolicy1.setHeightForWidth(boldBtn->sizePolicy().hasHeightForWidth());
+        boldBtn->setSizePolicy(sizePolicy1);
         boldBtn->setStyleSheet(QString::fromUtf8("font: 9pt \"Microsoft YaHei UI\";\n"
 "font-weight:bold;"));
         boldBtn->setIconSize(QSize(16, 16));
@@ -329,6 +346,8 @@ public:
 
         italicBtn = new QToolButton(fontWidget);
         italicBtn->setObjectName("italicBtn");
+        sizePolicy1.setHeightForWidth(italicBtn->sizePolicy().hasHeightForWidth());
+        italicBtn->setSizePolicy(sizePolicy1);
         italicBtn->setStyleSheet(QString::fromUtf8("font: italic 10pt \"Liberation Serif\";"));
         italicBtn->setCheckable(true);
 
@@ -336,6 +355,8 @@ public:
 
         underlineBtn = new QToolButton(fontWidget);
         underlineBtn->setObjectName("underlineBtn");
+        sizePolicy1.setHeightForWidth(underlineBtn->sizePolicy().hasHeightForWidth());
+        underlineBtn->setSizePolicy(sizePolicy1);
         underlineBtn->setStyleSheet(QString::fromUtf8("font: 9pt \"Microsoft YaHei UI\";\n"
 "text-decoration: underline;"));
         underlineBtn->setCheckable(true);
@@ -344,6 +365,8 @@ public:
 
         strikeOutBtn = new QToolButton(fontWidget);
         strikeOutBtn->setObjectName("strikeOutBtn");
+        sizePolicy1.setHeightForWidth(strikeOutBtn->sizePolicy().hasHeightForWidth());
+        strikeOutBtn->setSizePolicy(sizePolicy1);
         strikeOutBtn->setStyleSheet(QString::fromUtf8("font: 9pt \"Microsoft YaHei UI\";\n"
 "text-decoration: line-through;"));
         strikeOutBtn->setCheckable(true);
@@ -359,8 +382,11 @@ public:
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName("horizontalLayout_3");
+        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label = new QLabel(fontWidget);
         label->setObjectName("label");
+        sizePolicy1.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy1);
 
         horizontalLayout_3->addWidget(label);
 
@@ -384,14 +410,18 @@ public:
         spaceOptions->setObjectName("spaceOptions");
         sizePolicy2.setHeightForWidth(spaceOptions->sizePolicy().hasHeightForWidth());
         spaceOptions->setSizePolicy(sizePolicy2);
+        spaceOptions->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToMinimumContentsLengthWithIcon);
 
         horizontalLayout_3->addWidget(spaceOptions);
 
         letterSpace = new QDoubleSpinBox(fontWidget);
         letterSpace->setObjectName("letterSpace");
         letterSpace->setEnabled(false);
-        sizePolicy2.setHeightForWidth(letterSpace->sizePolicy().hasHeightForWidth());
-        letterSpace->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy3(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(letterSpace->sizePolicy().hasHeightForWidth());
+        letterSpace->setSizePolicy(sizePolicy3);
         letterSpace->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
         letterSpace->setDecimals(1);
         letterSpace->setMinimum(-999.000000000000000);
@@ -401,57 +431,56 @@ public:
 
         horizontalLayout_3->addWidget(letterSpace);
 
-        horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
-
-        horizontalLayout_3->addItem(horizontalSpacer_4);
-
 
         verticalLayout->addLayout(horizontalLayout_3);
 
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setObjectName("horizontalLayout_4");
-        horizontalLayout_4->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        horizontalLayout_4->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label_2 = new QLabel(fontWidget);
         label_2->setObjectName("label_2");
-        sizePolicy.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
-        label_2->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
+        label_2->setSizePolicy(sizePolicy1);
 
         horizontalLayout_4->addWidget(label_2);
 
         foreground = new ColorPicker(fontWidget);
         foreground->setObjectName("foreground");
-        QSizePolicy sizePolicy4(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
-        sizePolicy4.setHorizontalStretch(0);
-        sizePolicy4.setVerticalStretch(0);
-        sizePolicy4.setHeightForWidth(foreground->sizePolicy().hasHeightForWidth());
-        foreground->setSizePolicy(sizePolicy4);
+        sizePolicy2.setHeightForWidth(foreground->sizePolicy().hasHeightForWidth());
+        foreground->setSizePolicy(sizePolicy2);
 
         horizontalLayout_4->addWidget(foreground);
 
-        horizontalSpacer_6 = new QSpacerItem(10, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_6 = new QSpacerItem(10, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_4->addItem(horizontalSpacer_6);
 
+
+        verticalLayout->addLayout(horizontalLayout_4);
+
+        horizontalLayout_9 = new QHBoxLayout();
+        horizontalLayout_9->setObjectName("horizontalLayout_9");
+        horizontalLayout_9->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         bkColorLabel = new QLabel(fontWidget);
         bkColorLabel->setObjectName("bkColorLabel");
-        sizePolicy.setHeightForWidth(bkColorLabel->sizePolicy().hasHeightForWidth());
-        bkColorLabel->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(bkColorLabel->sizePolicy().hasHeightForWidth());
+        bkColorLabel->setSizePolicy(sizePolicy1);
 
-        horizontalLayout_4->addWidget(bkColorLabel);
+        horizontalLayout_9->addWidget(bkColorLabel);
 
         background = new ColorPicker(fontWidget);
         background->setObjectName("background");
-        sizePolicy4.setHeightForWidth(background->sizePolicy().hasHeightForWidth());
-        background->setSizePolicy(sizePolicy4);
+        sizePolicy2.setHeightForWidth(background->sizePolicy().hasHeightForWidth());
+        background->setSizePolicy(sizePolicy2);
 
-        horizontalLayout_4->addWidget(background);
+        horizontalLayout_9->addWidget(background);
 
-        horizontalSpacer_13 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_13 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
-        horizontalLayout_4->addItem(horizontalSpacer_13);
+        horizontalLayout_9->addItem(horizontalSpacer_13);
 
 
-        verticalLayout->addLayout(horizontalLayout_4);
+        verticalLayout->addLayout(horizontalLayout_9);
 
 
         verticalLayout_2->addWidget(fontWidget);

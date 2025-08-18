@@ -49,21 +49,21 @@ public:
         if (GradientColorPickerForm->objectName().isEmpty())
             GradientColorPickerForm->setObjectName("GradientColorPickerForm");
         GradientColorPickerForm->resize(261, 161);
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Preferred);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(GradientColorPickerForm->sizePolicy().hasHeightForWidth());
         GradientColorPickerForm->setSizePolicy(sizePolicy);
         verticalLayout_2 = new QVBoxLayout(GradientColorPickerForm);
         verticalLayout_2->setObjectName("verticalLayout_2");
-        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         verticalLayout_3 = new QVBoxLayout();
         verticalLayout_3->setObjectName("verticalLayout_3");
-        verticalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        verticalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         colorView = new QWidget(GradientColorPickerForm);
         colorView->setObjectName("colorView");
-        QSizePolicy sizePolicy1(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(colorView->sizePolicy().hasHeightForWidth());
@@ -74,11 +74,8 @@ public:
 
         markPanel = new QWidget(GradientColorPickerForm);
         markPanel->setObjectName("markPanel");
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(markPanel->sizePolicy().hasHeightForWidth());
-        markPanel->setSizePolicy(sizePolicy2);
+        sizePolicy1.setHeightForWidth(markPanel->sizePolicy().hasHeightForWidth());
+        markPanel->setSizePolicy(sizePolicy1);
         markPanel->setMinimumSize(QSize(0, 18));
 
         verticalLayout_3->addWidget(markPanel);
@@ -88,51 +85,44 @@ public:
 
         groupBox = new QGroupBox(GradientColorPickerForm);
         groupBox->setObjectName("groupBox");
-        QSizePolicy sizePolicy3(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(groupBox->sizePolicy().hasHeightForWidth());
-        groupBox->setSizePolicy(sizePolicy3);
+        sizePolicy.setHeightForWidth(groupBox->sizePolicy().hasHeightForWidth());
+        groupBox->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(groupBox);
         verticalLayout->setObjectName("verticalLayout");
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout->setContentsMargins(6, -1, 6, -1);
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
+        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label = new QLabel(groupBox);
         label->setObjectName("label");
-        sizePolicy2.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
-        label->setSizePolicy(sizePolicy2);
+        sizePolicy1.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy1);
 
         horizontalLayout->addWidget(label);
 
         colorPicker = new ColorPicker(groupBox);
         colorPicker->setObjectName("colorPicker");
-        QSizePolicy sizePolicy4(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
-        sizePolicy4.setHorizontalStretch(0);
-        sizePolicy4.setVerticalStretch(0);
-        sizePolicy4.setHeightForWidth(colorPicker->sizePolicy().hasHeightForWidth());
-        colorPicker->setSizePolicy(sizePolicy4);
+        sizePolicy1.setHeightForWidth(colorPicker->sizePolicy().hasHeightForWidth());
+        colorPicker->setSizePolicy(sizePolicy1);
 
         horizontalLayout->addWidget(colorPicker);
 
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer_2);
 
         label_3 = new QLabel(groupBox);
         label_3->setObjectName("label_3");
-        sizePolicy2.setHeightForWidth(label_3->sizePolicy().hasHeightForWidth());
-        label_3->setSizePolicy(sizePolicy2);
+        sizePolicy1.setHeightForWidth(label_3->sizePolicy().hasHeightForWidth());
+        label_3->setSizePolicy(sizePolicy1);
 
         horizontalLayout->addWidget(label_3);
 
         colorAlpha = new QSpinBox(groupBox);
         colorAlpha->setObjectName("colorAlpha");
-        QSizePolicy sizePolicy5(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Fixed);
-        sizePolicy5.setHorizontalStretch(0);
-        sizePolicy5.setVerticalStretch(0);
-        sizePolicy5.setHeightForWidth(colorAlpha->sizePolicy().hasHeightForWidth());
-        colorAlpha->setSizePolicy(sizePolicy5);
+        sizePolicy1.setHeightForWidth(colorAlpha->sizePolicy().hasHeightForWidth());
+        colorAlpha->setSizePolicy(sizePolicy1);
         colorAlpha->setButtonSymbols(QAbstractSpinBox::ButtonSymbols::NoButtons);
         colorAlpha->setMaximum(255);
 
@@ -143,29 +133,34 @@ public:
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
+        horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label_2 = new QLabel(groupBox);
         label_2->setObjectName("label_2");
-        sizePolicy2.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
-        label_2->setSizePolicy(sizePolicy2);
+        sizePolicy1.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
+        label_2->setSizePolicy(sizePolicy1);
 
         horizontalLayout_2->addWidget(label_2);
 
         colorPos = new QSpinBox(groupBox);
         colorPos->setObjectName("colorPos");
-        sizePolicy5.setHeightForWidth(colorPos->sizePolicy().hasHeightForWidth());
-        colorPos->setSizePolicy(sizePolicy5);
+        sizePolicy1.setHeightForWidth(colorPos->sizePolicy().hasHeightForWidth());
+        colorPos->setSizePolicy(sizePolicy1);
         colorPos->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
         colorPos->setButtonSymbols(QAbstractSpinBox::ButtonSymbols::NoButtons);
         colorPos->setMaximum(100);
 
         horizontalLayout_2->addWidget(colorPos);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer);
 
         delColor = new QPushButton(groupBox);
         delColor->setObjectName("delColor");
+        sizePolicy1.setHeightForWidth(delColor->sizePolicy().hasHeightForWidth());
+        delColor->setSizePolicy(sizePolicy1);
+        delColor->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
+        delColor->setContextMenuPolicy(Qt::ContextMenuPolicy::NoContextMenu);
 
         horizontalLayout_2->addWidget(delColor);
 

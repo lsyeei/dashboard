@@ -190,9 +190,11 @@ GraphicsItemGroup *BIGraphicsScene::newGroup(const QList<QGraphicsItem *> &items
     GraphicsItemGroup *group = new GraphicsItemGroup();
     addItem(group);
     auto list = sortItems(items, Qt::AscendingOrder);
+    blockSignals(true);
+    clearSelection();
+    blockSignals(false);
     for (int i = 0; i < list.count(); ++i) {
         auto item = list[i];
-        item->setSelected(false);
         item->setFlag(QGraphicsItem::ItemIsFocusable, false);
         group->addToGroup(item);
     }

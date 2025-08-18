@@ -37,7 +37,6 @@
 #include <QFileDialog>
 #include <QXmlStreamWriter>
 #include <QShortcut>
-#include <QtConcurrent>
 #include <QGraphicsItem>
 #include <QMessageBox>
 #include <QPluginLoader>
@@ -48,6 +47,7 @@
 #include "xmlHelper.h"
 #include "animation/animationform.h"
 #include "animation/animationfactory.h"
+ #include <QtConcurrent>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -74,13 +74,6 @@ MainWindow::MainWindow(QWidget *parent)
     // 初始化右键菜单
     initPopMenu();
     ui->graphicsView->installEventFilter(this);
-    // QThread::create([]{
-    //     // auto *webView = new QWebEngineView(this);
-    //     // webView->resize({12,12});
-    //     // webView->hide();
-
-    // });
-
 }
 
 MainWindow::~MainWindow()
@@ -129,7 +122,6 @@ void MainWindow::initStatusBar()
     ui->showViewRuler->setChecked(true);
     ui->showViewRuler->blockSignals(false);
 }
-
 
 QPushButton *MainWindow::createDropdownBtn(const QString &title, int width)
 {
@@ -313,7 +305,6 @@ void MainWindow::initPopMenu()
 
 void MainWindow::initToolBar()
 {
-
     // 添加菜单按钮
     menuBtn = createDropdownBtn(tr("Dashboard"), 100);
     ui->toolBar->insertWidget(ui->doSave, menuBtn);
@@ -428,6 +419,7 @@ void MainWindow::setMenuEvent()
 void MainWindow::initGraphicsWidget()
 {
     propertyWidget = new GraphicPropertyForm();
+    propertyWidget->installEventFilter(this);
     propertyWidget->setView(ui->graphicsView);
 }
 
@@ -609,7 +601,7 @@ void MainWindow::on_action_animate_triggered()
     QTransform trans;
     angle += 30;
     angle = fmodf(angle, 360);
-    trans.rotate(angle, Qt::YAxis);qDebug() << angle << items.first()->transform();
+    trans.rotate(angle, Qt::YAxis);//qDebug() << angle << items.first()->transform();
     items.first()->setTransform(trans, false);
     // qDebug() << "属性： " << item->property(attr.toLocal8Bit());
     //          << "state=" << item->property("state")

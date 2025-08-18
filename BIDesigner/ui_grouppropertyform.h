@@ -58,14 +58,13 @@ public:
     QToolButton *intersect;
     QToolButton *subtract;
     QToolButton *exclude;
-    QSpacerItem *verticalSpacer;
 
     void setupUi(QWidget *GroupPropertyForm)
     {
         if (GroupPropertyForm->objectName().isEmpty())
             GroupPropertyForm->setObjectName("GroupPropertyForm");
-        GroupPropertyForm->resize(320, 517);
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Fixed);
+        GroupPropertyForm->resize(246, 438);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(GroupPropertyForm->sizePolicy().hasHeightForWidth());
@@ -73,14 +72,14 @@ public:
         verticalLayout = new QVBoxLayout(GroupPropertyForm);
         verticalLayout->setSpacing(6);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout->setContentsMargins(0, -1, 0, 0);
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName("horizontalLayout_3");
-        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label_2 = new QLabel(GroupPropertyForm);
         label_2->setObjectName("label_2");
-        QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
@@ -90,18 +89,21 @@ public:
 
         stateBox = new BIComboBox(GroupPropertyForm);
         stateBox->setObjectName("stateBox");
-        sizePolicy1.setHeightForWidth(stateBox->sizePolicy().hasHeightForWidth());
-        stateBox->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(stateBox->sizePolicy().hasHeightForWidth());
+        stateBox->setSizePolicy(sizePolicy2);
 
         horizontalLayout_3->addWidget(stateBox);
 
-        horizontalLayout_3->setStretch(0, 1);
-        horizontalLayout_3->setStretch(1, 5);
 
         verticalLayout->addLayout(horizontalLayout_3);
 
         line_4 = new QFrame(GroupPropertyForm);
         line_4->setObjectName("line_4");
+        sizePolicy2.setHeightForWidth(line_4->sizePolicy().hasHeightForWidth());
+        line_4->setSizePolicy(sizePolicy2);
         line_4->setFrameShape(QFrame::Shape::HLine);
         line_4->setFrameShadow(QFrame::Shadow::Sunken);
 
@@ -109,11 +111,8 @@ public:
 
         posProperty = new PosProperty(GroupPropertyForm);
         posProperty->setObjectName("posProperty");
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::MinimumExpanding, QSizePolicy::Policy::Minimum);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(posProperty->sizePolicy().hasHeightForWidth());
-        posProperty->setSizePolicy(sizePolicy2);
+        sizePolicy.setHeightForWidth(posProperty->sizePolicy().hasHeightForWidth());
+        posProperty->setSizePolicy(sizePolicy);
         posProperty->setMinimumSize(QSize(0, 0));
         posProperty->setAspectRatio(true);
 
@@ -121,6 +120,8 @@ public:
 
         line_2 = new QFrame(GroupPropertyForm);
         line_2->setObjectName("line_2");
+        sizePolicy2.setHeightForWidth(line_2->sizePolicy().hasHeightForWidth());
+        line_2->setSizePolicy(sizePolicy2);
         line_2->setFrameShape(QFrame::Shape::HLine);
         line_2->setFrameShadow(QFrame::Shadow::Sunken);
 
@@ -128,21 +129,18 @@ public:
 
         lineProperty = new LineProperty(GroupPropertyForm);
         lineProperty->setObjectName("lineProperty");
-        QSizePolicy sizePolicy3(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(lineProperty->sizePolicy().hasHeightForWidth());
-        lineProperty->setSizePolicy(sizePolicy3);
-        lineProperty->setMinimumSize(QSize(0, 22));
-        lineProperty->setMaximumSize(QSize(16777215, 22));
+        sizePolicy.setHeightForWidth(lineProperty->sizePolicy().hasHeightForWidth());
+        lineProperty->setSizePolicy(sizePolicy);
+        lineProperty->setMinimumSize(QSize(0, 0));
+        lineProperty->setMaximumSize(QSize(16777215, 16777215));
         lineProperty->setShowLine(false);
 
         verticalLayout->addWidget(lineProperty);
 
         line = new QFrame(GroupPropertyForm);
         line->setObjectName("line");
-        sizePolicy1.setHeightForWidth(line->sizePolicy().hasHeightForWidth());
-        line->setSizePolicy(sizePolicy1);
+        sizePolicy2.setHeightForWidth(line->sizePolicy().hasHeightForWidth());
+        line->setSizePolicy(sizePolicy2);
         line->setFrameShadow(QFrame::Shadow::Sunken);
         line->setLineWidth(1);
         line->setFrameShape(QFrame::Shape::HLine);
@@ -151,16 +149,18 @@ public:
 
         fillProperty = new FillProperty(GroupPropertyForm);
         fillProperty->setObjectName("fillProperty");
-        sizePolicy2.setHeightForWidth(fillProperty->sizePolicy().hasHeightForWidth());
-        fillProperty->setSizePolicy(sizePolicy2);
-        fillProperty->setMinimumSize(QSize(0, 80));
-        fillProperty->setMaximumSize(QSize(16777215, 80));
+        sizePolicy.setHeightForWidth(fillProperty->sizePolicy().hasHeightForWidth());
+        fillProperty->setSizePolicy(sizePolicy);
+        fillProperty->setMinimumSize(QSize(0, 0));
+        fillProperty->setMaximumSize(QSize(16777215, 16777215));
         fillProperty->setProperty("fill", QVariant(true));
 
         verticalLayout->addWidget(fillProperty);
 
         line_3 = new QFrame(GroupPropertyForm);
         line_3->setObjectName("line_3");
+        sizePolicy2.setHeightForWidth(line_3->sizePolicy().hasHeightForWidth());
+        line_3->setSizePolicy(sizePolicy2);
         line_3->setFrameShape(QFrame::Shape::HLine);
         line_3->setFrameShadow(QFrame::Shadow::Sunken);
 
@@ -169,12 +169,12 @@ public:
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(6);
         horizontalLayout->setObjectName("horizontalLayout");
-        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout->setContentsMargins(-1, 0, -1, 0);
         roundChecked = new QCheckBox(GroupPropertyForm);
         roundChecked->setObjectName("roundChecked");
-        sizePolicy.setHeightForWidth(roundChecked->sizePolicy().hasHeightForWidth());
-        roundChecked->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(roundChecked->sizePolicy().hasHeightForWidth());
+        roundChecked->setSizePolicy(sizePolicy1);
 
         horizontalLayout->addWidget(roundChecked);
 
@@ -184,8 +184,8 @@ public:
 
         roundSize = new QSpinBox(GroupPropertyForm);
         roundSize->setObjectName("roundSize");
-        sizePolicy.setHeightForWidth(roundSize->sizePolicy().hasHeightForWidth());
-        roundSize->setSizePolicy(sizePolicy);
+        sizePolicy2.setHeightForWidth(roundSize->sizePolicy().hasHeightForWidth());
+        roundSize->setSizePolicy(sizePolicy2);
         roundSize->setMaximum(65536);
 
         horizontalLayout->addWidget(roundSize);
@@ -195,19 +195,23 @@ public:
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
-        horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout_2->setContentsMargins(-1, 0, -1, 0);
         label = new QLabel(GroupPropertyForm);
         label->setObjectName("label");
+        sizePolicy1.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy1);
 
         horizontalLayout_2->addWidget(label);
 
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(20, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer_2);
 
         rotation = new QDoubleSpinBox(GroupPropertyForm);
         rotation->setObjectName("rotation");
+        sizePolicy2.setHeightForWidth(rotation->sizePolicy().hasHeightForWidth());
+        rotation->setSizePolicy(sizePolicy2);
         rotation->setDecimals(1);
         rotation->setMinimum(-360.000000000000000);
         rotation->setMaximum(360.000000000000000);
@@ -219,24 +223,27 @@ public:
 
         mergeCheck = new QCheckBox(GroupPropertyForm);
         mergeCheck->setObjectName("mergeCheck");
+        sizePolicy2.setHeightForWidth(mergeCheck->sizePolicy().hasHeightForWidth());
+        mergeCheck->setSizePolicy(sizePolicy2);
 
         verticalLayout->addWidget(mergeCheck);
 
         mergeOptions = new QWidget(GroupPropertyForm);
         mergeOptions->setObjectName("mergeOptions");
-        QSizePolicy sizePolicy4(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Fixed);
-        sizePolicy4.setHorizontalStretch(0);
-        sizePolicy4.setVerticalStretch(0);
-        sizePolicy4.setHeightForWidth(mergeOptions->sizePolicy().hasHeightForWidth());
-        mergeOptions->setSizePolicy(sizePolicy4);
+        sizePolicy2.setHeightForWidth(mergeOptions->sizePolicy().hasHeightForWidth());
+        mergeOptions->setSizePolicy(sizePolicy2);
         horizontalLayout_4 = new QHBoxLayout(mergeOptions);
+        horizontalLayout_4->setSpacing(2);
         horizontalLayout_4->setObjectName("horizontalLayout_4");
-        horizontalLayout_4->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
-        horizontalLayout_4->setContentsMargins(6, 0, 6, 6);
+        horizontalLayout_4->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_4->setContentsMargins(0, 0, 0, 0);
         unit = new QToolButton(mergeOptions);
         unit->setObjectName("unit");
-        sizePolicy1.setHeightForWidth(unit->sizePolicy().hasHeightForWidth());
-        unit->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy3(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(unit->sizePolicy().hasHeightForWidth());
+        unit->setSizePolicy(sizePolicy3);
         QIcon icon;
         icon.addFile(QString::fromUtf8("icons/shapes_unite.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
         unit->setIcon(icon);
@@ -248,8 +255,8 @@ public:
 
         intersect = new QToolButton(mergeOptions);
         intersect->setObjectName("intersect");
-        sizePolicy1.setHeightForWidth(intersect->sizePolicy().hasHeightForWidth());
-        intersect->setSizePolicy(sizePolicy1);
+        sizePolicy3.setHeightForWidth(intersect->sizePolicy().hasHeightForWidth());
+        intersect->setSizePolicy(sizePolicy3);
         QIcon icon1;
         icon1.addFile(QString::fromUtf8("icons/shapes_intersect.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
         intersect->setIcon(icon1);
@@ -261,8 +268,8 @@ public:
 
         subtract = new QToolButton(mergeOptions);
         subtract->setObjectName("subtract");
-        sizePolicy1.setHeightForWidth(subtract->sizePolicy().hasHeightForWidth());
-        subtract->setSizePolicy(sizePolicy1);
+        sizePolicy3.setHeightForWidth(subtract->sizePolicy().hasHeightForWidth());
+        subtract->setSizePolicy(sizePolicy3);
         QIcon icon2;
         icon2.addFile(QString::fromUtf8("icons/shapes_minus_back.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
         subtract->setIcon(icon2);
@@ -274,8 +281,8 @@ public:
 
         exclude = new QToolButton(mergeOptions);
         exclude->setObjectName("exclude");
-        sizePolicy1.setHeightForWidth(exclude->sizePolicy().hasHeightForWidth());
-        exclude->setSizePolicy(sizePolicy1);
+        sizePolicy3.setHeightForWidth(exclude->sizePolicy().hasHeightForWidth());
+        exclude->setSizePolicy(sizePolicy3);
         QIcon icon3;
         icon3.addFile(QString::fromUtf8("icons/shapes_exclude.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
         exclude->setIcon(icon3);
@@ -287,10 +294,6 @@ public:
 
 
         verticalLayout->addWidget(mergeOptions);
-
-        verticalSpacer = new QSpacerItem(20, 20, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-        verticalLayout->addItem(verticalSpacer);
 
 
         retranslateUi(GroupPropertyForm);

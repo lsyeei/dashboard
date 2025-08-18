@@ -49,22 +49,24 @@ public:
     {
         if (PosPropertyForm->objectName().isEmpty())
             PosPropertyForm->setObjectName("PosPropertyForm");
-        PosPropertyForm->resize(212, 122);
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+        PosPropertyForm->resize(200, 136);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(PosPropertyForm->sizePolicy().hasHeightForWidth());
         PosPropertyForm->setSizePolicy(sizePolicy);
+        PosPropertyForm->setMinimumSize(QSize(0, 0));
         verticalLayout = new QVBoxLayout(PosPropertyForm);
         verticalLayout->setSpacing(0);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
-        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        verticalLayout->setContentsMargins(0, 5, 0, 5);
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
+        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         posLabel = new QLabel(PosPropertyForm);
         posLabel->setObjectName("posLabel");
-        QSizePolicy sizePolicy1(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Preferred);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(posLabel->sizePolicy().hasHeightForWidth());
@@ -81,8 +83,9 @@ public:
         leftValue->setSizePolicy(sizePolicy2);
         leftValue->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
         leftValue->setButtonSymbols(QAbstractSpinBox::ButtonSymbols::NoButtons);
-        leftValue->setMinimum(-2147483647);
-        leftValue->setMaximum(2147483647);
+        leftValue->setProperty("showGroupSeparator", QVariant(false));
+        leftValue->setMinimum(-99999);
+        leftValue->setMaximum(999999);
 
         horizontalLayout->addWidget(leftValue);
 
@@ -92,8 +95,8 @@ public:
         topValue->setSizePolicy(sizePolicy2);
         topValue->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
         topValue->setButtonSymbols(QAbstractSpinBox::ButtonSymbols::NoButtons);
-        topValue->setMinimum(-2147483647);
-        topValue->setMaximum(2147483647);
+        topValue->setMinimum(-99999);
+        topValue->setMaximum(999999);
 
         horizontalLayout->addWidget(topValue);
 
@@ -102,6 +105,7 @@ public:
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
+        horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout_2->setContentsMargins(-1, -1, -1, 0);
         horizontalSpacer = new QSpacerItem(24, 10, QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Minimum);
 
@@ -132,6 +136,7 @@ public:
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName("horizontalLayout_3");
+        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout_3->setContentsMargins(-1, 6, -1, -1);
         label = new QLabel(PosPropertyForm);
         label->setObjectName("label");
@@ -146,7 +151,7 @@ public:
         widthValue->setSizePolicy(sizePolicy2);
         widthValue->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
         widthValue->setButtonSymbols(QAbstractSpinBox::ButtonSymbols::NoButtons);
-        widthValue->setMaximum(2147483647);
+        widthValue->setMaximum(999999);
 
         horizontalLayout_3->addWidget(widthValue);
 
@@ -156,7 +161,7 @@ public:
         heightValue->setSizePolicy(sizePolicy2);
         heightValue->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
         heightValue->setButtonSymbols(QAbstractSpinBox::ButtonSymbols::NoButtons);
-        heightValue->setMaximum(2147483647);
+        heightValue->setMaximum(999999);
 
         horizontalLayout_3->addWidget(heightValue);
 
@@ -165,6 +170,7 @@ public:
 
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setObjectName("horizontalLayout_4");
+        horizontalLayout_4->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout_4->setContentsMargins(-1, 0, -1, -1);
         horizontalSpacer_2 = new QSpacerItem(24, 13, QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Minimum);
 
@@ -172,12 +178,16 @@ public:
 
         widthLabel = new QLabel(PosPropertyForm);
         widthLabel->setObjectName("widthLabel");
+        sizePolicy2.setHeightForWidth(widthLabel->sizePolicy().hasHeightForWidth());
+        widthLabel->setSizePolicy(sizePolicy2);
         widthLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         horizontalLayout_4->addWidget(widthLabel);
 
         heightLabel = new QLabel(PosPropertyForm);
         heightLabel->setObjectName("heightLabel");
+        sizePolicy2.setHeightForWidth(heightLabel->sizePolicy().hasHeightForWidth());
+        heightLabel->setSizePolicy(sizePolicy2);
         heightLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         horizontalLayout_4->addWidget(heightLabel);
@@ -188,14 +198,12 @@ public:
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setSpacing(0);
         horizontalLayout_5->setObjectName("horizontalLayout_5");
+        horizontalLayout_5->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout_5->setContentsMargins(-1, 6, -1, -1);
         aspectRatioChecked = new QCheckBox(PosPropertyForm);
         aspectRatioChecked->setObjectName("aspectRatioChecked");
-        QSizePolicy sizePolicy3(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(aspectRatioChecked->sizePolicy().hasHeightForWidth());
-        aspectRatioChecked->setSizePolicy(sizePolicy3);
+        sizePolicy1.setHeightForWidth(aspectRatioChecked->sizePolicy().hasHeightForWidth());
+        aspectRatioChecked->setSizePolicy(sizePolicy1);
 
         horizontalLayout_5->addWidget(aspectRatioChecked);
 

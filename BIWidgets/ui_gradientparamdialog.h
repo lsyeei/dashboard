@@ -61,10 +61,14 @@ public:
         horizontalLayout->setObjectName("horizontalLayout");
         verticalLayout_2 = new QVBoxLayout();
         verticalLayout_2->setObjectName("verticalLayout_2");
+        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         preview = new QWidget(GradientParamDialog);
         preview->setObjectName("preview");
-        sizePolicy.setHeightForWidth(preview->sizePolicy().hasHeightForWidth());
-        preview->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::MinimumExpanding);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(preview->sizePolicy().hasHeightForWidth());
+        preview->setSizePolicy(sizePolicy1);
         preview->setMinimumSize(QSize(180, 180));
         preview->setAutoFillBackground(false);
 
@@ -72,25 +76,32 @@ public:
 
         radialParam = new QWidget(GradientParamDialog);
         radialParam->setObjectName("radialParam");
-        QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(radialParam->sizePolicy().hasHeightForWidth());
-        radialParam->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(radialParam->sizePolicy().hasHeightForWidth());
+        radialParam->setSizePolicy(sizePolicy2);
         verticalLayout_3 = new QVBoxLayout(radialParam);
         verticalLayout_3->setObjectName("verticalLayout_3");
+        verticalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout_3->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setObjectName("horizontalLayout_4");
+        horizontalLayout_4->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label_2 = new QLabel(radialParam);
         label_2->setObjectName("label_2");
-        sizePolicy1.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
-        label_2->setSizePolicy(sizePolicy1);
+        sizePolicy2.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
+        label_2->setSizePolicy(sizePolicy2);
 
         horizontalLayout_4->addWidget(label_2);
 
         focalRadius = new QSlider(radialParam);
         focalRadius->setObjectName("focalRadius");
+        QSizePolicy sizePolicy3(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(focalRadius->sizePolicy().hasHeightForWidth());
+        focalRadius->setSizePolicy(sizePolicy3);
         focalRadius->setOrientation(Qt::Orientation::Horizontal);
 
         horizontalLayout_4->addWidget(focalRadius);
@@ -100,6 +111,7 @@ public:
 
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setObjectName("horizontalLayout_5");
+        horizontalLayout_5->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label_3 = new QLabel(radialParam);
         label_3->setObjectName("label_3");
 
@@ -122,8 +134,10 @@ public:
 
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName("verticalLayout");
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
+        horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         gradientType = new QComboBox(GradientParamDialog);
         gradientType->setObjectName("gradientType");
         gradientType->setInsertPolicy(QComboBox::InsertPolicy::NoInsert);
@@ -143,11 +157,9 @@ public:
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName("horizontalLayout_3");
+        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label = new QLabel(GradientParamDialog);
         label->setObjectName("label");
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Fixed);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
         label->setSizePolicy(sizePolicy2);
 
@@ -155,15 +167,15 @@ public:
 
         presets = new QComboBox(GradientParamDialog);
         presets->setObjectName("presets");
-        sizePolicy1.setHeightForWidth(presets->sizePolicy().hasHeightForWidth());
-        presets->setSizePolicy(sizePolicy1);
+        sizePolicy2.setHeightForWidth(presets->sizePolicy().hasHeightForWidth());
+        presets->setSizePolicy(sizePolicy2);
         presets->setInsertPolicy(QComboBox::InsertPolicy::NoInsert);
         presets->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
         presets->setIconSize(QSize(64, 16));
 
         horizontalLayout_3->addWidget(presets);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_3->addItem(horizontalSpacer);
 
@@ -172,6 +184,11 @@ public:
 
         gradientColorPicker = new GradientColorPicker(GradientParamDialog);
         gradientColorPicker->setObjectName("gradientColorPicker");
+        QSizePolicy sizePolicy4(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(gradientColorPicker->sizePolicy().hasHeightForWidth());
+        gradientColorPicker->setSizePolicy(sizePolicy4);
 
         verticalLayout->addWidget(gradientColorPicker);
 

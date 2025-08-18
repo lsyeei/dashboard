@@ -15,11 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "timeplugin.h"
-#include "svghelper.h"
-#include "timeitem.h"
-#include "formfactory.h"
 
-TimePlugin::TimePlugin() {}
-METHOD_DEFINE(TimePlugin, "时间", "通用", "系统时间", "系统时间",
-              :/icons/time.svg, TimeItem, FormType::TIME)
+#include <QHash>
+#include <QString>
+#ifndef FORMFACTORY_H
+#define FORMFACTORY_H
+
+class QWidget;
+enum class FormType{
+    RECT,SHARP_RECT,TEXT,HTML,TIME,WEB
+};
+/**
+ * @brief The FormFactory class 单例模式
+ */
+class FormFactory
+{
+    FormFactory();
+public:
+    ~FormFactory();
+    static FormFactory *instance();
+    QWidget* widget(FormType type);
+private:
+    // key form类型, value QWidget 指针
+    QHash<FormType, QWidget*> forms;
+};
+
+#endif // FORMFACTORY_H

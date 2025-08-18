@@ -36,7 +36,7 @@ QWidget *propertyWidget() override;\
 #define PROPERTY_WIDGET(CLASS_NAME, FORM) \
     QWidget *CLASS_NAME::propertyWidget()\
     {\
-            return new FORM();\
+        return FormFactory::instance()->widget(FORM);\
     }
 #endif
 

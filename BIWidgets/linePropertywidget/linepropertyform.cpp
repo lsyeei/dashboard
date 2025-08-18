@@ -1,21 +1,21 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #include "linepropertyform.h"
 #include "qscreen.h"
 #include "ui_linepropertyform.h"
@@ -30,12 +30,12 @@ LinePropertyForm::LinePropertyForm(QWidget *parent)
     , ui(new Ui::LinePropertyForm)
 {
     ui->setupUi(this);
-
+    layout()->setAlignment(Qt::AlignTop);
     screenRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
 
     initLineStyleName();
     initLineStyle();
-    // 设置comboBox的视图为自定义视图，拦截view的事件Q_D();
+    // 设置comboBox的视图为自定义视图，拦截view的事件
     QAbstractItemView* view = ui->lineStyle->view();
     if (view) {
         view->installEventFilter(this);
@@ -128,9 +128,8 @@ void LinePropertyForm::setLineStyle(Qt::PenStyle newLineStyle)
     if (style == newLineStyle)
         return;
     style = newLineStyle;
-    ui->lineStyle->blockSignals(true);
+    QSignalBlocker bolcker(ui->lineStyle);
     ui->lineStyle->setCurrentIndex(styleIndex[newLineStyle]);
-    ui->lineStyle->blockSignals(false);
     if (Qt::NoPen == newLineStyle) {
         setShowLine(false);
     }else{
@@ -148,9 +147,8 @@ void LinePropertyForm::setLineWidth(int newLineWidth)
     if (width == newLineWidth)
         return;
     width = newLineWidth;
-    ui->lineWidth->blockSignals(true);
+    QSignalBlocker bolcker(ui->lineWidth);
     ui->lineWidth->setValue(newLineWidth);
-    ui->lineWidth->blockSignals(false);
 }
 
 QColor LinePropertyForm::lineColor() const
@@ -163,9 +161,8 @@ void LinePropertyForm::setLineColor(const QColor &newLineColor)
     if (color == newLineColor)
         return;
     color = newLineColor;
-    ui->lineColor->blockSignals(true);
+    QSignalBlocker bolcker(ui->lineColor);
     ui->lineColor->setColor(newLineColor);
-    ui->lineColor->blockSignals(false);
 }
 
 void LinePropertyForm::on_lineStyle_currentIndexChanged(int index)
@@ -179,7 +176,6 @@ void LinePropertyForm::on_lineStyle_currentIndexChanged(int index)
     emit valueChanged();
 }
 
-
 void LinePropertyForm::on_lineColor_colorChanged(const QColor &oldColor, const QColor &newColor)
 {
     if(newColor != oldColor){
@@ -187,7 +183,6 @@ void LinePropertyForm::on_lineColor_colorChanged(const QColor &oldColor, const Q
         emit valueChanged();
     }
 }
-
 
 void LinePropertyForm::on_lineWidth_valueChanged(int arg1)
 {
@@ -203,7 +198,6 @@ bool LinePropertyForm::getShowLine() const
 void LinePropertyForm::showLineChanged()
 {
     if (showLine) {
-        setConstraint(QLayout::SetMinimumSize);
         ui->lineColor->show();
         ui->lineStyle->show();
         ui->lineWidth->show();
@@ -211,31 +205,21 @@ void LinePropertyForm::showLineChanged()
             setLineStyle(Qt::SolidLine);
         }
         if (ui->lineWidth->value() == 0) {
-            ui->lineWidth->blockSignals(true);
+            QSignalBlocker bolcker(ui->lineWidth);
             ui->lineWidth->setValue(1);
-            ui->lineWidth->blockSignals(false);
         }
     }else{
-        setConstraint(QLayout::SetFixedSize);
         ui->lineColor->hide();
         ui->lineStyle->hide();
         ui->lineWidth->hide();
     }
 }
 
-void LinePropertyForm::setConstraint(QLayout::SizeConstraint constraint)
-{
-    auto localLayout = layout();
-    localLayout->setSizeConstraint(constraint);
-    setLayout(localLayout);
-}
-
 void LinePropertyForm::setShowLine(bool newShowLine)
 {
     showLine = newShowLine;
-    ui->lineChecked->blockSignals(true);
+    QSignalBlocker bolcker(ui->lineChecked);
     ui->lineChecked->setChecked(showLine);
-    ui->lineChecked->blockSignals(false);
     showLineChanged();
 }
 
@@ -258,11 +242,4 @@ void LinePropertyForm::on_lineChecked_toggled(bool checked)
     showLine = checked;
     showLineChanged();
     emit valueChanged();
-}
-
-
-
-void LinePropertyForm::resizeEvent(QResizeEvent *event)
-{
-    emit sizeChanged(event->size());
 }

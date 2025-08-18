@@ -15,27 +15,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "webplugin.h"
-#include "svghelper.h"
-#include "webitem.h"
-#include <QWebEnginePage>
 #include "formfactory.h"
+#include <QLayout>
+#include "linepropertyform.h"
 
-WebPlugin::WebPlugin() {
-    // 通过加载QWebEnginePage初始化WebEngine环境，提高后期加载 QWebEngineView 的速度
-    page = new QWebEnginePage(this);
-    page->load(QUrl("https://www.baidu.com"));
-    connect(page, &QWebEnginePage::loadFinished, this, [&]{
-        page->deleteLater();
-    });
+FormFactory::FormFactory() {
+    forms[FormType::LINE] = new LinePropertyForm();
+    auto widget = new LinePropertyForm();
+    widget->showCornerProperty();
+    forms[FormType::CORNER_LINE] = widget;
 }
 
-WebPlugin::~WebPlugin()
+FormFactory::~FormFactory()
 {
-    if(page){
-        delete page;
-        page = nullptr;
+    auto item=forms.cbegin();
+    while(item != forms.cend()) {
+        auto widget = item.value();
+        item++;
+        if (widget->parentWidget()) {
+            continue;
+        }
+        delete widget;
     }
+    forms.clear();
 }
-METHOD_DEFINE(WebPlugin, "网页", "通用", "内嵌网页", "内嵌网页",
-              :/icons/web.svg, WebItem, FormType::WEB)
+
+FormFactory *FormFactory::instance()
+{
+    static FormFactory *factory = new FormFactory();
+    return factory;
+}
+
+QWidget *FormFactory::widget(FormType type)
+{
+    return forms[type];
+}

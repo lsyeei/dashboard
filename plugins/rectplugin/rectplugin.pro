@@ -25,6 +25,7 @@ SOURCES += \
     circleplugin.cpp \
     diamonditem.cpp \
     diamondplugin.cpp \
+    formfactory.cpp \
     hexagonitem.cpp \
     hexagonplugin.cpp \
     # htmleditorform.cpp \
@@ -92,6 +93,7 @@ HEADERS += \
     circleplugin.h \
     diamonditem.h \
     diamondplugin.h \
+    formfactory.h \
     hexagonitem.h \
     hexagonplugin.h \
     # htmleditorform.h \

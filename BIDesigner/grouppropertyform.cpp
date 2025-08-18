@@ -1,21 +1,21 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #include "grouppropertyform.h"
 #include "ui_grouppropertyform.h"
 #include <QComboBox>
@@ -25,6 +25,7 @@ GroupPropertyForm::GroupPropertyForm(QWidget *parent)
     , ui(new Ui::GroupPropertyForm)
 {
     ui->setupUi(this);
+    layout()->setAlignment(Qt::AlignTop);
     ui->mergeOptions->hide();
 
     // 关联事件
@@ -67,6 +68,9 @@ ICustomGraphic *GroupPropertyForm::getGraphicItem()
 
 void GroupPropertyForm::updateData()
 {
+    if (!graphicItem) {
+        return;
+    }
     property.copy(*graphicItem->attribute());
     auto width = property.getWidth();
     auto height = property.getHeight();
@@ -164,6 +168,9 @@ void GroupPropertyForm::updateData()
 
 void GroupPropertyForm::on_roundChecked_toggled(bool checked)
 {
+    if (!graphicItem) {
+        return;
+    }
     ui->roundSize->setVisible(checked);
     if (!checked){
         property.setArcSize(0);
@@ -177,6 +184,9 @@ void GroupPropertyForm::on_roundChecked_toggled(bool checked)
 
 void GroupPropertyForm::on_roundSize_valueChanged(int arg1)
 {
+    if (!graphicItem) {
+        return;
+    }
     if (ui->roundChecked->isChecked()) {
         property.setArcSize(arg1);
         graphicItem->updateAttribute(&property);
@@ -186,12 +196,18 @@ void GroupPropertyForm::on_roundSize_valueChanged(int arg1)
 
 void GroupPropertyForm::on_rotation_valueChanged(double arg1)
 {
+    if (!graphicItem) {
+        return;
+    }
     property.setRotate(arg1);
     graphicItem->updateAttribute(&property);
 }
 
 void GroupPropertyForm::posChanged(qint32 left, qint32 top, qint32 width, qint32 height, bool aspectRatio)
 {
+    if (!graphicItem) {
+        return;
+    }
     if (property.getAspectRatio() != aspectRatio) {
         property.setAspectRatio(aspectRatio);
     }else{
@@ -212,6 +228,9 @@ void GroupPropertyForm::posChanged(qint32 left, qint32 top, qint32 width, qint32
 
 void GroupPropertyForm::lineStyleChanged(Qt::PenStyle style, QColor Color, int width)
 {
+    if (!graphicItem) {
+        return;
+    }
     auto pen = property.getPen();
     pen.setColor(Color.name());
     pen.setStyle(style);
@@ -222,6 +241,9 @@ void GroupPropertyForm::lineStyleChanged(Qt::PenStyle style, QColor Color, int w
 
 void GroupPropertyForm::brushChanged(Qt::BrushStyle brushStyle, const QColor &baseColor, const QString imageFile)
 {
+    if (!graphicItem) {
+        return;
+    }
     auto brush = property.getBrush();
     brush.setStyle(brushStyle);
     brush.setColor(baseColor.rgb());
@@ -235,6 +257,9 @@ void GroupPropertyForm::brushChanged(Qt::BrushStyle brushStyle, const QColor &ba
 
 void GroupPropertyForm::on_stateBox_itemAdded(int index)
 {
+    if (!graphicItem) {
+        return;
+    }
     auto name = ui->stateBox->itemText(index);
     int id = graphicItem->addAttribute(name);
     ui->stateBox->getComboBox()->setItemData(index, id);
@@ -243,6 +268,9 @@ void GroupPropertyForm::on_stateBox_itemAdded(int index)
 
 void GroupPropertyForm::on_stateBox_itemModified(int index)
 {
+    if (!graphicItem) {
+        return;
+    }
     auto name = ui->stateBox->itemText(index);
     auto id = ui->stateBox->itemData(index);
     graphicItem->modifyAttribute(id.toInt(), name);
@@ -251,6 +279,9 @@ void GroupPropertyForm::on_stateBox_itemModified(int index)
 
 void GroupPropertyForm::on_stateBox_itemRemoved(const QString &name, const QVariant &data)
 {
+    if (!graphicItem) {
+        return;
+    }
     Q_UNUSED(name)
     graphicItem->removeAttribute(data.toInt());
 }
@@ -258,12 +289,18 @@ void GroupPropertyForm::on_stateBox_itemRemoved(const QString &name, const QVari
 
 void GroupPropertyForm::on_stateBox_currentIndexChanged(int index)
 {
+    if (!graphicItem) {
+        return;
+    }
     auto id = ui->stateBox->itemData(index);
     graphicItem->changeAttribute(id.toInt());
 }
 
 void GroupPropertyForm::mergeCheckChanged()
 {
+    if (!graphicItem) {
+        return;
+    }
     if (ui->mergeCheck->isChecked()) {
         ui->mergeOptions->show();
         ui->unit->setChecked(true);
@@ -276,6 +313,9 @@ void GroupPropertyForm::mergeCheckChanged()
 
 void GroupPropertyForm::groupReshape(bool checked)
 {
+    if (!graphicItem) {
+        return;
+    }
     if (!checked) {
         return;
     }
@@ -295,6 +335,9 @@ void GroupPropertyForm::groupReshape(bool checked)
 void GroupPropertyForm::onGradientChanged(Qt::BrushStyle brushStyle, const QGradientStops &stops,
                                          QGradient::Spread spread, const QPolygonF &points)
 {
+    if (!graphicItem) {
+        return;
+    }
     auto brush = property.getBrush();
     brush.setStyle(brushStyle);
     brush.setGradientStops(stops);

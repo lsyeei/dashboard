@@ -1,21 +1,21 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #ifndef FILLPROPERTYFORM_H
 #define FILLPROPERTYFORM_H
 
@@ -74,11 +74,9 @@ signals:
      */
     void valueChanged();
     void gradientChanged();
-    void sizeChanged(const QSize &size);
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
 private slots:
     void on_fillChecked_toggled(bool checked);
 
@@ -119,12 +117,6 @@ private:
     GradientParamDialog *gradientForm{nullptr};
 
     /**
-     * @brief 设置隐藏后是否占位
-     * @param obj 控件对象
-     * @param retainSize true 占位，false 不占位
-     */
-    void setSizePolicy(QWidget *obj, bool retainSize);
-    /**
      * @brief 初始化控件，并隐藏
      */
     void init();
@@ -132,6 +124,10 @@ private:
      * @brief 使用图标初始化画刷样式
      */
     void initBrushStyle1();
+    /**
+     * @brief brushStyleResize 调整图标大小
+     */
+    void brushStyleResize();
     /**
      * @brief 重选图片
      */
@@ -144,7 +140,6 @@ private:
      * @brief 隐藏所有属性
      */
     void hideAll();
-    void setConstraint(QLayout::SizeConstraint constraint);
     // 绘制渐变色配置按钮
     void paintGraientBtn();
 };

@@ -90,7 +90,6 @@ GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget 
     contentLayout->setAlignment(Qt::AlignTop);
     contentLayout->setVerticalSpacing(6);
     contentLayout->setHorizontalSpacing(6);
-    contentWidget->installEventFilter(this);
 
     paletteChanged();
 }
@@ -372,13 +371,5 @@ bool GraphicPluginGroup::eventFilter(QObject *watched, QEvent *event)
             }
         }
     }
-    // if(watched == contentWidget && event->type() == QEvent::Paint){
-    //    // 显示单组控件区域，观察调整该区域策略效果
-    //     QPainter paint(contentWidget);
-    //     paint.begin(contentWidget);
-    //     paint.setPen(QPen{Qt::red, 2});
-    //     paint.drawRect(contentWidget->rect());
-    //     paint.end();
-    // }
     return QWidget::eventFilter(watched, event);
 }

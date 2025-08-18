@@ -2,12 +2,15 @@
 <ui version="4.0">
  <class>RectPropertyForm</class>
  <widget class="QWidget" name="RectPropertyForm">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>492</height>
+    <width>223</width>
+    <height>524</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -27,7 +30,7 @@
     <number>6</number>
    </property>
    <property name="sizeConstraint">
-    <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
+    <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -43,10 +46,13 @@
      <property name="spacing">
       <number>0</number>
      </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+     </property>
      <item>
       <widget class="QLabel" name="label_2">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -70,6 +76,12 @@
    </item>
    <item>
     <widget class="Line" name="line_4">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="frameShadow">
       <enum>QFrame::Shadow::Sunken</enum>
      </property>
@@ -84,21 +96,27 @@
    <item>
     <widget class="PosProperty" name="posProperty">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>0</width>
-       <height>0</height>
+       <width>142</width>
+       <height>123</height>
       </size>
      </property>
     </widget>
    </item>
    <item>
     <widget class="Line" name="line_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="orientation">
       <enum>Qt::Orientation::Horizontal</enum>
      </property>
@@ -115,13 +133,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>60</height>
+       <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>60</height>
+       <height>16777215</height>
       </size>
      </property>
      <property name="showLine">
@@ -150,6 +168,9 @@
    </item>
    <item>
     <widget class="FillProperty" name="fillProperty">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
@@ -158,14 +179,14 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>0</width>
+       <width>173</width>
        <height>79</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>79</height>
+       <height>16777215</height>
       </size>
      </property>
      <property name="fill" stdset="0">
@@ -178,6 +199,12 @@
    </item>
    <item>
     <widget class="Line" name="line_3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="orientation">
       <enum>Qt::Orientation::Horizontal</enum>
      </property>
@@ -315,7 +342,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="textWidget" native="true">
+    <widget class="QWidget" name="extendWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>

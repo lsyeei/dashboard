@@ -8,6 +8,8 @@ DEFINES += QT_DEBUG_DRAW
 
 CONFIG += c++17 plugin
 
+ QMAKE_CXXFLAGS += /MP
+
 TARGET = $$qtLibraryTarget(lineplugin)
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -34,6 +36,7 @@ SOURCES += \
     dotlineplugin.cpp \
     endtypefactory.cpp \
     # lineItemproperty.cpp \
+    formfactory.cpp \
     horizontalelbow.cpp \
     horizontalelbowplugin.cpp \
     lineplugincollection.cpp \
@@ -71,6 +74,7 @@ HEADERS += \
     dotline.h \
     dotlineplugin.h \
     endtypefactory.h \
+    formfactory.h \
     horizontalelbow.h \
     horizontalelbowplugin.h \
     linebaseproperty.h \

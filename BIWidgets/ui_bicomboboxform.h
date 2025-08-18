@@ -34,18 +34,24 @@ public:
     {
         if (ComboBoxForm->objectName().isEmpty())
             ComboBoxForm->setObjectName("ComboBoxForm");
-        ComboBoxForm->resize(161, 24);
+        ComboBoxForm->resize(160, 24);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(ComboBoxForm->sizePolicy().hasHeightForWidth());
+        ComboBoxForm->setSizePolicy(sizePolicy);
         horizontalLayout = new QHBoxLayout(ComboBoxForm);
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName("horizontalLayout");
+        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         comboBox = new QComboBox(ComboBoxForm);
         comboBox->setObjectName("comboBox");
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(comboBox->sizePolicy().hasHeightForWidth());
-        comboBox->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(comboBox->sizePolicy().hasHeightForWidth());
+        comboBox->setSizePolicy(sizePolicy1);
         comboBox->setEditable(false);
         comboBox->setInsertPolicy(QComboBox::InsertPolicy::InsertAtTop);
 

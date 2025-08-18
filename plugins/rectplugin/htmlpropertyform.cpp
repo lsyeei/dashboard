@@ -89,17 +89,6 @@ void HtmlPropertyForm::setEditorHighlight()
     repoData->loadSyntaxFolder(&m_repository, ":/html");
     repoData->computeAlternativeDefLists();
     m_highlighter->setDefinition(m_repository.definitionForName("HTML"));
-
-    // Definition def;
-    // auto defData = DefinitionData::get(def);
-    // defData->repo = new Repository();
-    // defData->loadMetaData(":/html/html.xml");
-    // defData->loadMetaData(":/html/css.xml");
-    // defData->loadMetaData(":/html/doxygen.xml");
-    // defData->loadMetaData(":/html/comments.xml");
-    // defData->loadMetaData(":/html/javascript.xml");
-    // m_highlighter->setDefinition(def);
-
     Theme themeDef;
     auto themeData = ThemeData::get(themeDef);
     themeData->load(":/html/atom-one-light.theme");

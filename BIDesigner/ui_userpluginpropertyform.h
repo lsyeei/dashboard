@@ -47,47 +47,51 @@ public:
     QHBoxLayout *horizontalLayout_4;
     QPushButton *restoreBtn;
     QSpacerItem *horizontalSpacer_3;
-    QSpacerItem *verticalSpacer;
 
     void setupUi(QWidget *UserPluginPropertyForm)
     {
         if (UserPluginPropertyForm->objectName().isEmpty())
             UserPluginPropertyForm->setObjectName("UserPluginPropertyForm");
-        UserPluginPropertyForm->resize(320, 314);
+        UserPluginPropertyForm->resize(200, 309);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(UserPluginPropertyForm->sizePolicy().hasHeightForWidth());
+        UserPluginPropertyForm->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(UserPluginPropertyForm);
         verticalLayout->setObjectName("verticalLayout");
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName("horizontalLayout_3");
-        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         label_2 = new QLabel(UserPluginPropertyForm);
         label_2->setObjectName("label_2");
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
-        label_2->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
+        label_2->setSizePolicy(sizePolicy1);
 
         horizontalLayout_3->addWidget(label_2);
 
         stateBox = new BIComboBox(UserPluginPropertyForm);
         stateBox->setObjectName("stateBox");
-        sizePolicy.setHeightForWidth(stateBox->sizePolicy().hasHeightForWidth());
-        stateBox->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(stateBox->sizePolicy().hasHeightForWidth());
+        stateBox->setSizePolicy(sizePolicy2);
 
         horizontalLayout_3->addWidget(stateBox);
 
-        horizontalLayout_3->setStretch(1, 5);
 
         verticalLayout->addLayout(horizontalLayout_3);
 
         posProperty = new PosProperty(UserPluginPropertyForm);
         posProperty->setObjectName("posProperty");
-        QSizePolicy sizePolicy1(QSizePolicy::Policy::MinimumExpanding, QSizePolicy::Policy::Minimum);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(posProperty->sizePolicy().hasHeightForWidth());
-        posProperty->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(posProperty->sizePolicy().hasHeightForWidth());
+        posProperty->setSizePolicy(sizePolicy);
         posProperty->setMinimumSize(QSize(0, 0));
         posProperty->setAspectRatio(true);
 
@@ -95,25 +99,23 @@ public:
 
         lineProperty = new LineProperty(UserPluginPropertyForm);
         lineProperty->setObjectName("lineProperty");
+        lineProperty->setMinimumSize(QSize(0, 0));
 
         verticalLayout->addWidget(lineProperty);
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(6);
         horizontalLayout->setObjectName("horizontalLayout");
-        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout->setContentsMargins(-1, 0, -1, 0);
         roundChecked = new QCheckBox(UserPluginPropertyForm);
         roundChecked->setObjectName("roundChecked");
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Fixed);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(roundChecked->sizePolicy().hasHeightForWidth());
         roundChecked->setSizePolicy(sizePolicy2);
 
         horizontalLayout->addWidget(roundChecked);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);
 
@@ -130,19 +132,23 @@ public:
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
-        horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
+        horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         horizontalLayout_2->setContentsMargins(-1, 0, -1, 0);
         label = new QLabel(UserPluginPropertyForm);
         label->setObjectName("label");
+        sizePolicy2.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy2);
 
         horizontalLayout_2->addWidget(label);
 
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer_2);
 
         rotation = new QDoubleSpinBox(UserPluginPropertyForm);
         rotation->setObjectName("rotation");
+        sizePolicy2.setHeightForWidth(rotation->sizePolicy().hasHeightForWidth());
+        rotation->setSizePolicy(sizePolicy2);
         rotation->setDecimals(1);
         rotation->setMinimum(-360.000000000000000);
         rotation->setMaximum(360.000000000000000);
@@ -154,8 +160,11 @@ public:
 
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setObjectName("horizontalLayout_4");
+        horizontalLayout_4->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         restoreBtn = new QPushButton(UserPluginPropertyForm);
         restoreBtn->setObjectName("restoreBtn");
+        sizePolicy1.setHeightForWidth(restoreBtn->sizePolicy().hasHeightForWidth());
+        restoreBtn->setSizePolicy(sizePolicy1);
         QIcon icon(QIcon::fromTheme(QIcon::ThemeIcon::SystemReboot));
         restoreBtn->setIcon(icon);
         restoreBtn->setFlat(true);
@@ -168,10 +177,6 @@ public:
 
 
         verticalLayout->addLayout(horizontalLayout_4);
-
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-        verticalLayout->addItem(verticalSpacer);
 
 
         retranslateUi(UserPluginPropertyForm);

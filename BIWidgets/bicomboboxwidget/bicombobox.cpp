@@ -1,21 +1,21 @@
-/**
-* This file is part of the dashboard library
-* 
-* Copyright 2025 lishiying  lsyeei@163.com
-* 
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
+﻿/**
+* This file is part of the dashboard library
+* 
+* Copyright 2025 lishiying  lsyeei@163.com
+* 
+* Licensed under the Apache License, Version 2.0 (the License);
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an AS IS BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #include "bicombobox.h"
 #include "comboeditor.h"
 
@@ -75,17 +75,6 @@ void BIComboBox::removeItem(int index)
     ui->comboBox->removeItem(index);
 }
 
-QSize BIComboBox::sizeHint() const
-{
-    return {275, 30};
-}
-
-
-QSize BIComboBox::minimumSizeHint() const
-{
-    return {275, 30};
-}
-
 void BIComboBox::on_comboBox_currentIndexChanged(int index)
 {
     if (index <0) {
@@ -93,7 +82,6 @@ void BIComboBox::on_comboBox_currentIndexChanged(int index)
     }
     emit currentIndexChanged(index);
 }
-
 
 void BIComboBox::on_addBtn_clicked()
 {
@@ -126,8 +114,6 @@ void BIComboBox::on_editBtn_clicked()
     }
 }
 
-
-
 void BIComboBox::editEnd()
 {
     // 修改文字
@@ -135,7 +121,7 @@ void BIComboBox::editEnd()
     auto text = ui->comboBox->currentText();
     ui->comboBox->setItemText(index, text);
     ui->comboBox->setEditable(false);
-    // qDebug() << "editEnd ......" << index << text << editFlag;
+
     if (addFlag) {
         emit itemAdded(index);
         addFlag = false;

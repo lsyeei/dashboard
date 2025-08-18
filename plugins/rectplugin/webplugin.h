@@ -17,7 +17,6 @@
  */
 #ifndef WEBPLUGIN_H
 #define WEBPLUGIN_H
-#define PROPERTY_WIDGET_IMPL
 
 #include <QObject>
 #include "igraphicplugin.h"
