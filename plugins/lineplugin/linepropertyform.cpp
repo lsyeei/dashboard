@@ -302,6 +302,7 @@ void LinePropertyForm::onStateIndexChanged(int index)
 
 void LinePropertyForm::onPosChanged(int value)
 {
+    Q_UNUSED(value)
     auto obj = sender();
     auto pos = attr.getPos();
     if (obj == ui->centerX) {

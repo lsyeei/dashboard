@@ -97,17 +97,18 @@ void FlowLayout::setGeometry(const QRect &rect)
 QSize FlowLayout::sizeHint() const
 {
     auto parentRect = parentWidget()->rect();
-    return {parentRect.width(), heightForWidth(parentRect.width())};
+    QSize size{parentRect.width(), doLayout(QRect(0, 0, parentRect.width(), 0), true)};
+    return size;
 }
 
 QSize FlowLayout::minimumSize() const
 {
-    QSize size;
-    for (const QLayoutItem *item : std::as_const(itemList))
-        size = size.expandedTo(item->minimumSize());
-
-    const QMargins margins = contentsMargins();
-    size += QSize(margins.left() + margins.right(), margins.top() + margins.bottom());
+    QSize size = parentWidget()->size();
+    size.setHeight(doLayout(QRect(0, 0, size.width(), 0), true));
+    // for (const QLayoutItem *item : std::as_const(itemList))
+    //     size = size.expandedTo(item->minimumSize());
+    // const QMargins margins = contentsMargins();
+    // size += QSize(margins.left() + margins.right(), margins.top() + margins.bottom());
     return size;
 }
 
@@ -123,8 +124,10 @@ int FlowLayout::doLayout(const QRect &rect, bool testOnly) const
     for (QLayoutItem *item : std::as_const(itemList)) {
         const QWidget *wid = item->widget();
         int spaceX = horizontalSpacing();
-        // auto controlType = wid->sizePolicy().controlType();
-        auto controlType = QSizePolicy::PushButton;
+        auto controlType = wid->sizePolicy().controlType();
+        if (controlType == QSizePolicy::DefaultType) {
+            controlType = QSizePolicy::PushButton;
+        }
         if (spaceX == -1)
             spaceX = wid->style()->layoutSpacing(controlType,
                                                  controlType,
@@ -134,6 +137,7 @@ int FlowLayout::doLayout(const QRect &rect, bool testOnly) const
             spaceY = wid->style()->layoutSpacing(controlType,
                                                  controlType,
                                                  Qt::Vertical);
+
         int nextX = x + item->sizeHint().width() + spaceX;
         if (nextX - spaceX > effectiveRect.right() && lineHeight > 0) {
             x = effectiveRect.x();

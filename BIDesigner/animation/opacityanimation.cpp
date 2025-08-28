@@ -78,6 +78,8 @@ void OpacityAnimation::onFinished()
 
 void OpacityAnimation::onStateChanged(State newState, State oldState)
 {
+    Q_UNUSED(newState)
+    Q_UNUSED(oldState)
     // if (oldState == Stopped && newState == Running) {
     //     obj->setSelected(false);
     // }

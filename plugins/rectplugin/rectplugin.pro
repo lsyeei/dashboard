@@ -120,6 +120,7 @@ HEADERS += \
     rightttriangleitem.h \
     sectoritem.h \
     sectorplugin.h \
+    # stable.h \
     star4item.h \
     star4plugin.h \
     star5item.h \
@@ -146,6 +147,9 @@ HEADERS += \
     webplugin.h \
     webproperty.h \
     webpropertyform.h
+
+# PRECOMPILED_HEADER = \
+#     stable.h
 
 INCLUDEPATH += \
     ../interface \

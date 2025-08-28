@@ -42,10 +42,7 @@ GraphicPlugins::GraphicPlugins(QWidget *parent)
     : QWidget{parent}
 {
     setAcceptDrops(true);
-    QSizePolicy policy;
-    policy.setVerticalPolicy(QSizePolicy::MinimumExpanding);
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
     setObjectName("groupCollect");
     setMinimumHeight(100);
 
@@ -54,7 +51,6 @@ GraphicPlugins::GraphicPlugins(QWidget *parent)
     layout->setSizeConstraint(QLayout::SetMinimumSize);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
-    setLayout(layout);
 
     addGroupBtn = new QPushButton(QIcon::fromTheme(QIcon::ThemeIcon::FolderNew),
                             tr("新建图库"));
@@ -67,22 +63,20 @@ GraphicPlugins::GraphicPlugins(QWidget *parent)
     scroll->setWidgetResizable(true);
     scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    scroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    scroll->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     groupPanel = new QWidget(scroll);
     scroll->setWidget(groupPanel);
-    groupPanel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    groupPanel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     auto panelLayout = new QVBoxLayout(groupPanel);
     panelLayout->setAlignment(Qt::AlignTop);
     panelLayout->setSizeConstraint(QLayout::SetMinimumSize);
     panelLayout->setContentsMargins(0,0,0,0);
     panelLayout->setSpacing(0);
-    groupPanel->setLayout(panelLayout);
     // 加载控件
     loadPredefGraphicPlugin();
     // 加载用户图元控件
     loadUserGraphicPlugin();
-    panelLayout->addStretch();
 }
 
 GraphicPlugins::~GraphicPlugins()

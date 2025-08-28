@@ -1,4 +1,4 @@
-﻿/**
+/**
  * This file is part of the dashboard library
  *
  * Copyright 2025 lishiying  lsyeei@163.com
@@ -15,20 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef STABLE_H
+#define STABLE_H
+#include <QObject>
 
-#ifndef ISUBWIDGET_H
-#define ISUBWIDGET_H
+#include "pluginhelper.h"
+#include "igraphicplugin.h"
 
-#include <QWidget>
-
-class ISubWidget : public QWidget
-{
-    Q_OBJECT
-public:
-    ISubWidget(QWidget* parent = nullptr):QWidget(parent){};
-    virtual void setData(const QVariant &data)=0;
-Q_SIGNALS:
-    void dataChanged(const QVariant &data);
-};
-
-#endif // ISUBWIDGET_H
+#include "abstractitem.h"
+#include "abstractselector.h"
+#include "abstracttextitem.h"
+#include "abstractzoneitem.h"
+#include "adjustpoint.h"
+#include "baseproperty.h"
+#include "isubwidget.h"
+#include "namedpoint.h"
+#include "pointstyle.h"
+#include "rectselector.h"
+#include "zoneproperty.h"
+#endif // STABLE_H

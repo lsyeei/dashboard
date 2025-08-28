@@ -446,6 +446,7 @@ bool BIGraphicsView::exportToSvg(bool selectedScope, const QString &fileName, co
 
 void BIGraphicsView::setDragMode(DragMode mode)
 {
+    Q_UNUSED(mode)
     // qDebug() << "set drag mode:" << mode;
     // QGraphicsView::setDragMode(mode);
 }

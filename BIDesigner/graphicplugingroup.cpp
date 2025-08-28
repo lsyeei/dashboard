@@ -41,10 +41,7 @@ GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget 
     setParent(parent);
     widgetId = createId(groupName, index);
     setObjectName(widgetId);
-    QSizePolicy policy;
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Minimum);
-    setSizePolicy(policy);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     layout = new QVBoxLayout (this);
     layout->setObjectName("layout");
@@ -59,10 +56,7 @@ GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget 
 
     // 分组标题
     titleWidget->setObjectName("titlePanel");
-    QSizePolicy titlePolicy;
-    titlePolicy.setHorizontalPolicy(QSizePolicy::Expanding);
-    titlePolicy.setVerticalPolicy(QSizePolicy::Fixed);
-    titleWidget->setSizePolicy(titlePolicy);
+    titleWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     titleLayout = new QHBoxLayout(titleWidget);
     titleLayout->setContentsMargins(5,6,5,6);
     icon = new QLabel(titleWidget);
@@ -81,10 +75,7 @@ GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget 
 
     // 控件集合
     contentWidget->setObjectName("contentPanel");
-    QSizePolicy contentPolicy;
-    contentPolicy.setHorizontalPolicy(QSizePolicy::Expanding);
-    contentPolicy.setVerticalPolicy(QSizePolicy::MinimumExpanding);
-    contentWidget->setSizePolicy(contentPolicy);
+    contentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     contentLayout = new FlowLayout(contentWidget);
     contentLayout->setSizeConstraint(QLayout::SetMinimumSize);
     contentLayout->setAlignment(Qt::AlignTop);
@@ -277,6 +268,7 @@ void GraphicPluginGroup::updatePlugin(IGraphicPlugin *plugin)
 
 QString GraphicPluginGroup::createId(QString name, qint32 index)
 {
+    Q_UNUSED(name)
     // QCryptographicHash hash(QCryptographicHash::Md5);
     // hash.addData(name.toUtf8());
     // return hash.result().toHex();

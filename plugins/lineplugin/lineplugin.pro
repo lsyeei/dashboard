@@ -87,8 +87,12 @@ HEADERS += \
     polygonlineplugin.h \
     solidline.h \
     solidlineplugin.h \
+    # stable.h \
     verticalelbow.h \
     verticalelbowplugin.h
+
+# PRECOMPILED_HEADER = \
+#     stable.h
 
 INCLUDEPATH += \
     ../interface \

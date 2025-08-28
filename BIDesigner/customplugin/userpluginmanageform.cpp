@@ -110,6 +110,7 @@ void UserPluginManageForm::on_importBtn_clicked()
 
 void UserPluginManageForm::on_selectAll_checkStateChanged(const Qt::CheckState &arg1)
 {
+    Q_UNUSED(arg1)
     if (ui->selectAll->isChecked()) {
         model->selectAll();
     }else{

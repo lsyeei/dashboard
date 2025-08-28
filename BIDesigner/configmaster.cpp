@@ -128,6 +128,7 @@ bool ConfigMaster::checkTables(QSqlQuery *query)
 
 void ConfigMaster::initDbPwd(QSqlQuery *query)
 {
+    Q_UNUSED(query)
     // query->exec(QString("ATTACH DATABASE '%1' AS encrypted KEY '%2';").arg(appConfigs.dbName, appConfigs.dbPwd));
     // query->exec("SELECT sqlcipher_export('encrypted');");
     // query->exec("DETACH DATABASE encrypted;");

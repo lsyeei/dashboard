@@ -98,6 +98,7 @@ bool EntityTableModel<T>::removeRows(int row, int count, const QModelIndex &pare
 template<typename T>
 bool EntityTableModel<T>::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+    Q_UNUSED(role)
     if (checkFlag && index.column() == 0) {
         checkState[index.row()] = value == Qt::Checked;
         return true;
@@ -246,7 +247,7 @@ inline void EntityTableModel<T>::selectAll()
 {
     beginResetModel();
     for (int i=0; i < modelData.count(); i++){
-        checkState[i] = Qt::Checked;
+        checkState[i] = true;
     }
     endResetModel();
 }
@@ -256,7 +257,7 @@ inline void EntityTableModel<T>::deselectAll()
 {
     beginResetModel();
     for (int i=0; i < modelData.count(); i++){
-        checkState[i] = Qt::Unchecked;
+        checkState[i] = false;
     }
     endResetModel();
 }
@@ -264,12 +265,14 @@ inline void EntityTableModel<T>::deselectAll()
 template<typename T>
 int EntityTableModel<T>::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent)
     return modelData.count();
 }
 
 template<typename T>
 int EntityTableModel<T>::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent)
     if (checkFlag) {
         return headNameMap.count() + 1;
     }

@@ -120,6 +120,8 @@ void TranfromAnimation::onFinished()
 
 void TranfromAnimation::onStateChanged(State newState, State oldState)
 {
+    Q_UNUSED(newState)
+    Q_UNUSED(oldState)
     // if (oldState == Stopped && newState == Running) {
     // }
 }

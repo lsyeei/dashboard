@@ -18,6 +18,7 @@
 /**
  * 当存在 QObject 多路继承时，定义 EXIST_QOBJECT 避免 AbstractItem 继承 QObject
  */
+
 #ifndef ABSTRACTITEM_H
 #define ABSTRACTITEM_H
 
