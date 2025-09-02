@@ -22,7 +22,7 @@
 #include <QFile>
 #include <QSqlQuery>
 #include <configs.h>
-#include <customplugin/userplugingroupdo.h>
+#include <customgraphic/userplugingroupdo.h>
 
 Configs appConfigs = Configs();
 static const QString connName{"masterConn"};

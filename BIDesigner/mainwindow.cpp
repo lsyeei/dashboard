@@ -20,7 +20,7 @@
 #include "animation/path/imovepath.h"
 #include "filetemplate.h"
 #include "bigraphicsscene.h"
-#include "graphicplugins.h"
+#include "graphicrootwidget.h"
 #include "mainwindow.h"
 #include "graphicpropertyform.h"
 #include "svghelper.h"
@@ -85,6 +85,9 @@ bool MainWindow::event(QEvent *event)
 {
     if (event->type() == QEvent::PaletteChange) {
         paletteCanged();
+    }
+    if (event->type() == QEvent::Polish) {
+        GraphicsManager::instance()->loadGraphics();
     }
     return QMainWindow::event(event);
 }
@@ -421,6 +424,10 @@ void MainWindow::initGraphicsWidget()
     propertyWidget = new GraphicPropertyForm();
     propertyWidget->installEventFilter(this);
     propertyWidget->setView(ui->graphicsView);
+    auto manager = GraphicsManager::instance();
+    connect(manager, &GraphicsManager::loadEndEvent,
+            propertyWidget, &GraphicPropertyForm::onGraphicPluginLoaded,
+            Qt::QueuedConnection);
 }
 
 void MainWindow::initProjectPropertyForm()
@@ -453,6 +460,19 @@ void MainWindow::initAnimateForm()
     ui->propertyWidget->setTabVisible(index, false);
     // animationForm->setDisabled(true);
     AnimationFactory::instance()->bindScene(scene);
+}
+
+void MainWindow::loadPlugin()
+{
+    graphicPluginWidget = new GraphicRootWidget(ui->graphicItems);
+    ui->graphicItems->layout()->setAlignment(Qt::AlignTop);
+    ui->graphicItems->layout()->addWidget(graphicPluginWidget);
+    connect(graphicPluginWidget, SIGNAL(graphicItemChanged(IGraphicPlugin*)),
+            ui->graphicsView, SLOT(graphicItemChangedHandler(IGraphicPlugin*)));
+    auto manager = GraphicsManager::instance();
+    connect(manager, &GraphicsManager::loadEndEvent,
+            graphicPluginWidget, &GraphicRootWidget::onGraphicPluginLoaded,
+            Qt::QueuedConnection);
 }
 
 void MainWindow::setScene()
@@ -937,8 +957,24 @@ void MainWindow::saveToLib()
     if (items.isEmpty()) {
         return;
     }
-    if(graphicPluginWidget){
-        graphicPluginWidget->saveToLib(items);
+    if(graphicPluginWidget == nullptr){
+        return;
+    }
+    auto groupId = graphicPluginWidget->selectGroup();
+    // 生成插件信息
+    foreach (auto item, items) {
+        UserPluginDO plugin;
+        plugin.set_groupId(groupId);
+        plugin.set_name(scene->itemName(item));
+        plugin.set_thumb(ui->graphicsView->getItemThumbData(item, {64,64}));
+        plugin.set_type(typeid(*item) == typeid(GraphicsItemGroup)?
+                            UserPluginType::GROUP:UserPluginType::SYSTEM);
+        // 生成并保存插件
+        auto graphic = GraphicsManager::instance()->addGraphic(plugin, scene->toXml({item}));
+        if (graphic) {
+            // 安装插件
+            graphicPluginWidget->addGraphic(groupId, graphic);
+        }
     }
 }
 
@@ -953,13 +989,4 @@ void MainWindow::onViewMenuEvent(QContextMenuEvent *event)
     }else{
         viewMenu->popup(event->globalPos());
     }
-}
-
-void MainWindow::loadPlugin()
-{
-    graphicPluginWidget = new GraphicPlugins(ui->graphicItems);
-    ui->graphicItems->layout()->setAlignment(Qt::AlignTop);
-    ui->graphicItems->layout()->addWidget(graphicPluginWidget);
-    connect(graphicPluginWidget, SIGNAL(graphicItemChanged(IGraphicPlugin*)),
-            ui->graphicsView, SLOT(graphicItemChangedHandler(IGraphicPlugin*)));
 }

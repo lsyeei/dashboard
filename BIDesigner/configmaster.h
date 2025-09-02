@@ -20,8 +20,8 @@
 
 #include <QPointer>
 #include <QSqlDatabase>
-#include "customplugin/userplugingroupservice.h"
-#include "customplugin/userpluginservice.h"
+#include "customgraphic/userplugingroupservice.h"
+#include "customgraphic/userpluginservice.h"
 
 /**
  * @brief The ConfigMaster class

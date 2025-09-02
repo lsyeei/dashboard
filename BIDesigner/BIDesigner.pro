@@ -10,7 +10,8 @@ CONFIG += c++17
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+# disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
     ../plugins/common/pointstyle.cpp \
@@ -44,22 +45,21 @@ SOURCES += \
     bigraphicsview.cpp \
     biundocommand.cpp \
     configmaster.cpp \
-    customplugin/usergraphicplugins.cpp \
-    customplugin/abstractuserplugin.cpp \
-    customplugin/userimageitem.cpp \
-    customplugin/userplugingroupdialog.cpp \
-    customplugin/userpluginmanageform.cpp \
-    customplugin/userpluginpropertyform.cpp \
-    customplugin/usersvgitem.cpp \
+    customgraphic/abstractusergraphic.cpp \
+    customgraphic/userimageitem.cpp \
+    customgraphic/userplugingroupdialog.cpp \
+    customgraphic/userpluginmanageform.cpp \
+    customgraphic/userpluginpropertyform.cpp \
+    customgraphic/usersvgitem.cpp \
     exportdialog.cpp \
-    graphicplugingroup.cpp \
-    graphicplugins.cpp \
+    graphicgroupwidget.cpp \
     graphicpropertyform.cpp \
+    graphicrootwidget.cpp \
     graphicsitemgroup.cpp \
+    graphicsmanager.cpp \
     grouppropertyform.cpp \
     main.cpp \
     mainwindow.cpp \
-    predefgraphicplugins.cpp \
     projectpropertyform.cpp \
     rulerwidget.cpp
 
@@ -108,18 +108,17 @@ HEADERS += \
     biundocommand.h \
     configmaster.h \
     configs.h \
-    customplugin/usergraphicplugins.h \
-    customplugin/userimageitem.h \
-    customplugin/userplugindo.h \
-    customplugin/abstractuserplugin.h \
-    customplugin/userplugingroupdialog.h \
-    customplugin/userplugingroupdo.h \
-    customplugin/userplugingroupservice.h \
-    customplugin/userpluginmanageform.h \
-    customplugin/userpluginpropertyform.h \
-    customplugin/userpluginservice.h \
-    customplugin/userplugintype.h \
-    customplugin/usersvgitem.h \
+    customgraphic/abstractusergraphic.h \
+    customgraphic/userimageitem.h \
+    customgraphic/userplugindo.h \
+    customgraphic/userplugingroupdialog.h \
+    customgraphic/userplugingroupdo.h \
+    customgraphic/userplugingroupservice.h \
+    customgraphic/userpluginmanageform.h \
+    customgraphic/userpluginpropertyform.h \
+    customgraphic/userpluginservice.h \
+    customgraphic/userplugintype.h \
+    customgraphic/usersvgitem.h \
     dbutil/basemapper.h \
     dbutil/baseservice.h \
     dbutil/entity.h \
@@ -128,24 +127,24 @@ HEADERS += \
     dbutil/tablemodelevent.h \
     exportdialog.h \
     filetemplate.h \
-    graphicplugingroup.h \
-    graphicplugins.h \
+    graphicgroupwidget.h \
     graphicpropertyform.h \
+    graphicrootwidget.h \
     graphicsitemgroup.h \
+    graphicsmanager.h \
     grouppropertyform.h \
     igraphicsscene.h \
     mainwindow.h \
     pageproperty.h \
-    predefgraphicplugins.h \
     projectProperty.h \
     projectpropertyform.h \
     rulerwidget.h
 
 FORMS += \
     animation/animationform.ui \
-    customplugin/userplugingroupdialog.ui \
-    customplugin/userpluginmanageform.ui \
-    customplugin/userpluginpropertyform.ui \
+    customgraphic/userplugingroupdialog.ui \
+    customgraphic/userpluginmanageform.ui \
+    customgraphic/userpluginpropertyform.ui \
     exportdialog.ui \
     graphicproperty.ui \
     grouppropertyform.ui \

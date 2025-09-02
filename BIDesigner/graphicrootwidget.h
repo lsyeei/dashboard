@@ -1,4 +1,4 @@
-﻿/**
+/**
 * This file is part of the dashboard library
 * 
 * Copyright 2025 lishiying  lsyeei@163.com
@@ -16,9 +16,11 @@
 * limitations under the License.
 */
 
-#ifndef GRAPHICPLUGINS_H
-#define GRAPHICPLUGINS_H
+#ifndef GRAPHICROOTWIDGET_H
+#define GRAPHICROOTWIDGET_H
 
+#include "customgraphic/userpluginmanageform.h"
+#include "graphicsmanager.h"
 #include <QObject>
 #include <QPointer>
 #include <QWidget>
@@ -28,47 +30,39 @@ class QGraphicsItem;
 class QVBoxLayout;
 class QPushButton;
 class IGraphicPlugin;
-class GraphicPluginGroup;
+class GraphicGroupWidget;
 class ICustomGraphic;
-class UserGraphicPlugins;
-class PredefGraphicPlugins;
-class GraphicPlugins : public QWidget
+class UserGraphics;
+class PredefGraphics;
+class GraphicRootWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit GraphicPlugins(QWidget *parent = nullptr);
-    ~GraphicPlugins();
+    explicit GraphicRootWidget(QWidget *parent = nullptr);
+    ~GraphicRootWidget();
 
     // QObject interface
     bool event(QEvent *event) override;
     
     IGraphicPlugin *getSelectedPlugin() const;
-    /**
-     * @brief 通过ID获取图元
-     * @param id 图元ID
-     * @return 图元对象
-     */
-    static IGraphicPlugin *getPluginById(const QString id);
-    /**
-     * @brief 根据图元ID创建图元
-     * @param graphicId 图元ID
-     * @return 图元对象
-     */
-    static ICustomGraphic *createGraphic(const QString &graphicId);
-    /**
-     * @brief 获取全部图元插件
-     * @return  图元插件列表
-     */
-    static QList<IGraphicPlugin *> getAllPlugins();
-    /**
-     * @brief 根据图元ID创建图元
-     * @param graphicId 图元ID
-     * @param xmlText包含图元信息的XML
-     * @return 图元对象
-     */
-    static ICustomGraphic *createGraphic(const QString &graphicId, const QString &xmlText);
 
-    void saveToLib(QList<QGraphicsItem *> items);
+    /**
+     * @brief createGraphicGroup 创建图元组
+     * @param group 组信息
+     */
+    void createGraphicGroup(const GraphicGroup &group);
+
+    /**
+     * @brief selectGroup 选择或新建组
+     * @return 组ID
+     */
+    int selectGroup();
+    /**
+     * @brief addGraphic 添加图元
+     * @param groupId 组ID
+     * @param graphic 图元
+     */
+    void addGraphic(int groupId, IGraphicPlugin *graphic);
 
 Q_SIGNALS:
     /**
@@ -76,16 +70,30 @@ Q_SIGNALS:
      * @param currentPlugin 当前图元
      */
     void graphicItemChanged(IGraphicPlugin *currentPlugin);
+
+public Q_SLOTS:
+    /**
+     * @brief onGraphicPluginLoaded 图元插件加载完毕后生成插件
+     */
+    void onGraphicPluginLoaded(QList<GraphicGroup*> groups);
+
     // QWidget interface
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;
 
 private Q_SLOTS:
+    void onGraphicItemSelected(QString itemId);
+    // void onLoadEnd();
     /**
      * @brief onAddNewGroup 新增图元分组
      */
     void onAddNewGroup();
+    /**
+     * @brief onRemoveGroup 移除组控件
+     * @param groupId 组ID
+     */
+    void onRemoveGroup(int groupId);
 private:
     // 布局方式
     QVBoxLayout *layout;
@@ -94,18 +102,20 @@ private:
     QScrollArea *scroll;
     // 当前选中的插件
     IGraphicPlugin *selectedPlugin;
-    // 用户图元控件
-    static QPointer<UserGraphicPlugins> userGraphics;
-    static QPointer<PredefGraphicPlugins> predefGraphics;
-    /**
-     * @brief 加载图元控件G
-     */
-    void loadPredefGraphicPlugin();
-    /**
-     * @brief 加载用户自定义控件
-     */
-    void loadUserGraphicPlugin();
+    // 图元控件组控件，key 组ID，value widget对象
+    QMap<int, GraphicGroupWidget *> groupWidgetMap;
+    UserPluginManageForm* form{nullptr};
+
     void paletteChanged();
+    /**
+     * @brief createGroupWidget 创建组控件
+     * @param groupId 组ID
+     * @param groupName 组名称
+     * @param type 组类型
+     * @return 控件指针
+     */
+    GraphicGroupWidget *createGroupWidget(int groupId, const QString &groupName, GraphicType type);
+    bool addNewGroup(const QString &groupName);
 };
 
-#endif // GRAPHICPLUGINS_H
+#endif // GRAPHICROOTWIDGET_H

@@ -1,4 +1,4 @@
-﻿/**
+/**
 * This file is part of the dashboard library
 * 
 * Copyright 2025 lishiying  lsyeei@163.com
@@ -16,13 +16,15 @@
 * limitations under the License.
 */
 
-#ifndef GRAPHICPLUGINGROUP_H
-#define GRAPHICPLUGINGROUP_H
+#ifndef GRAPHICGROUPWIDGET_H
+#define GRAPHICGROUPWIDGET_H
 
+#include "customgraphic/userplugindo.h"
 #include <QObject>
 #include <QPointer>
 #include <QWidget>
 
+class UserPluginManageForm;
 class QPushButton;
 class QLineEdit;
 class QToolButton;
@@ -33,11 +35,11 @@ class QLabel;
 class QHBoxLayout;
 class ICustomGraphic;
 class IGraphicPlugin;
-class GraphicPluginGroup : public QWidget
+class GraphicGroupWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit GraphicPluginGroup(QString groupName, qint32 index, QWidget *parent = nullptr);
+    explicit GraphicGroupWidget(QString groupName, qint32 index, QWidget *parent = nullptr);
     /**
      * @brief 将插件加入到该组控件中
      * @param plugin 控件对象
@@ -50,7 +52,8 @@ public:
     bool eventFilter(QObject *watched, QEvent *event) override;
     bool event(QEvent *event) override;
 
-    QString getGroupId() const;
+    QString getWidgetId() const;
+    qint32 getUserGroupId() const;
     void setUserGroupId(qint32 id);
     /**
      * @brief setEditable 设置是否允许编辑组
@@ -63,10 +66,10 @@ public:
     void clearGroup();
     /**
      * @brief removePlugin 删除图元控件
-     * @param plugin 图元对象
+     * @param graphicId 图元对象ID
      * @return true 成功，false 失败
      */
-    bool removePlugin(IGraphicPlugin *plugin);
+    bool removePlugin(const QString &graphicId);
     /**
      * @brief updatePlugin 更新图元控件
      * @param plugin 图元对象
@@ -79,18 +82,18 @@ Q_SIGNALS:
      * @param graphicItem 图元对象
      */
     void graphicItemClicked(const QString &itemId);
-    /**
-     * @brief removeGroup 通知父控件移除该组
-     */
-    void removeGroup();
-    /**
-     * @brief nameChanged 分组名称修改
-     * @param oldName 原名称
-     * @param newName 新名称
-     */
-    void nameChanged(const QString &noldName, const QString &newName);
-    void importGraphic(qint32 userGroupId);
-    void manageGraphic(qint32 userGroupId);
+    // /**
+    //  * @brief removeGroup 通知父控件移除该组
+    //  */
+    // void removeGroup();
+    // /**
+    //  * @brief nameChanged 分组名称修改
+    //  * @param oldName 原名称
+    //  * @param newName 新名称
+    //  */
+    // void nameChanged(const QString &noldName, const QString &newName);
+    // void importGraphic(qint32 userGroupId);
+    // void manageGraphic(qint32 userGroupId);
 
 private Q_SLOTS:
 
@@ -100,8 +103,11 @@ private Q_SLOTS:
     void onImportClicked();
     void onManageClicked();
     void onNameEditEnd();
+    void onItemChanged(const UserPluginDO &data);
+    void onItemRemoved(const UserPluginDO &data);
 
 private:
+    UserPluginManageForm* form{nullptr};
     QString widgetId;
     QVBoxLayout *layout;
     QWidget *titleWidget;
@@ -143,4 +149,4 @@ private:
     void showEditBtns(bool showFlag);
 };
 
-#endif // GRAPHICPLUGINGROUP_H
+#endif // GRAPHICGROUPWIDGET_H

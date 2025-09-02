@@ -20,7 +20,7 @@
 #include "animationform.h"
 #include "bigraphicsscene.h"
 #include "bigraphicsview.h"
-#include "graphicplugins.h"
+#include "graphicrootwidget.h"
 #include "ui_animationform.h"
 
 #include <QMenu>

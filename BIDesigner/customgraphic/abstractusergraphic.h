@@ -1,4 +1,4 @@
-﻿/**
+/**
 * This file is part of the dashboard library
 *
 * Copyright 2025 lishiying  lsyeei@163.com
@@ -16,19 +16,19 @@
 * limitations under the License.
 */
 
-#ifndef ABSTRACTUSERPLUGIN_H
-#define ABSTRACTUSERPLUGIN_H
+#ifndef ABSTRACTUSERGRAPHIC_H
+#define ABSTRACTUSERGRAPHIC_H
 
-#include "customplugin/userplugindo.h"
+#include "customgraphic/userplugindo.h"
 #include "igraphicplugin.h"
 
 class GraphicsItemGroup;
 class UserImageItem;
 class UserSvgItem;
-class AbstractUserPlugin : public IGraphicPlugin
+class AbstractUserGraphic : public IGraphicPlugin
 {
 public:
-    AbstractUserPlugin(const QString &groupName, const UserPluginDO &info);
+    AbstractUserGraphic(const QString &groupName, const UserPluginDO &info);
 
 public:
     void updatePluginInfo(const UserPluginDO &data);
@@ -55,4 +55,4 @@ private:
     QString fileContent();
 };
 
-#endif // ABSTRACTUSERPLUGIN_H
+#endif // ABSTRACTUSERGRAPHIC_H

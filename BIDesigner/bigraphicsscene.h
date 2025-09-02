@@ -31,7 +31,6 @@ enum class AlignAction{NONE, LEFT, RIGHT, TOP, BOTTOM, HORIZON, VERTICAL};
 enum class DistributeAction{NONE, HORIZON, VERTICAL};
 
 class SnowFlake;
-class GraphicPlugins;
 class GraphicsItemGroup;
 class BIGraphicsScene : public IGraphicsScene, public UndoObject
 {

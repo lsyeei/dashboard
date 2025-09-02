@@ -33,6 +33,7 @@ public:
     bool deleteById(QVariant id);
     bool updateById(T data);
     bool save(T *data);
+    BaseMapper<T> *getMapper(){return mapper;}
 private:
     BaseMapper<T> *mapper{nullptr};
 };

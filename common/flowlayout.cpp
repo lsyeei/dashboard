@@ -103,13 +103,11 @@ QSize FlowLayout::sizeHint() const
 
 QSize FlowLayout::minimumSize() const
 {
-    QSize size = parentWidget()->size();
-    size.setHeight(doLayout(QRect(0, 0, size.width(), 0), true));
-    // for (const QLayoutItem *item : std::as_const(itemList))
-    //     size = size.expandedTo(item->minimumSize());
-    // const QMargins margins = contentsMargins();
-    // size += QSize(margins.left() + margins.right(), margins.top() + margins.bottom());
-    return size;
+    QSize size{0,0};
+    for (QLayoutItem *item : std::as_const(itemList)) {
+        size = size.expandedTo(item->minimumSize());
+    }
+    return size*2;
 }
 
 int FlowLayout::doLayout(const QRect &rect, bool testOnly) const

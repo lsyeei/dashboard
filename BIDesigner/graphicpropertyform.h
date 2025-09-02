@@ -19,6 +19,8 @@
 #ifndef GRAPHICPROPERTYFORM_H
 #define GRAPHICPROPERTYFORM_H
 
+#include "graphicsmanager.h"
+
 #include <QWidget>
 
 class BIGraphicsView;
@@ -38,7 +40,8 @@ public:
     bool setGraphicItem(QGraphicsItem *item);
 
     void setView(BIGraphicsView *newView);
-
+public Q_SLOTS:
+    void onGraphicPluginLoaded(QList<GraphicGroup*> groups);
 private slots:
     void graphicItemNameChanged();
 private:

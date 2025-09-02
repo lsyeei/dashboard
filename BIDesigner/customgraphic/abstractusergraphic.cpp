@@ -15,48 +15,48 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "abstractuserplugin.h"
+#include "abstractusergraphic.h"
 #include "bigraphicsscene.h"
-#include "graphicplugins.h"
+#include "graphicrootwidget.h"
 #include "grouppropertyform.h"
 #include "userpluginpropertyform.h"
 #include "usersvgitem.h"
 #include <QBuffer>
 #include <QIcon>
 #include <filetemplate.h>
-#include "customplugin/userimageitem.h"
+#include "customgraphic/userimageitem.h"
 #include "graphicsitemgroup.h"
 #include "icustomgraphic.h"
 
-AbstractUserPlugin::AbstractUserPlugin(const QString &groupName, const UserPluginDO &info)
+AbstractUserGraphic::AbstractUserGraphic(const QString &groupName, const UserPluginDO &info)
     : groupName(groupName), info(info) {}
 
-void AbstractUserPlugin::updatePluginInfo(const UserPluginDO &data)
+void AbstractUserGraphic::updatePluginInfo(const UserPluginDO &data)
 {
     info = data;
 }
 
-QString AbstractUserPlugin::pluginId(const UserPluginDO &data)
+QString AbstractUserGraphic::pluginId(const UserPluginDO &data)
 {
     return QString("__user-%2-%3").arg(data.get_groupId()).arg(data.get_id());
 }
 
-QString AbstractUserPlugin::id() const
+QString AbstractUserGraphic::id() const
 {
     return pluginId(info);
 }
 
-QString AbstractUserPlugin::name() const
+QString AbstractUserGraphic::name() const
 {
     return info.get_name();
 }
 
-QString AbstractUserPlugin::group() const
+QString AbstractUserGraphic::group() const
 {
     return groupName;
 }
 
-QString AbstractUserPlugin::toolTip() const
+QString AbstractUserGraphic::toolTip() const
 {
     if(info.get_note().isEmpty()){
         return info.get_name();
@@ -64,24 +64,24 @@ QString AbstractUserPlugin::toolTip() const
     return info.get_note();
 }
 
-QString AbstractUserPlugin::whatsThis() const
+QString AbstractUserGraphic::whatsThis() const
 {
     return info.get_note();
 }
 
-QIcon AbstractUserPlugin::icon() const
+QIcon AbstractUserGraphic::icon() const
 {
     QPixmap pixmap;
     pixmap.loadFromData(info.get_thumb());
     return QIcon(pixmap);
 }
 
-ICustomGraphic *AbstractUserPlugin::createItem()
+ICustomGraphic *AbstractUserGraphic::createItem()
 {
     return createItem("");
 }
 
-ICustomGraphic *AbstractUserPlugin::createItem(const QString &xml)
+ICustomGraphic *AbstractUserGraphic::createItem(const QString &xml)
 {    
     switch(info.get_type()){
     case UserPluginType::SVG:
@@ -100,7 +100,7 @@ ICustomGraphic *AbstractUserPlugin::createItem(const QString &xml)
     return nullptr;
 }
 
-QWidget *AbstractUserPlugin::propertyWidget()
+QWidget *AbstractUserGraphic::propertyWidget()
 {
     switch(info.get_type()){
     case UserPluginType::SVG:
@@ -119,7 +119,7 @@ QWidget *AbstractUserPlugin::propertyWidget()
     return nullptr;
 }
 
-GraphicsItemGroup *AbstractUserPlugin::createGroupGraphics(const QString &xml)
+GraphicsItemGroup *AbstractUserGraphic::createGroupGraphics(const QString &xml)
 {
     if (!xml.isEmpty()) {
         return new GraphicsItemGroup(xml);
@@ -130,7 +130,7 @@ GraphicsItemGroup *AbstractUserPlugin::createGroupGraphics(const QString &xml)
     return new GraphicsItemGroup(content);
 }
 
-UserSvgItem *AbstractUserPlugin::createSvgGraphics(const QString &xml)
+UserSvgItem *AbstractUserGraphic::createSvgGraphics(const QString &xml)
 {
     UserSvgItem *graphic;
     if (!xml.isEmpty()) {
@@ -141,7 +141,7 @@ UserSvgItem *AbstractUserPlugin::createSvgGraphics(const QString &xml)
     return graphic;
 }
 
-ICustomGraphic *AbstractUserPlugin::createSystemGraphics(const QString &xml)
+ICustomGraphic *AbstractUserGraphic::createSystemGraphics(const QString &xml)
 {
     // 读取文件
     QString content = fileContent();
@@ -155,12 +155,12 @@ ICustomGraphic *AbstractUserPlugin::createSystemGraphics(const QString &xml)
     return nullptr;
 }
 
-QString AbstractUserPlugin::appPath()
+QString AbstractUserGraphic::appPath()
 {
     return QCoreApplication::applicationDirPath();
 }
 
-QWidget *AbstractUserPlugin::getSystemPropertyForm()
+QWidget *AbstractUserGraphic::getSystemPropertyForm()
 {
     auto graphic = createSystemGraphics(fileContent());
     if (graphic == nullptr) {
@@ -172,14 +172,14 @@ QWidget *AbstractUserPlugin::getSystemPropertyForm()
     if (id.isEmpty()) {
         return nullptr;
     }
-    auto plugin = GraphicPlugins::getPluginById(id);
+    auto plugin = GraphicsManager::instance()->getPluginById(id);
     if (plugin) {
         return plugin->propertyWidget();
     }
     return nullptr;
 }
 
-QString AbstractUserPlugin::fileContent()
+QString AbstractUserGraphic::fileContent()
 {
     QString content;
     QFile file(QCoreApplication::applicationDirPath() + info.get_path());
@@ -189,7 +189,7 @@ QString AbstractUserPlugin::fileContent()
     return content;
 }
 
-UserImageItem *AbstractUserPlugin::createImgGraphics(const QString &xml)
+UserImageItem *AbstractUserGraphic::createImgGraphics(const QString &xml)
 {
     UserImageItem *graphic;
     if (!xml.isEmpty()) {

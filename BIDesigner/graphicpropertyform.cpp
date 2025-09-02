@@ -17,7 +17,7 @@
 */
 
 #include "icustomgraphic.h"
-#include "graphicplugins.h"
+#include "graphicrootwidget.h"
 #include "graphicpropertyform.h"
 #include "grouppropertyform.h"
 #include "ui_graphicproperty.h"
@@ -37,13 +37,7 @@ GraphicPropertyForm::GraphicPropertyForm(QWidget *parent)
     auto groupForm = new GroupPropertyForm();
     groupForm->setObjectName("group");
     widgets["group"] = groupForm;
-    // 图元属性
-    auto plugins = GraphicPlugins::getAllPlugins();
-    foreach (auto plugin, plugins) {
-        auto widget = plugin->propertyWidget();
-        widget->setObjectName(plugin->id());
-        widgets[plugin->id()] = widget;
-    }
+
     // 图元名称修改
     connect(ui->graphicName, SIGNAL(editingFinished()), this, SLOT(graphicItemNameChanged()));
 }
@@ -63,6 +57,18 @@ void GraphicPropertyForm::graphicItemNameChanged()
 void GraphicPropertyForm::setView(BIGraphicsView *newView)
 {
     view = newView;
+}
+
+void GraphicPropertyForm::onGraphicPluginLoaded(QList<GraphicGroup *> groups)
+{
+    // 加载图元属性控件
+    foreach(auto group, groups){
+        foreach(auto graphic, group->list){
+            auto widget = graphic->propertyWidget();
+            widget->setObjectName(graphic->id());
+            widgets[graphic->id()] = widget;
+        }
+    }
 }
 
 bool GraphicPropertyForm::setGraphicItem(QGraphicsItem *item)

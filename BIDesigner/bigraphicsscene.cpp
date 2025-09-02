@@ -18,7 +18,7 @@
 
 #include "bigraphicsscene.h"
 #include "graphicsitemgroup.h"
-#include "graphicplugins.h"
+#include "graphicrootwidget.h"
 #include "igraphicplugin.h"
 #include <QDebug>
 #include <QEvent>
@@ -93,7 +93,7 @@ QList<QGraphicsItem *> BIGraphicsScene::toItems(const QString &xmlText)
             typedef XmlTemplate::shapesTemplate::itemTemplate itemTemplate;
             if (attr.hasAttribute(itemTemplate::classId)){
                 auto classId = attr.value(itemTemplate::classId);
-                auto item = GraphicPlugins::createGraphic(classId.toString(),XmlHelper::rawText(&xml, true));
+                auto item = GraphicsManager::instance()->createGraphic(classId.toString(),XmlHelper::rawText(&xml, true));
                 if (attr.hasAttribute(itemTemplate::itemId)){
                     item->setData(itemIdIndex, attr.value(itemTemplate::itemId).toString());
                 }

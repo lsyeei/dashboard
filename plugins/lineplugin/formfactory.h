@@ -35,6 +35,9 @@ public:
     ~FormFactory();
     static FormFactory *instance();
     QWidget* widget(FormType type);
+    // 删除拷贝构造函数和赋值运算符
+    FormFactory(const FormFactory&) = delete;
+    FormFactory& operator=(const FormFactory&) = delete;
 private:
     // key form类型, value QWidget 指针
     QHash<FormType, QWidget*> forms;

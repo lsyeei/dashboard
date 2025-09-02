@@ -18,7 +18,7 @@
 
 #include "bigraphicsscene.h"
 #include "bigraphicsview.h"
-#include "graphicplugingroup.h"
+#include "graphicgroupwidget.h"
 #include "graphicsitemgroup.h"
 
 #include <QWheelEvent>
@@ -31,11 +31,12 @@
 #include "igraphicplugin.h"
 #include <QStringBuilder>
 #include <QXmlStreamWriter>
-#include "graphicplugins.h"
+#include "graphicrootwidget.h"
 #include <QMessageBox>
 #include "biundocommand.h"
 #include "rectselector.h"
 #include <QApplication>
+#include <QBuffer>
 #include <QImageWriter>
 #include <QMimeData>
 #include <QStyleOptionRubberBand>
@@ -444,6 +445,39 @@ bool BIGraphicsView::exportToSvg(bool selectedScope, const QString &fileName, co
     return true;
 }
 
+QByteArray BIGraphicsView::getItemThumbData(QGraphicsItem *item, const QSize &size, const QString &format)
+{
+    QImage image{size, QImage::Format_ARGB32};
+    image.fill(Qt::transparent);
+    QPainter painter{&image};
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+
+    QRectF rect{{0,0},size};
+    QRectF itemRect = item->sceneBoundingRect();
+    auto ratio = itemRect.width() / itemRect.height();
+    if (ratio > 1){
+        auto imgHeight = size.width()/ratio;
+        rect = {0, (size.height() - imgHeight)/2, 1.0*size.width(), imgHeight};
+    } else {
+        auto imgWidth = size.height()*ratio;
+        rect = {(size.width()-imgWidth)/2, 0, imgWidth, 1.0*size.height()};
+    }
+
+    BIGraphicsScene tempScene;
+    auto data = "<User>" + tempScene.toXml({item}) + "</User>";
+    tempScene.setSceneRect(0,0,itemRect.width(),itemRect.height());
+    auto items = tempScene.toItems(data);
+    tempScene.addItems(items);
+    tempScene.render(&painter, rect, itemRect);
+
+    QByteArray array;
+    QBuffer buf(&array);
+    image.save(&buf, format.toLocal8Bit());
+    return array;
+}
+
 void BIGraphicsView::setDragMode(DragMode mode)
 {
     Q_UNUSED(mode)
@@ -747,7 +781,7 @@ void BIGraphicsView::keyReleaseEvent(QKeyEvent *event)
 void BIGraphicsView::dragEnterEvent(QDragEnterEvent *event)
 {
     auto obj = event->source();
-    if (obj == nullptr || typeid(*obj) != typeid(GraphicPluginGroup)) {
+    if (obj == nullptr || typeid(*obj) != typeid(GraphicGroupWidget)) {
         return;
     }
     if (event->mimeData()->hasText()){
@@ -759,7 +793,7 @@ void BIGraphicsView::dragEnterEvent(QDragEnterEvent *event)
 void BIGraphicsView::dragMoveEvent(QDragMoveEvent *event)
 {
     auto obj = event->source();
-    if (obj == nullptr || typeid(*obj) != typeid(GraphicPluginGroup)) {
+    if (obj == nullptr || typeid(*obj) != typeid(GraphicGroupWidget)) {
         return;
     }
     if (event->mimeData()->hasText()){
@@ -770,7 +804,7 @@ void BIGraphicsView::dragMoveEvent(QDragMoveEvent *event)
 void BIGraphicsView::dropEvent(QDropEvent *event)
 {
     auto obj = event->source();
-    if (obj == nullptr || typeid(*obj) != typeid(GraphicPluginGroup)) {
+    if (obj == nullptr || typeid(*obj) != typeid(GraphicGroupWidget)) {
         return;
     }
     const QMimeData *data = event->mimeData();
@@ -778,7 +812,7 @@ void BIGraphicsView::dropEvent(QDropEvent *event)
         return event->ignore();
     }
     auto id = data->text();
-    currentGraphicItem = GraphicPlugins::getPluginById(id);
+    currentGraphicItem = GraphicsManager::instance()->getPluginById(id);
     createByDrop = true;
     createGraphicsItem(event->position());
     event->acceptProposedAction();

@@ -36,7 +36,7 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 class BIGraphicsScene;
-class GraphicPlugins;
+class GraphicRootWidget;
 class QGraphicsItem;
 class MainWindow : public QMainWindow
 {
@@ -55,6 +55,7 @@ Q_SIGNALS:
     void singleSelectEvent(QGraphicsItem *item);
     void noSelectEvent();
     void multiSelectEvent();
+
 private slots:
     // void colorChanged(QColor oldcolor,QColor newcolor);
     // 图元切换时同步切换属性窗口
@@ -104,7 +105,7 @@ private:
     QPushButton *zoomBtn{nullptr};
     ProjectPropertyForm *projectWidget{nullptr};
     // 控件所在 widget
-    GraphicPlugins * graphicPluginWidget{nullptr};
+    GraphicRootWidget * graphicPluginWidget{nullptr};
     // 状态栏控件
     QLabel *mouseInfo{nullptr};
     QLabel *scaleInfo{nullptr};

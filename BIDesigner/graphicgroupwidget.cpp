@@ -16,13 +16,15 @@
 * limitations under the License.
 */
 
-#include "graphicplugingroup.h"
+#include "graphicgroupwidget.h"
+#include "customgraphic/userpluginmanageform.h"
 #include "flowlayout.h"
-#include "graphicplugins.h"
+#include "graphicrootwidget.h"
 #include "svghelper.h"
 #include <QApplication>
 #include <QCryptographicHash>
 #include <QDrag>
+#include <QFileDialog>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -35,13 +37,13 @@
 #include <QToolButton>
 #include <igraphicplugin.h>
 
-GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget *parent)
+GraphicGroupWidget::GraphicGroupWidget(QString groupName, qint32 index, QWidget *parent)
     : QWidget{parent}, groupName(groupName)
 {
     setParent(parent);
     widgetId = createId(groupName, index);
     setObjectName(widgetId);
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
     layout = new QVBoxLayout (this);
     layout->setObjectName("layout");
@@ -56,7 +58,7 @@ GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget 
 
     // 分组标题
     titleWidget->setObjectName("titlePanel");
-    titleWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    titleWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     titleLayout = new QHBoxLayout(titleWidget);
     titleLayout->setContentsMargins(5,6,5,6);
     icon = new QLabel(titleWidget);
@@ -75,7 +77,7 @@ GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget 
 
     // 控件集合
     contentWidget->setObjectName("contentPanel");
-    contentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    contentWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     contentLayout = new FlowLayout(contentWidget);
     contentLayout->setSizeConstraint(QLayout::SetMinimumSize);
     contentLayout->setAlignment(Qt::AlignTop);
@@ -85,7 +87,7 @@ GraphicPluginGroup::GraphicPluginGroup(QString groupName, qint32 index, QWidget 
     paletteChanged();
 }
 
-bool GraphicPluginGroup::addPlugin(IGraphicPlugin *plugin)
+bool GraphicGroupWidget::addPlugin(IGraphicPlugin *plugin)
 {
     if (plugin->name().isEmpty() || plugin->icon().isNull()){
         return false;
@@ -111,7 +113,7 @@ bool GraphicPluginGroup::addPlugin(IGraphicPlugin *plugin)
     return true;
 }
 
-void GraphicPluginGroup::itemClicked(QToolButton * button)
+void GraphicGroupWidget::itemClicked(QToolButton * button)
 {
     auto name = button->objectName();
     if (name.startsWith("shape_")) {
@@ -119,7 +121,7 @@ void GraphicPluginGroup::itemClicked(QToolButton * button)
     }
 }
 
-void GraphicPluginGroup::createEditBtns()
+void GraphicGroupWidget::createEditBtns()
 {
     if (!editBtn.isNull()) {
         return;
@@ -156,7 +158,7 @@ void GraphicPluginGroup::createEditBtns()
     connect(manageAct.data(), SIGNAL(triggered(bool)), this, SLOT(onManageClicked()));
 }
 
-void GraphicPluginGroup::showEditBtns(bool showFlag)
+void GraphicGroupWidget::showEditBtns(bool showFlag)
 {
     if (!editBtn.isNull()) {
         return;
@@ -164,7 +166,7 @@ void GraphicPluginGroup::showEditBtns(bool showFlag)
     editBtn->setVisible(showFlag);
 }
 
-void GraphicPluginGroup::onTitleclicked()
+void GraphicGroupWidget::onTitleclicked()
 {
     if (contentWidget->isHidden()) {
         icon->setPixmap(SvgHelper{QString{":/icons/icons/arrow-down.svg"}}.toPixmap(SvgHelper::Normal));
@@ -175,7 +177,7 @@ void GraphicPluginGroup::onTitleclicked()
     }
 }
 
-void GraphicPluginGroup::onEditClicked()
+void GraphicGroupWidget::onEditClicked()
 {
     title->hide();
     titleEditor->setText(groupName);
@@ -184,25 +186,45 @@ void GraphicPluginGroup::onEditClicked()
     titleEditor->selectAll();
 }
 
-void GraphicPluginGroup::onDeleteClicked()
+void GraphicGroupWidget::onDeleteClicked()
 {
     if (QMessageBox::question(this, tr("提示"), "确定要删除吗？") == QMessageBox::No){
         return;
     }
-    emit removeGroup();
+    GraphicsManager::instance()->removeGroup(userGroupId);
 }
 
-void GraphicPluginGroup::onImportClicked()
+void GraphicGroupWidget::onImportClicked()
 {
-    emit importGraphic(userGroupId);
+    auto files = QFileDialog::getOpenFileNames(this, tr("导入图元"), QDir::currentPath(),
+                                               "Images (*.svg *.png *.jpg *.bmp *.gif *.jpeg)");
+    if (files.isEmpty()) {
+        return;
+    }
+    auto graphics = GraphicsManager::instance()->importGraphics(userGroupId, files);
+    // 添加控件
+    foreach(auto graphic, graphics){
+        addPlugin(graphic);
+    }
 }
 
-void GraphicPluginGroup::onManageClicked()
+void GraphicGroupWidget::onManageClicked()
 {
-    emit manageGraphic(userGroupId);
+    if (form == nullptr) {
+        form = new UserPluginManageForm(userGroupId, this);
+        connect(form, SIGNAL(importEvent(qint32)), this, SLOT(onImportClicked()));
+        connect(form, &UserPluginManageForm::dataChanged,
+                this, &GraphicGroupWidget::onItemChanged);
+        connect(form, &UserPluginManageForm::remove,
+                this, &GraphicGroupWidget::onItemRemoved);
+    }else{
+        form->setGroup(userGroupId);
+    }
+
+    form->show();
 }
 
-void GraphicPluginGroup::onNameEditEnd()
+void GraphicGroupWidget::onNameEditEnd()
 {
     auto newName = titleEditor->text().trimmed();
     if (newName.isEmpty()) {
@@ -213,20 +235,41 @@ void GraphicPluginGroup::onNameEditEnd()
     groupName = newName;
     titleEditor->hide();
     title->show();
-    emit nameChanged(oldName, newName);
+    // 图元管理类更新组名称
+    bool flag = GraphicsManager::instance()->updateGroupName(userGroupId, newName);
+    if (!flag) {
+        setGroupName(oldName);
+    }
 }
 
-QString GraphicPluginGroup::getGroupId() const
+void GraphicGroupWidget::onItemChanged(const UserPluginDO &data)
+{
+    auto graphic = GraphicsManager::instance()->updateGraphic(data);
+    updatePlugin(graphic);
+}
+
+void GraphicGroupWidget::onItemRemoved(const UserPluginDO &data)
+{
+    auto graphicId = GraphicsManager::instance()->removeGraphic(data);
+    removePlugin(graphicId);
+}
+
+QString GraphicGroupWidget::getWidgetId() const
 {
     return widgetId;
 }
 
-void GraphicPluginGroup::setUserGroupId(qint32 id)
+qint32 GraphicGroupWidget::getUserGroupId() const
+{
+    return userGroupId;
+}
+
+void GraphicGroupWidget::setUserGroupId(qint32 id)
 {
     userGroupId = id;
 }
 
-void GraphicPluginGroup::setEditable(bool flag)
+void GraphicGroupWidget::setEditable(bool flag)
 {
     if (editBtn.isNull() && flag) {
         createEditBtns();
@@ -235,7 +278,7 @@ void GraphicPluginGroup::setEditable(bool flag)
     editBtn->setVisible(flag);
 }
 
-void GraphicPluginGroup::clearGroup()
+void GraphicGroupWidget::clearGroup()
 {
     foreach (auto btn, pluginMap) {
         delete btn;
@@ -244,19 +287,19 @@ void GraphicPluginGroup::clearGroup()
     pluginMap.clear();
 }
 
-bool GraphicPluginGroup::removePlugin(IGraphicPlugin *plugin)
+bool GraphicGroupWidget::removePlugin(const QString &graphicId)
 {
-    auto btn = pluginMap[plugin->id()];
+    auto btn = pluginMap[graphicId];
     if (btn) {
         delete btn;
     }else{
         return false;
     }
-    pluginMap.remove(plugin->id());
+    pluginMap.remove(graphicId);
     return true;
 }
 
-void GraphicPluginGroup::updatePlugin(IGraphicPlugin *plugin)
+void GraphicGroupWidget::updatePlugin(IGraphicPlugin *plugin)
 {
     auto btn = pluginMap[plugin->id()];
     if (btn) {
@@ -266,7 +309,7 @@ void GraphicPluginGroup::updatePlugin(IGraphicPlugin *plugin)
     }
 }
 
-QString GraphicPluginGroup::createId(QString name, qint32 index)
+QString GraphicGroupWidget::createId(QString name, qint32 index)
 {
     Q_UNUSED(name)
     // QCryptographicHash hash(QCryptographicHash::Md5);
@@ -275,7 +318,7 @@ QString GraphicPluginGroup::createId(QString name, qint32 index)
     return QString::asprintf("group-%d", index);
 }
 
-void GraphicPluginGroup::paletteChanged()
+void GraphicGroupWidget::paletteChanged()
 {
     auto p = palette();
     auto textColor = p.brush(QPalette::Text).color().name();
@@ -291,10 +334,10 @@ void GraphicPluginGroup::paletteChanged()
     contentWidget->setStyleSheet("#contentPanel{ background-color:"+baseColor+";} QToolButton{border:none;padding:3px;border-radius:5px;}"
                                  "QToolButton:hover{background-color:"+buttonLightColor+"}");
     // 修改图标
-    for (auto item = pluginMap.cbegin(); item != pluginMap.cend(); item++)
+    for (const auto &[id,btn]:pluginMap.asKeyValueRange())
     {
-        auto plugin = GraphicPlugins::getPluginById(item.key());
-        item.value()->setIcon(plugin->icon());
+        auto plugin = GraphicsManager::instance()->getPluginById(id);
+        btn->setIcon(plugin->icon());
     }
 
     if (contentWidget->isHidden()) {
@@ -304,18 +347,18 @@ void GraphicPluginGroup::paletteChanged()
     }
 }
 
-QString GraphicPluginGroup::getGroupName() const
+QString GraphicGroupWidget::getGroupName() const
 {
     return groupName;
 }
 
-void GraphicPluginGroup::setGroupName(const QString &name)
+void GraphicGroupWidget::setGroupName(const QString &name)
 {
     title->setText(name);
     groupName = name;
 }
 
-bool GraphicPluginGroup::event(QEvent *event)
+bool GraphicGroupWidget::event(QEvent *event)
 {
     if (event->type() == QEvent::PaletteChange) {
         paletteChanged();
@@ -325,7 +368,7 @@ bool GraphicPluginGroup::event(QEvent *event)
     return QWidget::event(event);
 }
 
-bool GraphicPluginGroup::eventFilter(QObject *watched, QEvent *event)
+bool GraphicGroupWidget::eventFilter(QObject *watched, QEvent *event)
 {
     auto name = watched->objectName();
     if (watched == titleWidget) {
@@ -365,3 +408,4 @@ bool GraphicPluginGroup::eventFilter(QObject *watched, QEvent *event)
     }
     return QWidget::eventFilter(watched, event);
 }
+

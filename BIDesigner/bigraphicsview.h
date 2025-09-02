@@ -28,7 +28,6 @@
 
 class QXmlStreamWriter;
 class QXmlStreamReader;
-class GraphicPlugins;
 class IGraphicPlugin;
 class ICustomGraphic;
 class BIGraphicsView : public QGraphicsView
@@ -113,6 +112,14 @@ public:
     QSize selectSize();
     bool exportToImage(bool selectedScope, const QString &fileName, const QSize &size, const QColor &bgcolor, int quality);
     bool exportToSvg(bool selectedScope, const QString &fileName, const QSize &size);
+    /**
+     * @brief getItemThumbData 获取图元缩略图数据
+     * @param item 图元
+     * @param size 缩略图尺寸
+     * @param format 缩略图格式：png,jpg等
+     * @return 缩略图二进制数据
+     */
+    QByteArray getItemThumbData(QGraphicsItem *item, const QSize &size, const QString &format="png");
     void setDragMode(QGraphicsView::DragMode mode);
 
 Q_SIGNALS:
