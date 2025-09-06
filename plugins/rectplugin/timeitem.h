@@ -37,8 +37,10 @@ public:
     // ICustomGraphic interface
     QString toXml() const override;
     // AbstractItem interface
+    void updateAttribute(BaseProperty *attr) override;
+    // AbstractItem interface
 protected:
-    void attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr) override;
+    void attributeSwitched(int oldIndex, int newIndex) override;
     // AbstractItem interface
     void parseXML(const QString &xml) override;
 protected Q_SLOTS:

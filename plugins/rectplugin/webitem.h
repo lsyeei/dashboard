@@ -36,6 +36,8 @@ public:
     QString classId() const override;
     // QObject interface
     bool eventFilter(QObject *watched, QEvent *event) override;
+    // AbstractItem interface
+    void updateAttribute(BaseProperty *attr) override;
 Q_SIGNALS:
     void WebCreateEvent();
     // AbstractZoneItem interface
@@ -43,7 +45,7 @@ protected:
     QPainterPath shapePath() const override;
     // QGraphicsItem interface
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-    void attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr) override;
+    void attributeSwitched(int oldIndex, int newIndex) override;
     // AbstractZoneItem interface
 protected slots:
     void sizeChanged(QRectF offsetValue) override;
@@ -58,6 +60,15 @@ private:
      * @param content 页面内容
      */
     void loadWeb(PageType type, const QString &content);
+    /**
+     * @brief setDragMode 设置编辑模式
+     * @param flag true 拖动模式，false 编辑模式
+     */
+    void setDragMode(bool flag);
+    /**
+     * @brief updateWeb 刷新页面
+     */
+    void updateWeb();
 };
 
 

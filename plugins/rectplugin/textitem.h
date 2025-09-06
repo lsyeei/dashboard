@@ -38,12 +38,13 @@ public:
     explicit TextItem(const QString &xml, QGraphicsItem *parent = nullptr);
     ~TextItem();
     QString classId() const override;
-    // ITextObject interface
     // QObject interface
     bool eventFilter(QObject *watched, QEvent *event) override;
 
     QColor textColor() const;
     void setTextColor(const QColor &newTextColor);
+    // AbstractItem interface
+    void updateAttribute(BaseProperty *attr) override;
 
 protected:
     // QGraphicsItem interface
@@ -51,10 +52,11 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
     // AbstractItem interface
     void cursorSelectChanged();
-    void attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr) override;
+    void attributeSwitched(int oldIndex, int newIndex) override;
     void parseXML(const QString &xml) override;
 private:
     void setTextFormat(const QTextFormat &format);
+
 };
 
 #endif // TEXTITEM_H

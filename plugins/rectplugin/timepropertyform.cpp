@@ -74,9 +74,9 @@ void TimePropertyForm::setData(const QVariant &data)
         ui->fontFamily->setEnabled(true);
         ui->fontFamily->setCurrentFont(font);
     }else{
-        ui->lcdCheck->setChecked(true);
         ui->fontFamily->setEnabled(false);
     }
+    ui->lcdCheck->setChecked(attr.getIsLcd());
     ui->fontSize->setValue(font.pointSize());
     ui->boldBtn->setChecked(font.bold());
     ui->italicBtn->setChecked(font.italic());

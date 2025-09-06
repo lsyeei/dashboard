@@ -31,8 +31,6 @@ public:
     WebPlugin();
     ~WebPlugin();
     PLUGIN_INTERFACE
-private:
-    QWebEnginePage *page{nullptr};
 };
 
 #endif // WEBPLUGIN_H

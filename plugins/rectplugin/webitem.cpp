@@ -20,8 +20,11 @@
 #include "zoneproperty.h"
 #include <QWebEngineView>
 #include <QWebEngineSettings>
+#include <QWebEngineProfile>
 #include <QGraphicsScene>
 #include <QTimer>
+#include <QThread>
+#include <QApplication>
 
 QString WebItem::SHAPE_ID = "WEB_2024";
 WebItem::WebItem(QGraphicsItem *parent)
@@ -30,7 +33,12 @@ WebItem::WebItem(QGraphicsItem *parent)
     WebProperty property;
     property.setDragFlag(true);
     property.setType(PageType::CODE);
-    property.setContent(tr("支持输入网址、本地HTML文件或HTML代码，JS 代码支持实时解析"));
+    QString content = R"(<html><head>web 控件</head><body style="color:white;">
+    <div style="border:solid 1px red;border-radius:5px;padding: 5px;font-size:12pt;">
+    input your html code, js code, file or url...
+    </div>
+    </body></html>)";
+    property.setContent(content);
     attribute()->setData(QVariant::fromValue(property));
     setSize({80,60});
     connect(this, SIGNAL(WebCreateEvent()), this, SLOT(onNewWeb()), Qt::QueuedConnection);
@@ -94,32 +102,51 @@ void WebItem::adjustEnd(AbstractSelector::AdjustType type)
 void WebItem::onNewWeb()
 {
     web = new QWebEngineView();
-    auto webWidget = new QGraphicsProxyWidget(this);
-    webWidget->installEventFilter(this);
-    webWidget->setWidget(web);
-    webWidget->setAcceptedMouseButtons(Qt::LeftButton);
-    webWidget->setFlag(QGraphicsItem::ItemIsMovable, false);
-    webWidget->setFlag(QGraphicsItem::ItemIsSelectable, false);
-    widget.reset(webWidget);
-    webWidget->setParentItem(this);
-    webWidget->setPos(logicRect.topLeft());
-    web->resize(logicRect.size().toSize());
+    web->setWindowFlags(web->windowFlags() | Qt::FramelessWindowHint);
+    web->setAttribute(Qt::WA_TranslucentBackground);
+    web->setStyleSheet("background:transparent;");
+    connect(web, &QWebEngineView::loadFinished, this, [&]{web->show();});
+
     // 用独立渲染进程 隔离崩溃风险并提升稳定性
     auto settings = web->settings();
     // 禁用插件
     settings->setAttribute(QWebEngineSettings::PluginsEnabled, false);
     // 关本地存储
     settings->setAttribute(QWebEngineSettings::LocalStorageEnabled, false);
-
-    bool dragMode{true};
+    settings->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, false);
+    settings->setAttribute(QWebEngineSettings::ScreenCaptureEnabled, false);
+    settings->setAttribute(QWebEngineSettings::WebGLEnabled, false);
+    settings->setAttribute(QWebEngineSettings::JavascriptCanOpenWindows, false);
+    auto profile = web->page()->profile();
+    profile->setPersistentCookiesPolicy(QWebEngineProfile::NoPersistentCookies);
+    profile->setCachePath("");
+    profile->setHttpCacheType(QWebEngineProfile::MemoryHttpCache);
+    // 20M缓存
+    profile->setHttpCacheMaximumSize(20*1024*1024);
+    web->page()->setBackgroundColor(Qt::transparent);
+    web->setAttribute(Qt::WA_OpaquePaintEvent, false);
+    // 加载web数据
     auto data = attribute()->getData();
+    bool dragMode{true};
     if (!data.isNull()) {
         auto webAttr = data.value<WebProperty>();
         loadWeb(webAttr.getType(), webAttr.getContent());
         dragMode = webAttr.getDragFlag();
     }
-    // 设置 webWidget 下移一层，这样可以拖动控件，但是鼠标消息不会传递给web控件
-    webWidget->setFlag(QGraphicsItem::ItemStacksBehindParent, dragMode);
+    web->resize(logicRect.size().toSize());
+
+    auto webWidget = new QGraphicsProxyWidget(this);
+    webWidget->setAttribute(Qt::WA_OpaquePaintEvent);
+    webWidget->setWindowFlags(webWidget->windowFlags() | Qt::FramelessWindowHint);
+    webWidget->installEventFilter(this);
+    webWidget->setWidget(web);
+    webWidget->setAcceptedMouseButtons(Qt::LeftButton);
+    webWidget->setFlag(QGraphicsItem::ItemIsMovable, false);
+    webWidget->setFlag(QGraphicsItem::ItemIsSelectable, false);
+    widget.reset(webWidget);
+    webWidget->setPos(logicRect.topLeft());
+    setDragMode(dragMode);
+
 }
 
 void WebItem::loadWeb(PageType type, const QString &content)
@@ -133,6 +160,29 @@ void WebItem::loadWeb(PageType type, const QString &content)
         web->setHtml(content);
         break;
     }
+}
+
+void WebItem::setDragMode(bool flag)
+{
+    // 设置 webWidget 下移一层，这样可以拖动控件，但是鼠标消息不会传递给web控件
+    widget->setFlag(QGraphicsItem::ItemStacksBehindParent, flag);
+    if (flag) {
+        setCursor(QCursor(Qt::SizeAllCursor));
+    }
+}
+
+void WebItem::updateWeb()
+{
+    // 更新web控件
+    auto data = attribute()->getData();
+    if (data.isNull()) {
+        return;
+    }
+    auto webAttr = data.value<WebProperty>();
+    setDragMode(webAttr.getDragFlag());
+    widget->setPos(logicRect.topLeft());
+    web->resize(logicRect.size().toSize());
+    loadWeb(webAttr.getType(), webAttr.getContent());
 }
 
 bool WebItem::eventFilter(QObject *watched, QEvent *event)
@@ -152,18 +202,15 @@ bool WebItem::eventFilter(QObject *watched, QEvent *event)
     return AbstractZoneItem::eventFilter(watched, event);
 }
 
-void WebItem::attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr)
+void WebItem::updateAttribute(BaseProperty *attr)
 {
-    AbstractZoneItem::attributeChanged(oldAttr, newAttr);
-    // 更新web控件
-    auto data = attribute()->getData();
-    if (data.isNull()) {
-        return;
-    }
-    auto webAttr = data.value<WebProperty>();
-    widget->setFlag(QGraphicsItem::ItemStacksBehindParent, webAttr.getDragFlag());
-    if (webAttr.getDragFlag()) {
-        setCursor(QCursor(Qt::SizeAllCursor));
-    }
-    loadWeb(webAttr.getType(), webAttr.getContent());
+    AbstractZoneItem::updateAttribute(attr);
+    updateWeb();
+}
+
+void WebItem::attributeSwitched(int oldIndex, int newIndex)
+{
+    web->hide();
+    AbstractZoneItem::attributeSwitched(oldIndex, newIndex);
+    updateWeb();
 }

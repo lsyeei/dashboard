@@ -52,6 +52,11 @@ QVariant TextItem::itemChange(GraphicsItemChange change, const QVariant &value)
         if (!isSelected()) {
             // 取消可编辑状态
             textItem->setTextInteractionFlags(Qt::NoTextInteraction);
+            // 保存修改的文字
+            auto data = textItem->toHtml();
+            attribute()->setData(data);
+            // 清除选中状态
+            textItem->setHtml(data);
         }
     }
     return AbstractTextItem::itemChange(change, value);
@@ -162,6 +167,7 @@ bool TextItem::eventFilter(QObject *watched, QEvent *event)
         }
         if (event->type() == QEvent::FocusOut) {
             textItem->textCursor().clearSelection();
+            attribute()->setData(textItem->toHtml());
         }
     }
     return QObject::eventFilter(watched, event);
@@ -188,17 +194,17 @@ void TextItem::setTextColor(const QColor &newTextColor)
     updateItem();
 }
 
-
-void TextItem::attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr)
+void TextItem::attributeSwitched(int oldIndex, int newIndex)
 {
-    AbstractTextItem::attributeChanged(oldAttr, newAttr);
-    auto data = attribute()->getData();
-    if (data.isNull() || !data.canConvert<QTextFormat>()){
+    AbstractTextItem::attributeSwitched(oldIndex, newIndex);
+    auto attr = attribute();
+    auto data = attr->getData();
+    if (data.isNull()){
         return;
     }
-    setTextFormat(data.value<QTextFormat>());
+    textItem->setTextWidth(attr->getWidth());
+    textItem->setHtml(data.toString());
 }
-
 
 void TextItem::parseXML(const QString &xml)
 {
@@ -206,9 +212,27 @@ void TextItem::parseXML(const QString &xml)
     auto data = attribute()->getData();
     auto width = attribute()->getWidth();
     if (data.isValid()) {
-        textItem->setHtml(data.toString());
         textItem->setTextWidth(width);
+        textItem->setHtml(data.toString());
     }
     // 清空data字段用于和form传递字体及段落格式
-    attribute()->setData(QVariant());
+    // attribute()->setData(QVariant());
+}
+
+void TextItem::updateAttribute(BaseProperty *attr)
+{
+    auto property = dynamic_cast<ZoneProperty*>(attr);
+    // 设置文本格式
+    auto data = property->getData();
+    if (data.isNull() || !data.canConvert<QTextFormat>()){
+        // 更新属性
+        AbstractTextItem::updateAttribute(attr);
+        return;
+    }
+    setTextFormat(data.value<QTextFormat>());
+    // 获取文本
+    auto text = textItem->toHtml();
+    property->setData(text);
+    // 更新属性
+    AbstractTextItem::updateAttribute(property);
 }

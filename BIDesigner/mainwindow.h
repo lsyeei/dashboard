@@ -158,5 +158,9 @@ private:
     void initPopMenu();
     void onViewMenuEvent(QContextMenuEvent *event);
     void loadPlugin();
+    /**
+     * @brief initWebEngine 初始化 web 引擎
+     */
+    void initWebEngine();
 };
 #endif // MAINWINDOW_H

@@ -67,7 +67,7 @@ public:
      * @brief 更新当前属性
      * @param attr 属性对象
      */
-    void updateAttribute(BaseProperty *attr);
+    virtual void updateAttribute(BaseProperty *attr);
     /**
      * @brief 修改属性名称
      * @param id 属性ID

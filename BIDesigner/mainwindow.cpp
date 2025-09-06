@@ -48,6 +48,8 @@
 #include "animation/animationform.h"
 #include "animation/animationfactory.h"
  #include <QtConcurrent>
+#include <QNetworkProxyFactory>
+#include <QWebEnginePage>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -74,6 +76,10 @@ MainWindow::MainWindow(QWidget *parent)
     // 初始化右键菜单
     initPopMenu();
     ui->graphicsView->installEventFilter(this);
+    QTimer::singleShot(2000,[&](){
+        // 初始化 web 引擎
+        initWebEngine();
+    });
 }
 
 MainWindow::~MainWindow()
@@ -989,4 +995,25 @@ void MainWindow::onViewMenuEvent(QContextMenuEvent *event)
     }else{
         viewMenu->popup(event->globalPos());
     }
+}
+
+void MainWindow::initWebEngine()
+{
+    // QtWebEngineQuick::initialize();
+
+    // 关闭代理
+    QNetworkProxyFactory::setUseSystemConfiguration(false);
+    // 指定 DirectX 11,使用 DirectX/Vulkan 替代 OpenGL
+    // qputenv("QT_ANGLE_PLATFORM", "d3d11");
+    // 激活 Chromium 硬件加速参数 通过环境变量启用 GPU 光栅化与多线程渲染
+    qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
+            "--ignore-gpu-blacklist --enable-gpu-rasterization --num-raster-threads=4");
+    // QWebEngineProfile::defaultProfile()->setHttpCacheType(QWebEngineProfile::DiskHttpCache);
+    // QWebEngineProfile::defaultProfile()->setPersistentCookiesPolicy(QWebEngineProfile::NoPersistentCookies);
+    // 通过加载QWebEnginePage初始化WebEngine环境，提高后期加载 QWebEngineView 的速度
+    auto page = new QWebEnginePage();
+    page->setHtml("<div>web engine init...</div>");//->load(QUrl("https://www.baidu.com"));
+    connect(page, &QWebEnginePage::loadFinished, this, [page]{
+        page->deleteLater();
+    });
 }

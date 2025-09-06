@@ -46,6 +46,7 @@ AbstractTextItem::AbstractTextItem(QGraphicsItem *parent)
     auto pen = attr->getPen();
     pen.setStyle(Qt::NoPen);
     attr->setPen(pen);
+    attr->setData("Text");
 }
 
 AbstractTextItem::AbstractTextItem(const QString &xml, QGraphicsItem *parent)
@@ -195,7 +196,6 @@ void AbstractTextItem::adjustEnd(AbstractSelector::AdjustType type)
         textItem->setPos(logicRect.topLeft());
     }
 }
-
 
 void AbstractTextItem::docSizeChanged(QSizeF size)
 {

@@ -107,16 +107,27 @@ void TimeItem::propertyChanged(const TimeProperty &property)
         updateTime();
     }
 }
-void TimeItem::attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr)
+
+void TimeItem::updateAttribute(BaseProperty *attr)
 {
-    AbstractTextItem::attributeChanged(oldAttr, newAttr);
+    AbstractTextItem::updateAttribute(attr);
+    auto property = dynamic_cast<ZoneProperty*>(attr);
+    auto data = property->getData();
+    if (!data.isNull()) {
+        propertyChanged(data.value<TimeProperty>());
+    }
+}
+
+void TimeItem::attributeSwitched(int oldIndex, int newIndex)
+{
+    AbstractTextItem::attributeSwitched(oldIndex, newIndex);
     auto data = attribute()->getData();
     if (data.isNull()) {
         return;
     }
+    textItem->setTextWidth(attribute()->getWidth());
     propertyChanged(data.value<TimeProperty>());
 }
-
 
 QString TimeItem::toXml() const
 {

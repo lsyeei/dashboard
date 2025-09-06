@@ -42,14 +42,19 @@ QString HtmlItem::classId() const
     return SHAPE_ID;
 }
 
-void HtmlItem::attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr)
-{
-    AbstractTextItem::attributeChanged(oldAttr, newAttr);
-    textItem->setHtml(attribute()->getData().toString());
-}
-
-
 QString HtmlItem::toXml() const
 {
     return AbstractZoneItem::toXml();
+}
+
+void HtmlItem::updateAttribute(BaseProperty *attr)
+{
+    AbstractTextItem::updateAttribute(attr);
+    textItem->setHtml(attribute()->getData().toString());
+}
+
+void HtmlItem::attributeSwitched(int oldIndex, int newIndex)
+{
+    AbstractTextItem::attributeSwitched(oldIndex, newIndex);
+    textItem->setHtml(attribute()->getData().toString());
 }

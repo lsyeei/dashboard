@@ -21,21 +21,9 @@
 #include <QWebEnginePage>
 #include "formfactory.h"
 
-WebPlugin::WebPlugin() {
-    // 通过加载QWebEnginePage初始化WebEngine环境，提高后期加载 QWebEngineView 的速度
-    page = new QWebEnginePage(this);
-    page->load(QUrl("https://www.baidu.com"));
-    connect(page, &QWebEnginePage::loadFinished, this, [&]{
-        page->deleteLater();
-    });
-}
+WebPlugin::WebPlugin() {}
 
 WebPlugin::~WebPlugin()
-{
-    if(page){
-        delete page;
-        page = nullptr;
-    }
-}
+{}
 METHOD_DEFINE(WebPlugin, "网页", "通用", "内嵌网页", "内嵌网页",
               :/icons/web.svg, WebItem, FormType::WEB)

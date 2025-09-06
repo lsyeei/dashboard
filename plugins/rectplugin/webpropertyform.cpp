@@ -57,23 +57,22 @@ void WebPropertyForm::setData(const QVariant &data)
     switch (type) {
     case PageType::URL:
         ui->urlRadio->setChecked(true);
+        ui->urlEdit->setText(content);
         break;
     case PageType::FILE:
         ui->fileRadio->setChecked(true);
+        ui->codeEdit->setText(content);
         break;
     default:
         ui->codeRadio->setChecked(true);
+        ui->codeEdit->clear();
+        ui->codeEdit->setPlainText(content);
         break;
     }
     ui->urlWidget->setVisible(type != PageType::CODE);
     ui->codeEdit->setVisible(type == PageType::CODE);
     ui->fileBtn->setVisible(type == PageType::FILE);
     ui->urlEdit->setEnabled(type == PageType::URL);
-    if (type == PageType::FILE){
-        ui->codeEdit->setText(content);
-    }else{
-        ui->urlEdit->setText(content);
-    }
 }
 
 void WebPropertyForm::onValueChanged()
