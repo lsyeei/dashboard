@@ -32,7 +32,7 @@ class AbstractZoneItem : public AbstractItem
     Q_PROPERTY(QColor color READ color WRITE setColor FINAL)
 
 public:
-    AbstractZoneItem(QGraphicsItem *parent = nullptr);
+    AbstractZoneItem(QGraphicsItem *parent = nullptr, bool init = true);
 
     // QGraphicsItem interface
     QRectF boundingRect() const override;
@@ -42,8 +42,8 @@ public:
     void setSize(const QSizeF &size) override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QMap<QString, QString> propertyDescription() Q_DECL_OVERRIDE;
-
-    virtual ZoneProperty *attribute() const;
+    using AbstractItem::attribute;
+    ZoneProperty *attribute() const;
 
     qreal width() const;
     virtual void setWidth(qreal newWidth);

@@ -1,0 +1,38 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/areachart.svg</file>
+        <file>icons/candlestickchart.svg</file>
+        <file>icons/combochart.svg</file>
+        <file>icons/gauge.svg</file>
+        <file>icons/histogram.svg</file>
+        <file>icons/linechart.svg</file>
+        <file>icons/piechart.svg</file>
+        <file>icons/scatterchart.svg</file>
+        <file>icons/steppedareachart.svg</file>
+        <file>html/chart.html</file>
+        <file>html/loader.js</file>
+        <file>html/charts/51/loader.js</file>
+        <file>html/charts/51/js/jsapi_compiled_corechart_module.js</file>
+        <file>html/charts/51/js/jsapi_compiled_default_module.js</file>
+        <file>html/charts/51/js/jsapi_compiled_graphics_module.js</file>
+        <file>html/charts/51/js/jsapi_compiled_ui_module.js</file>
+        <file>html/charts/51/css/core/tooltip.css</file>
+        <file>html/charts/51/css/util/util.css</file>
+        <file>html/charts/51/js/jsapi_compiled_gauge_module.js</file>
+        <file>html/charts/51/js/jsapi_compiled_flashui_module.js</file>
+        <file>html/charts/51/js/jsapi_compiled_fw_module.js</file>
+        <file>html/charts/51/js/jsapi_compiled_geo_module.js</file>
+        <file>html/charts/51/js/jsapi_compiled_geochart_module.js</file>
+        <file>html/charts/51/js/jsapi_compiled_geomap_module.js</file>
+        <file>html/charts/51/js/jsapi_compiled_orgchart_module.js</file>
+        <file>html/charts/51/js/jsapi_compiled_table_module.js</file>
+        <file>html/charts/51/js/jsapi_compiled_treemap_module.js</file>
+        <file>html/charts/51/third_party/dygraphs/dygraph-tickers-combined.js</file>
+        <file>html/charts/51/css/orgchart/orgchart.css</file>
+        <file>html/charts/51/css/table/table.css</file>
+        <file>html/charts/51/css/util/format.css</file>
+        <file>icons/barchart.svg</file>
+        <file>icons/table.svg</file>
+        <file>icons/bubblechart.svg</file>
+    </qresource>
+</RCC>

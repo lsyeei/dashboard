@@ -21,10 +21,10 @@
 #include "zoneproperty.h"
 #include <QGraphicsItem>
 
-AbstractZoneItem::AbstractZoneItem(QGraphicsItem *parent)
+AbstractZoneItem::AbstractZoneItem(QGraphicsItem *parent, bool init)
     : AbstractItem(parent)
 {
-
+    if (!init) return;
     attributes[0] = newProperty();
     attributes[0]->setId(0);
     attributes[0]->setName("default");
@@ -95,7 +95,6 @@ QMap<QString, QString> AbstractZoneItem::propertyDescription()
     return result;
 }
 
-
 ZoneProperty *AbstractZoneItem::attribute() const
 {
     auto attr = attributes[attrIndex];
@@ -106,7 +105,6 @@ qreal AbstractZoneItem::width() const
 {
     return attribute()->getWidth();
 }
-
 
 void AbstractZoneItem::setWidth(qreal newWidth)
 {
@@ -354,10 +352,9 @@ void AbstractZoneItem::copyProperty(QVariant from, BaseProperty *to)
 void AbstractZoneItem::attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr)
 {
     Q_UNUSED(oldAttr)
-    auto newItem = dynamic_cast<const ZoneProperty&>(newAttr);
-    attribute()->copy(newItem);
-    logicRect = newItem.getLogicRect();
-    setPos(newItem.getPos());
+    attribute()->copy(newAttr);
+    logicRect = attribute()->getLogicRect();
+    setPos(attribute()->getPos());
     updateSelector();
 }
 

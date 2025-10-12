@@ -79,6 +79,9 @@ void GradientParamDialog::setControlPoint(const QPainterPath &path, const QPolyg
     auto canvasBound = ui->preview->rect();
     QLineF l1{shapeBound.topLeft(), shapeBound.bottomRight()};
     QLineF l2{canvasBound.topLeft(), canvasBound.bottomRight()};
+    if(l1.length() <= 0){
+        return;
+    }
     shapeRatio = (l2.length() - previewPadding) / l1.length();
     QTransform trans;
     trans.scale(shapeRatio, shapeRatio);

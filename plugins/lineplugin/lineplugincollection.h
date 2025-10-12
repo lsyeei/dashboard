@@ -30,8 +30,8 @@ class LinePluginCollection : public QObject, public IGraphicPluginCollection
 public:
     LinePluginCollection();
     ~LinePluginCollection();
-    QList<IGraphicPlugin *> graphicPlugins() override;
     // IGraphicPluginCollection interface
+    QList<IGraphicPlugin *> graphicPlugins() override;
 private:
     QList<IGraphicPlugin *> pluginList;
 };

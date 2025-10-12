@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="qrc:/html/loader.js"></script>
+    <!--script type="text/javascript">
+          // Load the Visualization API and the corechart package.
+          google.charts.load('51');
+
+          var wrapper;
+          function drawChart() {
+
+            // Draw chart
+            wrapper = new google.visualization.ChartWrapper({
+              chartType: '%1',
+              dataTable: %2,
+              options: %3,
+              containerId: 'chart_div'
+            });
+
+            wrapper.draw();
+          }
+          // Set a callback to run when the Google Visualization API is loaded.
+          google.charts.setOnLoadCallback(drawChart);
+    </script-->
+  </head>
+
+  <body style="margin:0;padding:0;">
+    <!--Div that will hold the pie chart-->
+    <div id="chart_div"></div>
+  </body>
+</html>
