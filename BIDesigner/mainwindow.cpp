@@ -76,10 +76,10 @@ MainWindow::MainWindow(QWidget *parent)
     // 初始化右键菜单
     initPopMenu();
     ui->graphicsView->installEventFilter(this);
-    QTimer::singleShot(2000,[&](){
-        // 初始化 web 引擎
-        initWebEngine();
-    });
+    // QTimer::singleShot(2000,[&](){
+    //     // 初始化 web 引擎，初始化过程可能会导致UI页面卡顿
+    //     initWebEngine();
+    // });
 }
 
 MainWindow::~MainWindow()
@@ -430,10 +430,13 @@ void MainWindow::initGraphicsWidget()
     propertyWidget = new GraphicPropertyForm();
     propertyWidget->installEventFilter(this);
     propertyWidget->setView(ui->graphicsView);
-    auto manager = GraphicsManager::instance();
-    connect(manager, &GraphicsManager::loadEndEvent,
-            propertyWidget, &GraphicPropertyForm::onGraphicPluginLoaded,
-            Qt::QueuedConnection);
+    // 延迟到使用时再创建属性窗口
+    // do nothing
+    // 立即创建所有组件的属性窗口
+    // auto manager = GraphicsManager::instance();
+    // connect(manager, &GraphicsManager::loadEndEvent,
+    //         propertyWidget, &GraphicPropertyForm::onGraphicPluginLoaded,
+    //         Qt::QueuedConnection);
 }
 
 void MainWindow::initProjectPropertyForm()

@@ -53,6 +53,8 @@ private:
     QHash<QString, QWidget*> widgets;
     // 当前显示的属性面板
     QWidget *current{nullptr};
+
+    QWidget *findOrCreateForm(const QString &graphicId);
 };
 
 #endif // GRAPHICPROPERTYFORM_H

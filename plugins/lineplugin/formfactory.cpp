@@ -20,10 +20,11 @@
 #include "linepropertyform.h"
 
 FormFactory::FormFactory() {
-    forms[FormType::LINE] = new LinePropertyForm();
-    auto widget = new LinePropertyForm();
-    widget->showCornerProperty();
-    forms[FormType::CORNER_LINE] = widget;
+    // 延迟到使用时再加载，防止界面卡顿
+    // forms[FormType::LINE] = new LinePropertyForm();
+    // auto widget = new LinePropertyForm();
+    // widget->showCornerProperty();
+    // forms[FormType::CORNER_LINE] = widget;
 }
 
 FormFactory::~FormFactory()
@@ -48,5 +49,20 @@ FormFactory *FormFactory::instance()
 
 QWidget *FormFactory::widget(FormType type)
 {
-    return forms[type];
+    auto widget = forms[type];
+    if (widget) {
+        return widget;
+    }
+    auto form = new LinePropertyForm();
+    switch (type) {
+    case FormType::LINE:
+        break;
+    case FormType::CORNER_LINE:
+        form->showCornerProperty();
+        break;
+    default:
+        break;
+    }
+    forms[type] = form;
+    return form;
 }

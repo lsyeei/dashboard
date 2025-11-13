@@ -24,22 +24,23 @@
 #include "webpropertyform.h"
 
 FormFactory::FormFactory() {
-    forms[FormType::RECT] = new RectPropertyForm();
-    auto widget = new RectPropertyForm();
-    widget->hideRound();
-    forms[FormType::SHARP_RECT] = widget;
-    widget = new RectPropertyForm();
-    widget->addSubWidget(new TextPropertyForm());
-    forms[FormType::TEXT] = widget;
-    widget = new RectPropertyForm();
-    widget->addSubWidget(new HtmlPropertyForm());
-    forms[FormType::HTML] = widget;
-    widget = new RectPropertyForm();
-    widget->addSubWidget(new TimePropertyForm());
-    forms[FormType::TIME] = widget;
-    widget = new RectPropertyForm();
-    widget->addSubWidget(new WebPropertyForm());
-    forms[FormType::WEB] = widget;
+    // 延迟到使用时再创建，较少界面卡顿
+    // forms[FormType::RECT] = new RectPropertyForm();
+    // auto widget = new RectPropertyForm();
+    // widget->hideRound();
+    // forms[FormType::SHARP_RECT] = widget;
+    // widget = new RectPropertyForm();
+    // widget->addSubWidget(new TextPropertyForm());
+    // forms[FormType::TEXT] = widget;
+    // widget = new RectPropertyForm();
+    // widget->addSubWidget(new HtmlPropertyForm());
+    // forms[FormType::HTML] = widget;
+    // widget = new RectPropertyForm();
+    // widget->addSubWidget(new TimePropertyForm());
+    // forms[FormType::TIME] = widget;
+    // widget = new RectPropertyForm();
+    // widget->addSubWidget(new WebPropertyForm());
+    // forms[FormType::WEB] = widget;
 }
 
 FormFactory::~FormFactory()
@@ -64,5 +65,32 @@ FormFactory *FormFactory::instance()
 
 QWidget *FormFactory::widget(FormType type)
 {
-    return forms[type];
+    auto widget= forms[type];
+    if (widget) {
+        return widget;
+    }
+    RectPropertyForm *rectForm = new RectPropertyForm();
+    switch (type) {
+    case FormType::RECT:
+        break;
+    case FormType::SHARP_RECT:
+        rectForm->hideRound();
+        break;
+    case FormType::TEXT:
+        rectForm->addSubWidget(new TextPropertyForm());
+        break;
+    case FormType::HTML:
+        rectForm->addSubWidget(new HtmlPropertyForm());
+        break;
+    case FormType::TIME:
+        rectForm->addSubWidget(new TimePropertyForm());
+        break;
+    case FormType::WEB:
+        rectForm->addSubWidget(new WebPropertyForm());
+        break;
+    default:
+        break;
+    }
+    forms[type] = rectForm;
+    return rectForm;
 }

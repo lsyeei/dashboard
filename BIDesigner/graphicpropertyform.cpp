@@ -61,14 +61,31 @@ void GraphicPropertyForm::setView(BIGraphicsView *newView)
 
 void GraphicPropertyForm::onGraphicPluginLoaded(QList<GraphicGroup *> groups)
 {
-    // 加载图元属性控件
-    foreach(auto group, groups){
-        foreach(auto graphic, group->list){
-            auto widget = graphic->propertyWidget();
-            widget->setObjectName(graphic->id());
-            widgets[graphic->id()] = widget;
-        }
+    // 一次创建所有插件的属性窗口，导致启动慢，可以延迟到使用时再创建
+    // // 加载图元属性控件
+    // foreach(auto group, groups){
+    //     foreach(auto graphic, group->list){
+    //         auto widget = graphic->propertyWidget();
+    //         widget->setObjectName(graphic->id());
+    //         widgets[graphic->id()] = widget;
+    //     }
+    // }
+}
+
+QWidget *GraphicPropertyForm::findOrCreateForm(const QString &graphicId)
+{
+    QWidget *form = widgets[graphicId];
+    if (form) {
+        return form;
     }
+    auto graphicPlugin = GraphicsManager::instance()->getPluginById(graphicId);
+    if (graphicPlugin == nullptr) {
+        return nullptr;
+    }
+    form = graphicPlugin->propertyWidget();
+    form->setObjectName(graphicId);
+    widgets[graphicId] = form;
+    return form;
 }
 
 bool GraphicPropertyForm::setGraphicItem(QGraphicsItem *item)
@@ -99,7 +116,7 @@ bool GraphicPropertyForm::setGraphicItem(QGraphicsItem *item)
         ICustomGraphic *curItem = dynamic_cast<ICustomGraphic*>(item);
         if (curItem) {
             ui->graphicName->setText(itemName);
-            QWidget *property = widgets[curItem->classId()];
+            QWidget *property = findOrCreateForm(curItem->classId());//widgets[curItem->classId()];
             if (property){
                 curItem->setPropertyWidget(property);
                 layout()->addWidget(property);
