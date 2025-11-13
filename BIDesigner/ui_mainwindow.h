@@ -80,6 +80,7 @@ public:
     QAction *flipVertical;
     QAction *saveToLib;
     QAction *doDelete;
+    QAction *dataSource;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QSplitter *splitter_2;
@@ -368,6 +369,12 @@ public:
         QIcon icon30(QIcon::fromTheme(QIcon::ThemeIcon::EditDelete));
         doDelete->setIcon(icon30);
         doDelete->setMenuRole(QAction::MenuRole::NoRole);
+        dataSource = new QAction(MainWindow);
+        dataSource->setObjectName("dataSource");
+        QIcon icon31;
+        icon31.addFile(QString::fromUtf8(":/icons/icons/datasource.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        dataSource->setIcon(icon31);
+        dataSource->setMenuRole(QAction::MenuRole::NoRole);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         QSizePolicy sizePolicy1(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
@@ -461,7 +468,7 @@ public:
         scrollArea->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop);
         graphicProperty = new QWidget();
         graphicProperty->setObjectName("graphicProperty");
-        graphicProperty->setGeometry(QRect(0, 0, 234, 475));
+        graphicProperty->setGeometry(QRect(0, 0, 239, 482));
         QSizePolicy sizePolicy5(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Minimum);
         sizePolicy5.setHorizontalStretch(0);
         sizePolicy5.setVerticalStretch(0);
@@ -498,7 +505,7 @@ public:
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName("menuBar");
         menuBar->setEnabled(true);
-        menuBar->setGeometry(QRect(0, 0, 1038, 21));
+        menuBar->setGeometry(QRect(0, 0, 1038, 22));
         QSizePolicy sizePolicy6(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::MinimumExpanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -519,6 +526,8 @@ public:
         MainWindow->setMenuBar(menuBar);
 
         toolBar->addAction(doSave);
+        toolBar->addSeparator();
+        toolBar->addAction(dataSource);
         toolBar->addSeparator();
         toolBar->addAction(undo);
         toolBar->addAction(redo);
@@ -557,6 +566,8 @@ public:
         menuBar->addAction(helpMenu->menuAction());
         fileMenu->addAction(doCreate);
         fileMenu->addAction(doOpen);
+        fileMenu->addSeparator();
+        fileMenu->addAction(dataSource);
         fileMenu->addSeparator();
         fileMenu->addAction(doSave);
         fileMenu->addAction(doExport);
@@ -816,6 +827,10 @@ public:
         doDelete->setText(QCoreApplication::translate("MainWindow", "\345\210\240\351\231\244", nullptr));
 #if QT_CONFIG(tooltip)
         doDelete->setToolTip(QCoreApplication::translate("MainWindow", "\345\210\240\351\231\244\351\200\211\344\270\255\347\232\204\345\233\276\345\205\203", nullptr));
+#endif // QT_CONFIG(tooltip)
+        dataSource->setText(QCoreApplication::translate("MainWindow", "\346\225\260\346\215\256\346\272\220", nullptr));
+#if QT_CONFIG(tooltip)
+        dataSource->setToolTip(QCoreApplication::translate("MainWindow", "\346\225\260\346\215\256\346\272\220", nullptr));
 #endif // QT_CONFIG(tooltip)
         propertyWidget->setTabText(propertyWidget->indexOf(property), QCoreApplication::translate("MainWindow", "Tab 1", nullptr));
         toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));

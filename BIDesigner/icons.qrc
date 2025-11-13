@@ -38,6 +38,7 @@
         <file>icons/edit-box.svg</file>
         <file>icons/manage.svg</file>
         <file>icons/library-add.svg</file>
+        <file>icons/datasource.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>animation/path/icons/curvedLine.svg</file>

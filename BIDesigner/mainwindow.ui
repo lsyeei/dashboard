@@ -259,8 +259,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>234</width>
-              <height>475</height>
+              <width>239</width>
+              <height>482</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -338,6 +338,8 @@
    </attribute>
    <addaction name="doSave"/>
    <addaction name="separator"/>
+   <addaction name="dataSource"/>
+   <addaction name="separator"/>
    <addaction name="undo"/>
    <addaction name="redo"/>
    <addaction name="separator"/>
@@ -379,7 +381,7 @@
      <x>0</x>
      <y>0</y>
      <width>1038</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -400,6 +402,8 @@
     </property>
     <addaction name="doCreate"/>
     <addaction name="doOpen"/>
+    <addaction name="separator"/>
+    <addaction name="dataSource"/>
     <addaction name="separator"/>
     <addaction name="doSave"/>
     <addaction name="doExport"/>
@@ -1125,6 +1129,21 @@
    </property>
    <property name="toolTip">
     <string>删除选中的图元</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="dataSource">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/icons/datasource.svg</normaloff>:/icons/icons/datasource.svg</iconset>
+   </property>
+   <property name="text">
+    <string>数据源</string>
+   </property>
+   <property name="toolTip">
+    <string>数据源</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

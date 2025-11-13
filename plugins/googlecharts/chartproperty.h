@@ -24,7 +24,7 @@ class ChartProperty: public ZoneProperty
     Q_GADGET
     SERIALIZE(ChartProperty)
 public:
-    ChartProperty(){}
+    ChartProperty():ZoneProperty(){}
 private:
     QString chartType;
     QString dataTable;

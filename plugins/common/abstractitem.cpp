@@ -258,10 +258,11 @@ void AbstractItem::parseXML(const QString &xml)
 {
     QXmlStreamReader obj(xml);
     obj.readNextStartElement();
-    auto id = classId();
-    if (!id.isEmpty() && id.compare(obj.name()) != 0){
-        return;
-    }
+    // 该条件不适合使用模板类实现的图元，如 GoogleChart
+    // auto id = classId();
+    // if (!id.isEmpty() && id.compare(obj.name()) != 0){
+    //     return;
+    // }
     while (!obj.atEnd()) {
         auto type = obj.readNext();
         if (type == QXmlStreamReader::StartElement && obj.name().compare("index") == 0) {
@@ -276,6 +277,9 @@ void AbstractItem::parseXML(const QString &xml)
             for(int i=0; i<count; i++){
                 auto attr = newProperty();
                 stream >> *attr;
+                if(attributes[i]) {
+                    delete attributes[i];
+                }
                 attributes[i] = attr;
             }
             QTransform trans;

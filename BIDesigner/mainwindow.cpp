@@ -219,6 +219,8 @@ void MainWindow::parsePageXml(const QString &xml)
 void MainWindow::paletteCanged()
 {
     // 修改图标
+    ui->dataSource->setIcon(QIcon{SvgHelper{QString{":/icons/icons/datasource.svg"}}
+                                      .toPixmap(ui->dataSource->isEnabled()?SvgHelper::Normal:SvgHelper::Disabled)});
     ui->group->setIcon(QIcon{SvgHelper{QString{":/icons/icons/group.svg"}}
                     .toPixmap(ui->group->isEnabled()?SvgHelper::Normal:SvgHelper::Disabled)});
     ui->ungroup->setIcon(QIcon{SvgHelper{QString{":/icons/icons/ungroup.svg"}}
