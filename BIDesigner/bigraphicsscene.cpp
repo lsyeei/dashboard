@@ -182,30 +182,6 @@ void BIGraphicsScene::addItems(QList<QGraphicsItem *> items)
     }
 }
 
-GraphicsItemGroup *BIGraphicsScene::newGroup(const QList<QGraphicsItem *> &items)
-{
-    if (items.isEmpty() || items.count() < 2) {
-        return nullptr;
-    }
-    GraphicsItemGroup *group = new GraphicsItemGroup();
-    addItem(group);
-    auto list = sortItems(items, Qt::AscendingOrder);
-    blockSignals(true);
-    clearSelection();
-    blockSignals(false);
-    for (int i = 0; i < list.count(); ++i) {
-        auto item = list[i];
-        item->setFlag(QGraphicsItem::ItemIsFocusable, false);
-        group->addToGroup(item);
-    }
-    setItemName(group, tr("组合图"));
-    setItemId(group, idGenerator->nextIdString());
-    group->update();
-    group->setSelected(true);
-    group->setFocus(Qt::MouseFocusReason);
-    return group;
-}
-
 void BIGraphicsScene::ungroup(QGraphicsItemGroup *group)
 {
     blockSignals(true);
@@ -219,8 +195,13 @@ void BIGraphicsScene::ungroup(QGraphicsItemGroup *group)
     removeItem(group);
 }
 
-void BIGraphicsScene::regroup(QGraphicsItemGroup *group, const QList<QGraphicsItem *> &items)
+void BIGraphicsScene::group(QGraphicsItemGroup *group, const QList<QGraphicsItem *> &items)
 {
+    auto groupId = getItemId(group);
+    if (groupId.isEmpty()) {
+        // 对于新建组，需要分配ID
+        setItemId(group, idGenerator->nextIdString());
+    }
     addItem(group);
     blockSignals(true);
     clearSelection();
@@ -232,7 +213,6 @@ void BIGraphicsScene::regroup(QGraphicsItemGroup *group, const QList<QGraphicsIt
     }
     group->update();
     group->setSelected(true);
-    group->setFocus(Qt::MouseFocusReason);
     group->setFocus(Qt::MouseFocusReason);
 }
 
@@ -894,25 +874,17 @@ void BIGraphicsScene::doCommand(QVariant undoData)
     } else if (data.first.compare("delItems") == 0){
         // 删除图元
         deleteItems(data.second.value<list>());
-    } else if (data.first.compare("newGroup") == 0){
-        // 创建组
-        newGroup(data.second.value<list>());
     } else if (data.first.compare("ungroup") == 0){
         // 解散组
         auto item = data.second.value<list>().first();
-        QGraphicsItemGroup *obj;
-        if (typeid(GraphicsItemGroup) == typeid(*item)) {
-            obj = dynamic_cast<QGraphicsItemGroup *>(item);
-        }else{
-            obj = dynamic_cast<QGraphicsItemGroup *>(item->parentItem());
-        }
+        auto obj = dynamic_cast<QGraphicsItemGroup *>(item);
         if (obj){
             ungroup(obj);
         }
-    } else if (data.first.compare("regroup") == 0){
-        // 重组
-        auto groupInfo = data.second.value<QPair<QGraphicsItem *, QList<QGraphicsItem *>>>();
-        regroup(dynamic_cast<QGraphicsItemGroup*>(groupInfo.first), groupInfo.second);
+    } else if (data.first.compare("group") == 0){
+        // 组合
+        auto items = data.second.value<list>();
+        group(dynamic_cast<QGraphicsItemGroup*>(items[0]), items.sliced(1));
     }else if (data.first.compare("setPos") == 0){
         auto itemsPos = data.second.value<QHash<QGraphicsItem *, QPointF>>();
         for(auto item = itemsPos.begin(); item != itemsPos.end(); ++item){

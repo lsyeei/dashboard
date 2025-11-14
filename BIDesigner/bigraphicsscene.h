@@ -71,22 +71,16 @@ public:
      */
     void addItems(QList<QGraphicsItem *> items);
     /**
-     * @brief 创建组合
-     * @param items 要组合的图元
-     * @return 组合后的图元
-     */
-    GraphicsItemGroup *newGroup(const QList<QGraphicsItem *> &items);
-    /**
      * @brief 取消组合
      * @param group 要取消的图元
      */
     void ungroup(QGraphicsItemGroup *group);
     /**
-     * @brief regroup 取消后重组
+     * @brief group 组合
      * @param group 原组对象
      * @param items 组成员列表
      */
-    void regroup(QGraphicsItemGroup *group, const QList<QGraphicsItem *> &items);
+    void group(QGraphicsItemGroup *group, const QList<QGraphicsItem *> &items);
     /**
      * @brief flipItem 翻转当前选中对象
      * @param orientation 方向

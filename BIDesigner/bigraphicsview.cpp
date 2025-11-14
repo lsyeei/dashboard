@@ -107,13 +107,13 @@ void BIGraphicsView::createGroup()
     if (groupItems.isEmpty() || groupItems.count() < 2) {
         return;
     }
-    // biScene->newGroup(groupItems);
+    GraphicsItemGroup *group = new GraphicsItemGroup();
+    biScene->setItemName(group, tr("组合图"));
+    connect(group, SIGNAL(undoEvent(QString,QVariant,QVariant)), this, SLOT(undoEventProcessor(QString,QVariant,QVariant)));
+    QList<QGraphicsItem*> groupInfo;
+    groupInfo << group << groupItems;
     // 创建可撤销命令
-    genUndoCommand(GROUP, groupItems);
-    auto group = dynamic_cast<GraphicsItemGroup *>(groupItems.first()->parentItem());
-    if (group) {
-        connect(group, SIGNAL(undoEvent(QString,QVariant,QVariant)), this, SLOT(undoEventProcessor(QString,QVariant,QVariant)));
-    }
+    genUndoCommand(GROUP, groupInfo);
 }
 
 void BIGraphicsView::destroyGroup()
@@ -127,10 +127,18 @@ void BIGraphicsView::destroyGroup()
         return;
     }
     auto item = groupItems.first();
-    if (typeid(*item) == typeid(GraphicsItemGroup)) {
-        // biScene->ungroup(dynamic_cast<GraphicsItemGroup *>(item));
+    if (typeid(*item) == typeid(GraphicsItemGroup)) {        
+        auto childs = item->childItems();
+        foreach (auto child, childs) {
+            //
+            if (typeid(*child) == typeid(RectSelector)) {
+                childs.removeOne(child);
+            }
+        }
+        QList<QGraphicsItem*> groupInfo;
+        groupInfo << item << childs;
         // 创建可撤销命令
-        genUndoCommand(UNGROUP,{item});
+        genUndoCommand(UNGROUP, groupInfo);
     }
 }
 
@@ -994,7 +1002,6 @@ void BIGraphicsView::genUndoCommand(UndoAction action, QList<QGraphicsItem *> it
         undoData.setValue(undoOps);
         // 监听item属性改变事件
         foreach (auto item, items) {
-            // QObject *obj = dynamic_cast<QObject *>(item);
             AbstractItem *obj = dynamic_cast<AbstractItem *>(item);
             if (obj) {
                 auto rtn = connect(obj, SIGNAL(undoEvent(QString,QVariant,QVariant)),
@@ -1010,7 +1017,7 @@ void BIGraphicsView::genUndoCommand(UndoAction action, QList<QGraphicsItem *> it
         undoData.setValue(undoOps);
     } else if (action == GROUP){
         tips = "group items";
-        QPair<QString, QVariant> redoOps{"newGroup", data};
+        QPair<QString, QVariant> redoOps{"group", data};
         redoData.setValue(redoOps);
         QPair<QString, QVariant> undoOps{"ungroup", data};
         undoData.setValue(undoOps);
@@ -1018,15 +1025,7 @@ void BIGraphicsView::genUndoCommand(UndoAction action, QList<QGraphicsItem *> it
         tips = "ungroup items";
         QPair<QString, QVariant> redoOps{"ungroup", data};
         redoData.setValue(redoOps);
-        auto childs = items[0]->childItems();
-        foreach (auto child, childs) {
-            //
-            if (typeid(*child) == typeid(RectSelector)) {
-                childs.removeOne(child);
-            }
-        }
-        QPair<QGraphicsItem *, QList<QGraphicsItem *>> groupInfo{items[0], childs};
-        QPair<QString, QVariant> undoOps{"regroup", QVariant::fromValue(groupInfo)};
+        QPair<QString, QVariant> undoOps{"group", data};
         undoData.setValue(undoOps);
     }
     BIUndoCommand *command = new BIUndoCommand(dynamic_cast<UndoObject *>(scene()), undoData, redoData, tips);
