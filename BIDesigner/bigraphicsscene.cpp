@@ -200,6 +200,7 @@ GraphicsItemGroup *BIGraphicsScene::newGroup(const QList<QGraphicsItem *> &items
     }
     setItemName(group, tr("组合图"));
     setItemId(group, idGenerator->nextIdString());
+    group->update();
     group->setSelected(true);
     group->setFocus(Qt::MouseFocusReason);
     return group;
@@ -207,14 +208,32 @@ GraphicsItemGroup *BIGraphicsScene::newGroup(const QList<QGraphicsItem *> &items
 
 void BIGraphicsScene::ungroup(QGraphicsItemGroup *group)
 {
-    group->setSelected(false);
+    blockSignals(true);
     foreach (QGraphicsItem *item, group->childItems()){
         group->removeFromGroup(item);
         item->setFlag(QGraphicsItem::ItemIsFocusable, true);
         item->setSelected(true);
-    }
+    }    
+    blockSignals(false);
+    group->setSelected(false);
     removeItem(group);
-    delete group;
+}
+
+void BIGraphicsScene::regroup(QGraphicsItemGroup *group, const QList<QGraphicsItem *> &items)
+{
+    addItem(group);
+    blockSignals(true);
+    clearSelection();
+    blockSignals(false);
+    for (int i = 0; i < items.count(); ++i) {
+        auto item = items[i];
+        item->setFlag(QGraphicsItem::ItemIsFocusable, false);
+        group->addToGroup(item);
+    }
+    group->update();
+    group->setSelected(true);
+    group->setFocus(Qt::MouseFocusReason);
+    group->setFocus(Qt::MouseFocusReason);
 }
 
 void BIGraphicsScene::flipItem(Qt::Orientation orientation)
@@ -890,7 +909,11 @@ void BIGraphicsScene::doCommand(QVariant undoData)
         if (obj){
             ungroup(obj);
         }
-    } else if (data.first.compare("setPos") == 0){
+    } else if (data.first.compare("regroup") == 0){
+        // 重组
+        auto groupInfo = data.second.value<QPair<QGraphicsItem *, QList<QGraphicsItem *>>>();
+        regroup(dynamic_cast<QGraphicsItemGroup*>(groupInfo.first), groupInfo.second);
+    }else if (data.first.compare("setPos") == 0){
         auto itemsPos = data.second.value<QHash<QGraphicsItem *, QPointF>>();
         for(auto item = itemsPos.begin(); item != itemsPos.end(); ++item){
             item.key()->setPos(item.value());

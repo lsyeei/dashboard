@@ -62,7 +62,10 @@ QRectF AbstractLineItem::boundingRect() const
 
 QPainterPath AbstractLineItem::shape() const
 {
-    return shapePath();
+    // return shapePath();
+    // 把线宽考虑进去，只要鼠标点击到先宽上就可以选中
+    QPainterPathStroker stroker{attribute()->getPen().getPen()};
+    return stroker.createStroke(shapePath());
 }
 
 void AbstractLineItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -85,7 +88,7 @@ void AbstractLineItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 
     painter->setPen(pen);
-    QBrush brush(pen.color(), Qt::SolidPattern);
+    QBrush brush(Qt::red/*pen.color()*/, Qt::SolidPattern);
     painter->setBrush(brush);
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setRenderHint(QPainter::TextAntialiasing);
@@ -105,7 +108,6 @@ void AbstractLineItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     auto path = linePath(points);
     painter->setBrushOrigin(path.boundingRect().topLeft());
     painter->strokePath(path, pen);
-
     // pen.setColor(Qt::red);
     // painter->setPen(pen);
     // brush.setStyle(Qt::NoBrush);

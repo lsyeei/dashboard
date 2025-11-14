@@ -553,8 +553,10 @@ void BIGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (isDrag){
         // 拖动图元结束，生成撤销命令
+        auto itemPos = dragItemPos;
+        itemPos.detach();
         BIUndoCommand *command = new BIUndoCommand(dynamic_cast<UndoObject *>(scene()),
-           QVariant::fromValue(QPair<QString, QVariant>{"setPos", QVariant::fromValue(dragItemPos)}),
+           QVariant::fromValue(QPair<QString, QVariant>{"setPos", QVariant::fromValue(itemPos)}),
            QVariant::fromValue(QPair<QString, QVariant>{"setPos", QVariant::fromValue(getItemsPos(scene()->selectedItems()))}),
            "pos changed");
         undoStack.push(command);
@@ -580,6 +582,7 @@ void BIGraphicsView::mouseReleaseEvent(QMouseEvent *event)
             emit rubberBandChanged(rubberBandRect, QPointF(), QPointF());
         }
     }
+    dragItemPos.clear();
     QGraphicsView::mouseReleaseEvent(event);
 }
 
@@ -603,8 +606,7 @@ void BIGraphicsView::mouseMoveEvent(QMouseEvent *event)
         event->accept();
     }
     if (!isDrag && !dragItemPos.isEmpty() && event->buttons().testFlag(Qt::LeftButton)){
-        // 测试是否拖动
-        auto item = dragItemPos.begin();
+        auto item = dragItemPos.constBegin();
         if (item.key() && item.key()->pos() != item.value()) {
             isDrag = true;
         }
@@ -1023,7 +1025,8 @@ void BIGraphicsView::genUndoCommand(UndoAction action, QList<QGraphicsItem *> it
                 childs.removeOne(child);
             }
         }
-        QPair<QString, QVariant> undoOps{"newGroup", QVariant::fromValue(childs)};
+        QPair<QGraphicsItem *, QList<QGraphicsItem *>> groupInfo{items[0], childs};
+        QPair<QString, QVariant> undoOps{"regroup", QVariant::fromValue(groupInfo)};
         undoData.setValue(undoOps);
     }
     BIUndoCommand *command = new BIUndoCommand(dynamic_cast<UndoObject *>(scene()), undoData, redoData, tips);

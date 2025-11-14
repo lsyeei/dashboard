@@ -351,9 +351,10 @@ void LineSelector::setCurrentPoint(const QString &id)
 QPainterPath LineSelector::getParentPath() const
 {
     auto parent = dynamic_cast<ILinePath*>(parentItem());
-    if (!previewMode){
-        return mapToView(parentItem()->shape());
-    }
+    // 不使用以下代码，shape()方法可能包含了线宽，selector 不需要线宽
+    // if (!previewMode){
+    //     return mapToView(parentItem()->shape());
+    // }
     QList<QPointF> points;
     int j=-1,k=-1;
     QString insertId{""};

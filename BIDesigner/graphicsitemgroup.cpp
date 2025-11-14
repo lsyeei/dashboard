@@ -116,6 +116,14 @@ QVariant GraphicsItemGroup::itemChange(GraphicsItemChange change, const QVariant
             setFlag(GraphicsItemFlag::ItemClipsChildrenToShape);
         }
     }
+    if (change == QGraphicsItem::ItemSceneHasChanged && !value.isNull()){
+        // 加入 scene
+        auto attr = attribute();
+        if (attr->getWidth() > 0 || attr->getHeight() > 0) {
+            // 重新组合时，宽高及位置无需重新计算
+            isParsing = true;
+        }
+    }
     return AbstractZoneItem::itemChange(change, value);
 }
 

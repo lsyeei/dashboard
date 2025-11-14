@@ -82,6 +82,12 @@ public:
      */
     void ungroup(QGraphicsItemGroup *group);
     /**
+     * @brief regroup 取消后重组
+     * @param group 原组对象
+     * @param items 组成员列表
+     */
+    void regroup(QGraphicsItemGroup *group, const QList<QGraphicsItem *> &items);
+    /**
      * @brief flipItem 翻转当前选中对象
      * @param orientation 方向
      */
