@@ -205,12 +205,12 @@ void BIGraphicsScene::group(QGraphicsItemGroup *group, const QList<QGraphicsItem
     addItem(group);
     blockSignals(true);
     clearSelection();
-    blockSignals(false);
     for (int i = 0; i < items.count(); ++i) {
         auto item = items[i];
         item->setFlag(QGraphicsItem::ItemIsFocusable, false);
         group->addToGroup(item);
     }
+    blockSignals(false);
     group->update();
     group->setSelected(true);
     group->setFocus(Qt::MouseFocusReason);

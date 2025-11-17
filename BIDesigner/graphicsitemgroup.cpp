@@ -173,6 +173,7 @@ void GraphicsItemGroup::setMergeType(MergeType newMergeType)
 void GraphicsItemGroup::adjustChildItemPos(QPointF offset)
 {
     auto childs = childItems();
+    auto sc = dynamic_cast<BIGraphicsScene*>(scene());
     foreach (auto item, childs) {
         if (item == selector) {
             continue;

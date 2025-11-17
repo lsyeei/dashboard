@@ -237,12 +237,12 @@ void FillPropertyForm::on_fillChecked_toggled(bool checked)
     isFill = checked;
     isGradient = false;
     isImage = false;
+    showHide();
     if (!checked){
         style = Qt::NoBrush;
     }else{
         style = Qt::BrushStyle(ui->brushStyle1->currentData().toInt());
     }
-    showHide();
     emit valueChanged();
 }
 
@@ -376,6 +376,7 @@ void FillPropertyForm::init()
 
 void FillPropertyForm::initBrushStyle1()
 {
+    QSignalBlocker blocker(ui->brushStyle1);
     QComboBox *style1 = ui->brushStyle1;
     auto size = style1->size();
     qint16 width = size.width() - size.height();
@@ -406,11 +407,10 @@ void FillPropertyForm::initBrushStyle1()
     }
     style1->setIconSize({width, height});
 
-    if (index > -1){
-        style1->setCurrentIndex(index);
-    }else{
-        style1->setCurrentIndex(0);
+    if (index < 0){
+        index = 0;
     }
+    style1->setCurrentIndex(index);
 }
 
 void FillPropertyForm::brushStyleResize()
