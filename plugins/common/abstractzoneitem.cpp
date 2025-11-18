@@ -311,8 +311,9 @@ void AbstractZoneItem::updateSelector()
 void AbstractZoneItem::updateGraphic()
 {
     auto attr = attribute();
-    setRotation(attr->getRotate());
     setPos(attr->getPos());
+    logicRect = attr->getLogicRect();
+    setRotation(attr->getRotate());
     update();
 }
 
@@ -376,7 +377,7 @@ void AbstractZoneItem::parseXML(const QString &xml)
     syncLogicRect();
 }
 
-QVariant AbstractZoneItem::itemChange(GraphicsItemChange change, const QVariant &value)
+QVariant AbstractZoneItem:: itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if (change == ItemPositionHasChanged) {
         attribute()->setPos(pos());

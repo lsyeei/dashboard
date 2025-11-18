@@ -145,7 +145,6 @@ void GraphicsItemGroup::adjustChildItemSize(QRectF rectOffset)
             continue;
         }
         adjustSubItemSize(item);
-
     }
 }
 
@@ -303,7 +302,10 @@ void GraphicsItemGroup::adjustSubItemSize(QGraphicsItem * const item)
                               newTopLeft.y() - itemRect.top(),
                               newBottomRight.x() - itemRect.right(),
                               newBottomRight.y() - itemRect.bottom());
-            obj->sizeChanged(itemOffset);
+            obj->setSize({width,height});
+            obj->setPos(item->mapToParent(QPointF{newTopLeft.x() + width/2,
+                                                  newTopLeft.y() + height/2}));
+            obj->adjustChildItemSize({1,1,1,1});
         }
     }else{
         auto obj = dynamic_cast<ICustomGraphic*>(item);
@@ -318,7 +320,6 @@ void GraphicsItemGroup::adjustSubItemSize(QGraphicsItem * const item)
 
 void GraphicsItemGroup::customUndoAction(QString action, QVariant data, bool isUndo)
 {
-    Q_UNUSED(isUndo)
     if (action.compare("changeMergeType") == 0) {
         auto type = data.value<MergeType>();
         mergeType = type;
@@ -385,7 +386,16 @@ void GraphicsItemGroup::customUndoAction(QString action, QVariant data, bool isU
             attr->setBrush(brush);
             setSelected(true);
         }
+    } else  if (action.compare("size") == 0) {
+        copyProperty(data, attributes[attrIndex]);
+        // 设定尺寸变化
+        QRectF offsetValue{1,1,1,1};
+        logicRect = attribute()->getLogicRect();
+        // 调整子图元尺寸
+        adjustChildItemSize(offsetValue);
+        return;
     }
+    AbstractZoneItem::customUndoAction(action, data, isUndo);
 }
 
 
