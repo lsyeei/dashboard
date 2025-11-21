@@ -513,7 +513,7 @@ void MainWindow::setScene()
 
 void MainWindow::onSceneSelectionChanged()
 {
-    auto f = QtConcurrent::run([&]{
+    // auto f = QtConcurrent::run([&]{
         // 选中的图元
         auto selectedItems = scene->selectedItems();
         if (!selectedItems.isEmpty()){
@@ -532,7 +532,7 @@ void MainWindow::onSceneSelectionChanged()
             // 没有选中的图元
             emit(noSelectEvent());
         }
-    });
+    // });
 }
 
 void MainWindow::oneGraphSelected(QGraphicsItem *item)

@@ -43,6 +43,7 @@ public:
     static int itemIdIndex;
     static int itemNameIndex;
     static int itemHideFlag;
+    static int itemGroupFlag;
     /**
      * @brief 解析XML转换为 QGraphicsItem
      * @param xmlText XML文本

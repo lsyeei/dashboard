@@ -40,6 +40,7 @@
 int BIGraphicsScene::itemIdIndex = 0;
 int BIGraphicsScene::itemNameIndex = 1;
 int BIGraphicsScene::itemHideFlag = 2;
+int BIGraphicsScene::itemGroupFlag = 3;
 
 BIGraphicsScene::BIGraphicsScene(QObject *parent)
     : IGraphicsScene{parent}/*, UndoObject{}*/
@@ -187,6 +188,7 @@ void BIGraphicsScene::ungroup(QGraphicsItemGroup *group)
     blockSignals(true);
     foreach (QGraphicsItem *item, group->childItems()){
         group->removeFromGroup(item);
+        item->setData(itemGroupFlag, QVariant());
         item->setFlag(QGraphicsItem::ItemIsFocusable, true);
         item->setSelected(true);
     }    
@@ -208,6 +210,7 @@ void BIGraphicsScene::group(QGraphicsItemGroup *group, const QList<QGraphicsItem
     for (int i = 0; i < items.count(); ++i) {
         auto item = items[i];
         item->setFlag(QGraphicsItem::ItemIsFocusable, false);
+        item->setData(itemGroupFlag, groupId);
         group->addToGroup(item);
     }
     blockSignals(false);

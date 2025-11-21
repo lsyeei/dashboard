@@ -20,7 +20,7 @@
 #include "filetemplate.h"
 #include "graphicsitemgroup.h"
 #include "zoneproperty.h"
-
+#include "rectselector.h"
 #include <QBuffer>
 #include <QXmlStreamWriter>
 #include <XmlHelper.h>
@@ -40,6 +40,7 @@ GraphicsItemGroup::GraphicsItemGroup(QGraphicsItem *parent)
     PenProperty pen;
     pen.setStyle(Qt::NoPen);
     attr->setPen(pen);
+    connect(this, SIGNAL(itemAddEvent(QGraphicsItem*)), this, SLOT(onItemAdd(QGraphicsItem*)), Qt::QueuedConnection);
 }
 
 GraphicsItemGroup::GraphicsItemGroup(const QString &xml, QGraphicsItem *parent)
@@ -77,46 +78,20 @@ QPainterPath GraphicsItemGroup::shapePath() const
 QVariant GraphicsItemGroup::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if (change == QGraphicsItem::ItemChildAddedChange && scene()){
-        auto item = value.value<QGraphicsItem*>();
-        if (item && !isSelected() && !isParsing) {
-            auto itemBound = item->mapToScene(item->boundingRect()/*shape()*/).boundingRect();
-            if (rect.isEmpty()) {
-                rect = itemBound;
-            }else{
-                rect = rect.united(itemBound);
-            }
-            auto attr = attribute();
-            attr->setWidth(rect.width());
-            attr->setHeight(rect.height());
-            attr->setPos(rect.center());
-            logicRect = attr->getLogicRect();
-            updateForm();
+        if (!isParsing){
+            // 延迟到下一个消息循环再处理
+            emit itemAddEvent(value.value<QGraphicsItem*>());
         }
-    }
-    if (change == QGraphicsItem::ItemChildRemovedChange) {
-        auto item = value.value<QGraphicsItem*>();
-        if (item == nullptr || item == selector){
-            return AbstractZoneItem::itemChange(change, value);
-        }
-        item->show();
-        item->setRotation(item->rotation() + rotation());
-    }
-    if (change == QGraphicsItem::ItemSelectedHasChanged) {
-        // 首次选中，切换子图元坐标到grop坐标
-        if (firstSelected) {
-            setPos(rect.center());
-            adjustChildItemPos(rect.center());
-            firstSelected = false;
-            // 计算并保存初始比例，用于后续缩放
-            calcChildItemRatio();
-        }
+    } else if (change == QGraphicsItem::ItemChildRemovedChange) {
+        // 立即处理，否则图元关联的很多信息会消失
+        onItemRemove(value.value<QGraphicsItem*>());
+    } else if (change == QGraphicsItem::ItemSelectedHasChanged) {
         if (value.toBool()) {
             setFlag(GraphicsItemFlag::ItemClipsChildrenToShape, false);
         }else{
             setFlag(GraphicsItemFlag::ItemClipsChildrenToShape);
         }
-    }
-    if (change == QGraphicsItem::ItemSceneHasChanged && !value.isNull()){
+    } else if (change == QGraphicsItem::ItemSceneHasChanged && !value.isNull()){
         // 加入 scene
         auto attr = attribute();
         if (attr->getWidth() > 0 || attr->getHeight() > 0) {
@@ -124,7 +99,35 @@ QVariant GraphicsItemGroup::itemChange(GraphicsItemChange change, const QVariant
             isParsing = true;
         }
     }
+    // return result;
     return AbstractZoneItem::itemChange(change, value);
+}
+
+void GraphicsItemGroup::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    auto mousePos = event->pos();
+    QGraphicsItem *underMouseItem{nullptr};
+    // 打散组合，并记录
+    QList<QGraphicsItem*> childs;
+    auto items = childItems();
+    foreach (auto item, items) {
+        if (item == selector) {
+            continue;
+        }
+        // 获取鼠标下的图元
+        auto shape = item->shape();
+        auto pos = item->pos();
+        QTransform trans;
+        trans.translate(pos.x(),pos.y());
+        shape = trans.map(shape);
+        if(underMouseItem == nullptr && shape.contains(mousePos)){
+            underMouseItem = item;
+        }
+        // 记录
+        childs << item;
+    }//return;
+    QPair<QGraphicsItem*, QList<QGraphicsItem*>> redoData{underMouseItem, childs};
+    undoTrigger("edit group", {"editGroup", QVariant::fromValue(childs), QVariant::fromValue(redoData)});
 }
 
 void GraphicsItemGroup::sizeChanged(QRectF offsetValue)
@@ -156,6 +159,28 @@ void GraphicsItemGroup::adjustEnd(AbstractSelector::AdjustType type)
     AbstractZoneItem::adjustEnd(type);
 }
 
+void GraphicsItemGroup::childSelectionChanged()
+{
+    if(!editFlag){
+        // 只有编辑状态才监控子图元选中状态
+        return;
+    }
+    bool noSelected{true};
+    foreach (auto item, editingChilds) {
+        if (item->isSelected()) {
+            noSelected = false;
+            break;
+        }
+    }
+    if (noSelected) {
+        // 结束编辑
+        auto childs = editingChilds;
+        childs.detach();
+        auto undoParam = QPair<QGraphicsItem*, QList<QGraphicsItem*>>{nullptr, childs};
+        undoTrigger("group edit finished", {"editFinished",QVariant::fromValue(undoParam),QVariant::fromValue(childs)});
+    }
+}
+
 GraphicsItemGroup::MergeType GraphicsItemGroup::getMergeType() const
 {
     return mergeType;
@@ -172,7 +197,6 @@ void GraphicsItemGroup::setMergeType(MergeType newMergeType)
 void GraphicsItemGroup::adjustChildItemPos(QPointF offset)
 {
     auto childs = childItems();
-    auto sc = dynamic_cast<BIGraphicsScene*>(scene());
     foreach (auto item, childs) {
         if (item == selector) {
             continue;
@@ -317,75 +341,193 @@ void GraphicsItemGroup::adjustSubItemSize(QGraphicsItem * const item)
     }
 }
 
+void GraphicsItemGroup::doMerge(MergeType type)
+{
+    mergeType = type;
+
+    auto childs = childItems();
+    auto attr = attribute();
+    attr->setAspectRatio(true);
+    PenProperty pen;
+    BrushProperty brush;
+    if (type == None){
+        pen.setStyle(Qt::NoPen);
+        attr->setPen(pen);
+        brush.setStyle(Qt::NoBrush);
+        attr->setBrush(brush);
+
+        foreach (auto item, childs) {
+            if (dynamic_cast<QObject*>(item)->objectName() == "RectSelector") {
+                continue;
+            }
+            item->show();
+        }
+        return;
+    }else{
+        mergedPath.clear();
+        QPainterPath path,interShape;
+        foreach (auto item, childs) {
+            if (dynamic_cast<QObject*>(item)->objectName() == "RectSelector") {
+                continue;
+            }
+            item->hide();
+            auto shape = item->mapToParent(item->shape());
+            if (path.isEmpty()) {
+                path.addPath(shape);
+                interShape.addPath(shape);
+                continue;
+            }
+            switch (type) {
+            case Unit:
+                path = path.united(shape);
+                break;
+            case Intersect:
+                path = path.intersected(shape);
+                break;
+            case Subtract:
+                path = path.subtracted(shape);
+                break;
+            case Exclude:
+                path = path.united(shape);
+                interShape = interShape.intersected(shape);
+                break;
+            default:
+                break;
+            }
+        }
+        if (type == Exclude) {
+            path = path.subtracted(interShape);
+        }
+        path.closeSubpath();
+        mergedPath = path.simplified();
+        mergedRect = logicRect;
+        pen.setStyle(Qt::SolidLine);
+        attr->setPen(pen);
+        brush.setStyle(Qt::SolidPattern);
+        attr->setBrush(brush);
+        setSelected(true);
+    }
+}
+
+void GraphicsItemGroup::editEnabled(QGraphicsItem *item, const QList<QGraphicsItem*> &childs)
+{
+    setFlag(QGraphicsItem::ItemIsMovable,false);
+    setSelected(false);
+    editingChilds = childs;
+    editFlag = true;
+    editRect = boundingRect();
+    auto oldPos = pos();
+    // 打散组合
+    foreach (auto child, childs) {
+        removeFromGroup(child);
+    }
+    if (item) {
+        setSelected(false);
+        item->setSelected(true);
+    }
+    // 保持原位置，标记原位置
+    auto attr = attribute();
+    attr->setWidth(editRect.width());
+    attr->setHeight(editRect.height());
+    setPos(oldPos);
+
+    // 监控选中图元变化
+    connect(scene(), SIGNAL(selectionChanged()), this, SLOT(childSelectionChanged()));
+}
+
+void GraphicsItemGroup::editFinished(const QList<QGraphicsItem*> &childs)
+{
+    disconnect(this, SLOT(childSelectionChanged()));
+    editFlag = false;
+    // 恢复组的初始状态
+    auto attr = attribute();
+    attr->setWidth(0);
+    attr->setHeight(0);
+
+    prepareGeometryChange();
+    foreach (auto item, childs) {
+        if(item->scene() == nullptr){
+            // 已被删除
+            continue;
+        }
+        item->setSelected((false));
+        // 自动触发 group 大小改变
+        addToGroup(item);
+    }
+    editingChilds.clear();
+    setFlag(QGraphicsItem::ItemIsMovable);
+    // 触发
+    setSelected(true);
+}
+
+void GraphicsItemGroup::onItemAdd(QGraphicsItem *item)
+{
+    if (item == nullptr || item == selector){
+        return;
+    }
+    if(selector == nullptr && isSelected()){
+        // 此时添加的可能是选择框
+        return;
+    }
+
+    auto groupRect = mapToScene(boundingRect()).boundingRect();
+    auto itemBound = item->mapToScene(item->boundingRect()).boundingRect();
+    groupRect = groupRect.united(itemBound);
+    // 调整组的大小及位置
+    adjustGroup(groupRect);
+    updateSelector();
+    updateForm();
+}
+
+void GraphicsItemGroup::onItemRemove(QGraphicsItem *item)
+{
+    if (item == nullptr || item == selector){
+        return;
+    }
+    if (item->scene() == nullptr){
+        // 从 scene 中删除的图元，不处理
+        return;
+    }
+    item->show();
+    item->setRotation(item->rotation() + rotation());
+
+    QRectF groupRect{0,0,0,0};
+    auto childs = childItems();
+    foreach (auto child, childs) {
+        if (child == selector || child == item || typeid(*child) == typeid(RectSelector)) {
+            continue;
+        }
+        groupRect = groupRect.united(child->mapToScene(child->boundingRect()).boundingRect());
+    }
+    // 调整组的大小及位置
+    adjustGroup(groupRect);
+
+}
+
+void GraphicsItemGroup::adjustGroup(const QRectF &boundRect)
+{
+    prepareGeometryChange();
+    // 更新属性
+    auto attr = attribute();
+    attr->setWidth(boundRect.width());
+    attr->setHeight(boundRect.height());
+    attr->setPos(boundRect.center());
+    logicRect = attr->getLogicRect();
+
+    // 调整中心位置
+    auto offset = boundRect.center() - pos();
+    setPos(boundRect.center());
+    // 调整内部图元位置
+    adjustChildItemPos(offset);
+    // 计算并保存初始比例，用于后续缩放
+    calcChildItemRatio();
+}
 
 void GraphicsItemGroup::customUndoAction(QString action, QVariant data, bool isUndo)
 {
     if (action.compare("changeMergeType") == 0) {
         auto type = data.value<MergeType>();
-        mergeType = type;
-
-        auto childs = childItems();
-        auto attr = attribute();
-        attr->setAspectRatio(true);
-        PenProperty pen;
-        BrushProperty brush;
-        if (type == None){
-            pen.setStyle(Qt::NoPen);
-            attr->setPen(pen);
-            brush.setStyle(Qt::NoBrush);
-            attr->setBrush(brush);
-
-            foreach (auto item, childs) {
-                if (dynamic_cast<QObject*>(item)->objectName() == "RectSelector") {
-                    continue;
-                }
-                item->show();
-            }
-            return;
-        }else{
-            mergedPath.clear();
-            QPainterPath path,interShape;
-            foreach (auto item, childs) {
-                if (dynamic_cast<QObject*>(item)->objectName() == "RectSelector") {
-                    continue;
-                }
-                item->hide();
-                auto shape = item->mapToParent(item->shape());
-                if (path.isEmpty()) {
-                    path.addPath(shape);
-                    interShape.addPath(shape);
-                    continue;
-                }
-                switch (type) {
-                case Unit:
-                    path = path.united(shape);
-                    break;
-                case Intersect:
-                    path = path.intersected(shape);
-                    break;
-                case Subtract:
-                    path = path.subtracted(shape);
-                    break;
-                case Exclude:
-                    path = path.united(shape);
-                    interShape = interShape.intersected(shape);
-                    break;
-                default:
-                    break;
-                }
-            }
-            if (type == Exclude) {
-                path = path.subtracted(interShape);
-            }
-            path.closeSubpath();
-            mergedPath = path.simplified();
-            mergedRect = logicRect;
-            pen.setStyle(Qt::SolidLine);
-            attr->setPen(pen);
-            brush.setStyle(Qt::SolidPattern);
-            attr->setBrush(brush);
-            setSelected(true);
-        }
+        doMerge(type);
     } else  if (action.compare("size") == 0) {
         copyProperty(data, attributes[attrIndex]);
         // 设定尺寸变化
@@ -394,10 +536,23 @@ void GraphicsItemGroup::customUndoAction(QString action, QVariant data, bool isU
         // 调整子图元尺寸
         adjustChildItemSize(offsetValue);
         return;
+    } else if(action.compare("editGroup") == 0) {
+        if (isUndo) {
+            editFinished(data.value<QList<QGraphicsItem*>>());
+        }else{
+            auto params = data.value<QPair<QGraphicsItem*, QList<QGraphicsItem*>>>();
+            editEnabled(params.first, params.second);
+        }
+    } else if(action.compare("editFinished") == 0) {
+        if (isUndo) {
+            auto params = data.value<QPair<QGraphicsItem*, QList<QGraphicsItem*>>>();
+            editEnabled(params.first, params.second);
+        } else{
+            editFinished(data.value<QList<QGraphicsItem*>>());
+        }
     }
     AbstractZoneItem::customUndoAction(action, data, isUndo);
 }
-
 
 QString GraphicsItemGroup::toXml() const
 {
@@ -428,12 +583,31 @@ QString GraphicsItemGroup::toXml() const
     return data;
 }
 
+void GraphicsItemGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    AbstractZoneItem::paint(painter, option, widget);
+    if(editFlag){
+        // 设置编辑模式的样式
+        painter->save();
+        auto pen = painter->pen();
+        pen.setStyle(Qt::DashLine);
+        pen.setColor(Qt::red);
+        pen.setWidth(2);
+        painter->setPen(pen);
+        // auto brush = painter->brush();
+        // brush.setStyle(Qt::SolidPattern);
+        // brush.setColor(Qt::yellow);
+        // painter->setBrush(brush);
+        painter->setOpacity(0.2);
+        painter->drawRect(editRect);
+        painter->restore();
+    }
+}
 
 void GraphicsItemGroup::parseXML(const QString &xml)
 {
     isParsing = true;
     QTransform trans;
-    // auto biScene = dynamic_cast<BIGraphicsScene *>(scene());
     auto array = xml.toUtf8();
     QBuffer buf(&array);
     buf.open(QIODeviceBase::ReadOnly);
@@ -492,11 +666,8 @@ void GraphicsItemGroup::parseXML(const QString &xml)
                     item->hide();
                 }
             }
-            firstSelected = false;
             setPos(attr->getPos());
             logicRect = attr->getLogicRect();
-            rect = logicRect;
-            rect.moveCenter(attr->getPos());
             setRotation(attr->getRotate());
             setTransform(trans);
             calcChildItemRatio();
@@ -506,7 +677,6 @@ void GraphicsItemGroup::parseXML(const QString &xml)
     buf.close();
     isParsing = false;
 }
-
 
 void GraphicsItemGroup::attributeChanged(const BaseProperty &oldAttr, const BaseProperty &newAttr)
 {

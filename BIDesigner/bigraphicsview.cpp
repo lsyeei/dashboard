@@ -249,12 +249,16 @@ void BIGraphicsView::selectAll(bool flag)
 
 void BIGraphicsView::undo()
 {
-    undoStack.undo();
+    if (undoStack.canUndo()){
+        undoStack.undo();
+    }
 }
 
 void BIGraphicsView::redo()
 {
-    undoStack.redo();
+    if (undoStack.canRedo()){
+        undoStack.redo();
+    }
 }
 
 qreal BIGraphicsView::zoomByStep(qreal step)
