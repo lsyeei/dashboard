@@ -103,7 +103,6 @@ QVariant GraphicsItemGroup::itemChange(GraphicsItemChange change, const QVariant
             isParsing = true;
         }
     }
-    // return result;
     return AbstractZoneItem::itemChange(change, value);
 }
 
@@ -455,9 +454,7 @@ void GraphicsItemGroup::editEnabled(QGraphicsItem *item, const QList<QGraphicsIt
     // 监控选中图元变化
     if (subGroupList.isEmpty()) {
         // 不存在内部组合，直接监控 scene 选中变换
-        connect(scene(), &QGraphicsScene::selectionChanged,
-                this, &GraphicsItemGroup::sceneSelectionChanged, Qt::QueuedConnection);
-        emit editReadyEvent();
+        onSubGroupEditReady();
     }
     // 等待内部组合准备好后再监控
 }
@@ -573,14 +570,17 @@ void GraphicsItemGroup::receiveEditFinishEvent(const QList<QGraphicsItem*> &item
 
 void GraphicsItemGroup::onSubGroupEditReady()
 {
-    auto subGroup = dynamic_cast<GraphicsItemGroup*>(sender());
-    subGroupList.removeOne(subGroup);
     if (!subGroupList.isEmpty()) {
-        // 还有内部组未准备好
-        return;
+        auto subGroup = dynamic_cast<GraphicsItemGroup*>(sender());
+        subGroupList.removeOne(subGroup);
+        if (!subGroupList.isEmpty()) {
+            // 还有内部组未准备好
+            return;
+        }
     }
     connect(scene(), &QGraphicsScene::selectionChanged,
             this, &GraphicsItemGroup::sceneSelectionChanged, Qt::QueuedConnection);
+    emit editReadyEvent();
 }
 
 void GraphicsItemGroup::onSubgroupRegroupEnd()
