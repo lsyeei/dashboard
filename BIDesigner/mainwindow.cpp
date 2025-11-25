@@ -596,8 +596,9 @@ void MainWindow::noGraphSelected()
 void MainWindow::multiGraphSelected()
 {
     // 有多个图元被选中
-    ui->group->setEnabled(true);
-    ui->ungroup->setDisabled(true);
+    auto groupFlag = scene->canGroup();
+    ui->group->setEnabled(groupFlag);
+    ui->ungroup->setDisabled(groupFlag);
     enableAlignAction(true);
     enableDistributeAction(true);
     enableLayerAction(true);

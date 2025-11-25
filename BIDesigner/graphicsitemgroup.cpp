@@ -41,6 +41,10 @@ GraphicsItemGroup::GraphicsItemGroup(QGraphicsItem *parent)
     pen.setStyle(Qt::NoPen);
     attr->setPen(pen);
     connect(this, SIGNAL(itemAddEvent(QGraphicsItem*)), this, SLOT(onItemAdd(QGraphicsItem*)), Qt::QueuedConnection);
+    connect(this, &GraphicsItemGroup::editEnableEvent, this,
+            &GraphicsItemGroup::receiveEditEnableEvent, Qt::QueuedConnection);
+    connect(this, &GraphicsItemGroup::editFinishEvent, this,
+            &GraphicsItemGroup::receiveEditFinishEvent, Qt::QueuedConnection);
 }
 
 GraphicsItemGroup::GraphicsItemGroup(const QString &xml, QGraphicsItem *parent)
@@ -125,7 +129,7 @@ void GraphicsItemGroup::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
         }
         // 记录
         childs << item;
-    }//return;
+    }
     QPair<QGraphicsItem*, QList<QGraphicsItem*>> redoData{underMouseItem, childs};
     undoTrigger("edit group", {"editGroup", QVariant::fromValue(childs), QVariant::fromValue(redoData)});
 }
@@ -159,20 +163,22 @@ void GraphicsItemGroup::adjustEnd(AbstractSelector::AdjustType type)
     AbstractZoneItem::adjustEnd(type);
 }
 
-void GraphicsItemGroup::childSelectionChanged()
+void GraphicsItemGroup::sceneSelectionChanged()
 {
-    if(!editFlag){
-        // 只有编辑状态才监控子图元选中状态
+    if(!editFlag || endEditSignal){
+        // 只有编辑状态才监控子图元选中状态；如果已经收到信号，后续信号自动拒绝
         return;
     }
-    bool noSelected{true};
-    foreach (auto item, editingChilds) {
-        if (item->isSelected()) {
-            noSelected = false;
-            break;
+    if (auto s=dynamic_cast<BIGraphicsScene*>(scene())) {
+        if(s->findGroup(this)){
+            // 如果存在上级组则等待上级组通知结束编辑状态
+            return;
         }
     }
-    if (noSelected) {
+    if (!hasChildSelected()) {
+        endEditSignal = true;
+        disconnect(scene(), &QGraphicsScene::selectionChanged,
+                   this, &GraphicsItemGroup::sceneSelectionChanged);
         // 结束编辑
         auto childs = editingChilds;
         childs.detach();
@@ -412,18 +418,33 @@ void GraphicsItemGroup::doMerge(MergeType type)
 void GraphicsItemGroup::editEnabled(QGraphicsItem *item, const QList<QGraphicsItem*> &childs)
 {
     setFlag(QGraphicsItem::ItemIsMovable,false);
-    setSelected(false);
+    // setSelected(false);
     editingChilds = childs;
     editFlag = true;
     editRect = boundingRect();
     auto oldPos = pos();
+    QGraphicsItem *selectedItem{item};
     // 打散组合
     foreach (auto child, childs) {
         removeFromGroup(child);
+        // 如果存在内部组合，逐级打散
+        if (typeid(*child) == typeid(GraphicsItemGroup)) {
+            if(auto subGroup = dynamic_cast<GraphicsItemGroup*>(child)){
+                subGroup->notifyEditEnable();
+                if (child == selectedItem) {
+                    // 如果内部选中的图元是组合，交给组合去处理
+                    selectedItem = nullptr;
+                    setSelected(false);
+                }
+                subGroupList << subGroup;
+                connect(subGroup, &GraphicsItemGroup::editReadyEvent,
+                        this, &GraphicsItemGroup::onSubGroupEditReady, Qt::QueuedConnection);
+            }
+        }
     }
-    if (item) {
+    if (selectedItem) {
         setSelected(false);
-        item->setSelected(true);
+        selectedItem->setSelected(true);
     }
     // 保持原位置，标记原位置
     auto attr = attribute();
@@ -432,51 +453,67 @@ void GraphicsItemGroup::editEnabled(QGraphicsItem *item, const QList<QGraphicsIt
     setPos(oldPos);
 
     // 监控选中图元变化
-    connect(scene(), SIGNAL(selectionChanged()), this, SLOT(childSelectionChanged()));
+    if (subGroupList.isEmpty()) {
+        // 不存在内部组合，直接监控 scene 选中变换
+        connect(scene(), &QGraphicsScene::selectionChanged,
+                this, &GraphicsItemGroup::sceneSelectionChanged, Qt::QueuedConnection);
+        emit editReadyEvent();
+    }
+    // 等待内部组合准备好后再监控
 }
 
 void GraphicsItemGroup::editFinished(const QList<QGraphicsItem*> &childs)
 {
-    disconnect(this, SLOT(childSelectionChanged()));
-    editFlag = false;
-    // 恢复组的初始状态
-    auto attr = attribute();
-    attr->setWidth(0);
-    attr->setHeight(0);
-
-    prepareGeometryChange();
+    editingChilds = childs;
+    // 先将内部组合复原
     foreach (auto item, childs) {
-        if(item->scene() == nullptr){
-            // 已被删除
-            continue;
+        if (typeid(*item) == typeid(GraphicsItemGroup)){
+            auto subGroup = dynamic_cast<GraphicsItemGroup*>(item);
+            subGroup->notifyEditFinished();
+            subGroupList << subGroup;
+            connect(subGroup, &GraphicsItemGroup::regroupEndEvent,
+                    this, &GraphicsItemGroup::onSubgroupRegroupEnd);
         }
-        item->setSelected((false));
-        // 自动触发 group 大小改变
-        addToGroup(item);
     }
-    editingChilds.clear();
-    setFlag(QGraphicsItem::ItemIsMovable);
-    // 触发
-    setSelected(true);
+    if (subGroupList.isEmpty()) {
+        // 不存在下级组合
+        onSubgroupRegroupEnd();
+    }
+    // 内部存在组合，等待内部组合完成的消息
 }
 
 void GraphicsItemGroup::onItemAdd(QGraphicsItem *item)
 {
-    if (item == nullptr || item == selector){
+    if (item == nullptr || item == selector || typeid(*item) == typeid(RectSelector)){
         return;
     }
     if(selector == nullptr && isSelected()){
         // 此时添加的可能是选择框
         return;
     }
+    if (!editingChilds.isEmpty()) {
+        // 编辑图元归位后从记录中移除
+        editingChilds.removeOne(item);
+    }
 
     auto groupRect = mapToScene(boundingRect()).boundingRect();
     auto itemBound = item->mapToScene(item->boundingRect()).boundingRect();
     groupRect = groupRect.united(itemBound);
     // 调整组的大小及位置
+    prepareGeometryChange();
     adjustGroup(groupRect);
     updateSelector();
     updateForm();
+    // 编辑状态是否结束
+    if (editFlag && isEditEnd()){
+        editFlag = false;
+        endEditSignal = false;
+        setFlag(QGraphicsItem::ItemIsMovable);
+        update();
+        // 触发
+        setSelected(true);
+        emit regroupEndEvent();
+    }
 }
 
 void GraphicsItemGroup::onItemRemove(QGraphicsItem *item)
@@ -502,6 +539,76 @@ void GraphicsItemGroup::onItemRemove(QGraphicsItem *item)
     // 调整组的大小及位置
     adjustGroup(groupRect);
 
+}
+
+void GraphicsItemGroup::receiveEditEnableEvent()
+{
+    if (editFlag) {
+        return;
+    }
+    QGraphicsItem* underMouseItem{nullptr};
+    // 打散组合，并记录
+    QList<QGraphicsItem*> childs;
+    auto items = childItems();
+    foreach (auto item, items) {
+        if (item == selector) {
+            continue;
+        }
+        // 获取鼠标下的图元
+        if (underMouseItem == nullptr && isUnderMouse()) {
+            underMouseItem = item;
+        }
+        // 记录
+        childs << item;
+    }
+    editEnabled(underMouseItem, childs);
+}
+
+void GraphicsItemGroup::receiveEditFinishEvent(const QList<QGraphicsItem*> &items)
+{
+    disconnect(scene(), &QGraphicsScene::selectionChanged,
+               this, &GraphicsItemGroup::sceneSelectionChanged);
+    editFinished(items);
+}
+
+void GraphicsItemGroup::onSubGroupEditReady()
+{
+    auto subGroup = dynamic_cast<GraphicsItemGroup*>(sender());
+    subGroupList.removeOne(subGroup);
+    if (!subGroupList.isEmpty()) {
+        // 还有内部组未准备好
+        return;
+    }
+    connect(scene(), &QGraphicsScene::selectionChanged,
+            this, &GraphicsItemGroup::sceneSelectionChanged, Qt::QueuedConnection);
+}
+
+void GraphicsItemGroup::onSubgroupRegroupEnd()
+{
+    if (!subGroupList.isEmpty()) {
+        auto obj = dynamic_cast<GraphicsItemGroup*>(sender());
+        subGroupList.removeOne(obj);
+        if (!subGroupList.isEmpty()) {
+            return;
+        }
+    }
+    disconnect(this, SLOT(onSubgroupRegroupEnd()));
+    // 恢复组的初始状态
+    auto attr = attribute();
+    attr->setWidth(0);
+    attr->setHeight(0);
+    logicRect = attr->getLogicRect();
+    prepareGeometryChange();
+    // 执行本级组合
+    foreach (auto item, editingChilds) {
+        if(item->scene() == nullptr){
+            // 已被删除
+            continue;
+        }
+        item->setSelected((false));
+        // 自动触发 group 大小改变
+        addToGroup(item);
+    }
 }
 
 void GraphicsItemGroup::adjustGroup(const QRectF &boundRect)
@@ -538,7 +645,7 @@ void GraphicsItemGroup::customUndoAction(QString action, QVariant data, bool isU
         return;
     } else if(action.compare("editGroup") == 0) {
         if (isUndo) {
-            editFinished(data.value<QList<QGraphicsItem*>>());
+            emit editFinishEvent(data.value<QList<QGraphicsItem*>>());
         }else{
             auto params = data.value<QPair<QGraphicsItem*, QList<QGraphicsItem*>>>();
             editEnabled(params.first, params.second);
@@ -548,7 +655,7 @@ void GraphicsItemGroup::customUndoAction(QString action, QVariant data, bool isU
             auto params = data.value<QPair<QGraphicsItem*, QList<QGraphicsItem*>>>();
             editEnabled(params.first, params.second);
         } else{
-            editFinished(data.value<QList<QGraphicsItem*>>());
+            emit editFinishEvent(data.value<QList<QGraphicsItem*>>());
         }
     }
     AbstractZoneItem::customUndoAction(action, data, isUndo);
@@ -586,22 +693,72 @@ QString GraphicsItemGroup::toXml() const
 void GraphicsItemGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     AbstractZoneItem::paint(painter, option, widget);
-    if(editFlag){
-        // 设置编辑模式的样式
-        painter->save();
-        auto pen = painter->pen();
-        pen.setStyle(Qt::DashLine);
-        pen.setColor(Qt::red);
-        pen.setWidth(2);
-        painter->setPen(pen);
-        // auto brush = painter->brush();
-        // brush.setStyle(Qt::SolidPattern);
-        // brush.setColor(Qt::yellow);
-        // painter->setBrush(brush);
-        painter->setOpacity(0.2);
-        painter->drawRect(editRect);
-        painter->restore();
+    // if(editFlag){
+    //     // 设置编辑模式的样式
+    //     painter->save();
+    //     auto pen = painter->pen();
+    //     pen.setStyle(Qt::DashLine);
+    //     pen.setColor(Qt::red);
+    //     pen.setWidth(2);
+    //     painter->setPen(pen);
+    //     // auto brush = painter->brush();
+    //     // brush.setStyle(Qt::SolidPattern);
+    //     // brush.setColor(Qt::yellow);
+    //     // painter->setBrush(brush);
+    //     painter->setOpacity(0.2);
+    //     painter->drawRect(editRect);
+    //     painter->restore();
+    // }
+}
+
+bool GraphicsItemGroup::isEditing()
+{
+    return editFlag;
+}
+
+void GraphicsItemGroup::notifyEditEnable()
+{
+    emit editEnableEvent();
+}
+
+void GraphicsItemGroup::notifyEditFinished()
+{
+    emit editFinishEvent(editingChilds);
+}
+
+bool GraphicsItemGroup::hasChildSelected()
+{
+    bool hasSelected{false};
+    foreach (auto item, editingChilds) {
+        if (typeid(*item) == typeid(GraphicsItemGroup)){
+            if(auto subGroup=dynamic_cast<GraphicsItemGroup*>(item)) {
+                if(subGroup->hasChildSelected()){
+                    hasSelected = true;
+                    break;
+                }
+            }
+        }else if (item->isSelected()) {
+            hasSelected = true;
+            break;
+        }
     }
+    return hasSelected;
+}
+
+bool GraphicsItemGroup::isEditEnd()
+{
+    if(editingChilds.isEmpty()){
+        return true;
+    }
+    bool result{true};
+    foreach (auto item, editingChilds) {
+        if(item->scene()){
+            // 还有未归位的图元
+            result = false;
+            break;
+        }
+    }
+    return result;
 }
 
 void GraphicsItemGroup::parseXML(const QString &xml)

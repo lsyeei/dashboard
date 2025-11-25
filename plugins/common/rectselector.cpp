@@ -318,6 +318,9 @@ void RectSelector::onAdjusterMove(const QPointF &from, const QPointF &to)
         return;
     }
     auto parent = parentItem();
+    if (parent == nullptr) {
+        return;
+    }
     QPointF itemFrom = parent->mapFromScene(from);
     QPointF itemTo = parent->mapFromScene(to);
     if (AdjustType(data.toInt()) == SIZE) {

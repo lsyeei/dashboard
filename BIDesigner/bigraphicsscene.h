@@ -83,6 +83,17 @@ public:
      */
     void group(QGraphicsItemGroup *group, const QList<QGraphicsItem *> &items);
     /**
+     * @brief canGroup 是否允许组合操作
+     * @return true 允许，false 不允许
+     */
+    bool canGroup();
+    /**
+     * @brief findGroup 查找图元所在的组
+     * @param item 图元对象
+     * @return 若图元在某个组内，返回图元所在的组；否则返回nullptr
+     */
+    QGraphicsItem *findGroup(QGraphicsItem *item);
+    /**
      * @brief flipItem 翻转当前选中对象
      * @param orientation 方向
      */

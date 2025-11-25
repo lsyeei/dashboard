@@ -202,7 +202,8 @@ void BIGraphicsScene::group(QGraphicsItemGroup *group, const QList<QGraphicsItem
     auto groupId = getItemId(group);
     if (groupId.isEmpty()) {
         // 对于新建组，需要分配ID
-        setItemId(group, idGenerator->nextIdString());
+        groupId = idGenerator->nextIdString();
+        setItemId(group, groupId);
     }
     addItem(group);
     blockSignals(true);
@@ -217,6 +218,33 @@ void BIGraphicsScene::group(QGraphicsItemGroup *group, const QList<QGraphicsItem
     group->update();
     group->setSelected(true);
     group->setFocus(Qt::MouseFocusReason);
+}
+
+bool BIGraphicsScene::canGroup()
+{
+    auto selectList = selectedItems();
+    if (selectList.isEmpty()) {
+        return false;
+    }
+    bool flag{true};
+    foreach (auto item, selectList) {
+        if (!item->data(itemGroupFlag).isNull()) {
+            // 组图元正处于编辑状态，不能执行组合操作
+            flag = false;
+            break;
+        }
+    }
+    return flag;
+}
+
+QGraphicsItem *BIGraphicsScene::findGroup(QGraphicsItem *item)
+{
+    auto groupFlag = item->data(itemGroupFlag);
+    if (groupFlag.isNull()) {
+        return nullptr;
+    }
+    auto id = groupFlag.toString();
+    return getItemById(id);
 }
 
 void BIGraphicsScene::flipItem(Qt::Orientation orientation)
