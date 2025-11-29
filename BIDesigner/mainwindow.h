@@ -38,6 +38,7 @@ QT_END_NAMESPACE
 class BIGraphicsScene;
 class GraphicRootWidget;
 class QGraphicsItem;
+class GraphicListForm;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -85,6 +86,7 @@ private slots:
     void undo();
     void redo();
     void doZoom();
+    void showLayer(bool flag);
     void showRuler(bool flag);
     void showGrid(bool flag);
     void showRefLine(bool flag);
@@ -97,6 +99,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    // 图层窗口
+    QPointer<GraphicListForm> layerForm;
     // 图元属性窗口
     GraphicPropertyForm *propertyWidget{nullptr};
     QMenu *menu{nullptr};

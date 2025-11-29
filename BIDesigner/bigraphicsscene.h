@@ -29,6 +29,7 @@
 enum class OrderAction{NONE, UP, DOWN, TOP, BOTTOM};
 enum class AlignAction{NONE, LEFT, RIGHT, TOP, BOTTOM, HORIZON, VERTICAL};
 enum class DistributeAction{NONE, HORIZON, VERTICAL};
+enum class ItemAction{NONE, ADD, REMOVE, GROUP, UNGROUP, HIDE, SHOW, RENAME};
 
 class SnowFlake;
 class GraphicsItemGroup;
@@ -208,9 +209,21 @@ public:
                           Qt::ItemSelectionOperation selectionOperation,
                           Qt::ItemSelectionMode mode,
                           const QTransform &deviceTransform);
+    /**
+     * @brief getGroupItems 获取组及组内所有图元
+     * @param group 图元对象
+     * @return 如果group 是组合对象，返回该对象本身及内部所有图元；否则，返回图元本身
+     */
+    QList<QGraphicsItem *> getGroupItems(QGraphicsItem *group);
 
 signals:
     void undoEvent(const QString &text, QVariant undoData, QVariant redoData) override;
+    /**
+     * @brief contentChanged scene中 graphic item变动消息
+     * @param action 变动类型
+     * @param items 变动的 graphic item集合
+     */
+    void contentChanged(ItemAction action, const QList<QGraphicsItem*> &items);
 
     // QGraphicsScene interface
 protected:

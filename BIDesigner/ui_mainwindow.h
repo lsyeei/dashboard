@@ -81,6 +81,7 @@ public:
     QAction *saveToLib;
     QAction *doDelete;
     QAction *dataSource;
+    QAction *showLayer;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QSplitter *splitter_2;
@@ -375,6 +376,10 @@ public:
         icon31.addFile(QString::fromUtf8(":/icons/icons/datasource.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
         dataSource->setIcon(icon31);
         dataSource->setMenuRole(QAction::MenuRole::NoRole);
+        showLayer = new QAction(MainWindow);
+        showLayer->setObjectName("showLayer");
+        showLayer->setCheckable(true);
+        showLayer->setMenuRole(QAction::MenuRole::NoRole);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         QSizePolicy sizePolicy1(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
@@ -468,7 +473,7 @@ public:
         scrollArea->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop);
         graphicProperty = new QWidget();
         graphicProperty->setObjectName("graphicProperty");
-        graphicProperty->setGeometry(QRect(0, 0, 239, 482));
+        graphicProperty->setGeometry(QRect(0, 0, 234, 475));
         QSizePolicy sizePolicy5(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Minimum);
         sizePolicy5.setHorizontalStretch(0);
         sizePolicy5.setVerticalStretch(0);
@@ -505,7 +510,7 @@ public:
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName("menuBar");
         menuBar->setEnabled(true);
-        menuBar->setGeometry(QRect(0, 0, 1038, 22));
+        menuBar->setGeometry(QRect(0, 0, 1038, 21));
         QSizePolicy sizePolicy6(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::MinimumExpanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -831,6 +836,10 @@ public:
         dataSource->setText(QCoreApplication::translate("MainWindow", "\346\225\260\346\215\256\346\272\220", nullptr));
 #if QT_CONFIG(tooltip)
         dataSource->setToolTip(QCoreApplication::translate("MainWindow", "\346\225\260\346\215\256\346\272\220", nullptr));
+#endif // QT_CONFIG(tooltip)
+        showLayer->setText(QCoreApplication::translate("MainWindow", "\345\233\276\345\261\202", nullptr));
+#if QT_CONFIG(tooltip)
+        showLayer->setToolTip(QCoreApplication::translate("MainWindow", "\346\211\223\345\274\200\345\233\276\345\261\202\347\252\227\345\217\243", nullptr));
 #endif // QT_CONFIG(tooltip)
         propertyWidget->setTabText(propertyWidget->indexOf(property), QCoreApplication::translate("MainWindow", "Tab 1", nullptr));
         toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));

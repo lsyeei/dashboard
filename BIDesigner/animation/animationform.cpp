@@ -129,7 +129,8 @@ void AnimationForm::onRemoveAnimate()
 void AnimationForm::onPlay()
 {
     if (player.isNull()){
-        player = AnimationFactory::instance()->play(graphicItem);
+        auto scene = dynamic_cast<BIGraphicsScene*>(graphicItem->scene());
+        player = AnimationFactory::instance()->playGroup(scene->getGroupItems(graphicItem));//play(graphicItem);
         if (player == nullptr) {
             qDebug() << "未找到动画配置";
             return;

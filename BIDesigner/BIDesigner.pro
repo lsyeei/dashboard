@@ -53,6 +53,7 @@ SOURCES += \
     customgraphic/usersvgitem.cpp \
     exportdialog.cpp \
     graphicgroupwidget.cpp \
+    graphiclistform.cpp \
     graphicpropertyform.cpp \
     graphicrootwidget.cpp \
     graphicsitemgroup.cpp \
@@ -128,6 +129,7 @@ HEADERS += \
     exportdialog.h \
     filetemplate.h \
     graphicgroupwidget.h \
+    graphiclistform.h \
     graphicpropertyform.h \
     graphicrootwidget.h \
     graphicsitemgroup.h \
@@ -146,6 +148,7 @@ FORMS += \
     customgraphic/userpluginmanageform.ui \
     customgraphic/userpluginpropertyform.ui \
     exportdialog.ui \
+    graphiclistform.ui \
     graphicproperty.ui \
     grouppropertyform.ui \
     mainwindow.ui \

@@ -715,9 +715,9 @@ void BIGraphicsView::resizeEvent(QResizeEvent *event)
 void BIGraphicsView::keyPressEvent(QKeyEvent *event)
 {
     QGraphicsView::keyPressEvent(event);
-    if (event->isAccepted()) {
-        return;
-    }
+    // if (event->isAccepted()) {
+    //     return;
+    // }
     auto biScene = dynamic_cast<BIGraphicsScene *>(scene());
     if (event->modifiers() == Qt::NoModifier) {
         auto items = biScene->selectedItems();
@@ -841,21 +841,26 @@ void BIGraphicsView::paintEvent(QPaintEvent *event)
 {
     QGraphicsView::paintEvent(event);
 
-    QPainter painter(viewport());
+    auto view = viewport();
+    if (view == nullptr || view->paintingActive()) {
+        return;
+    }
+    QPainter painter(view);
     if (rubberBanding && !rubberBandRect.isEmpty()) {
         QStyleOptionRubberBand option;
-        option.initFrom(viewport());
+        option.initFrom(view);
         option.rect = rubberBandRect;
         option.shape = QRubberBand::Rectangle;
 
         QStyleHintReturnMask mask;
-        if (viewport()->style()->styleHint(QStyle::SH_RubberBand_Mask, &option, viewport(), &mask)) {
+        if (view->style()->styleHint(QStyle::SH_RubberBand_Mask, &option, view, &mask)) {
             // painter clipping for masked rubberbands
             painter.setClipRegion(mask.region, Qt::IntersectClip);
         }
 
-        viewport()->style()->drawControl(QStyle::CE_RubberBand, &option, &painter, viewport());
+        view->style()->drawControl(QStyle::CE_RubberBand, &option, &painter, view);
     }
+    painter.end();
 }
 
 void BIGraphicsView::scrollContentsBy(int dx, int dy)

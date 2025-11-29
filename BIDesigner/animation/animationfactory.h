@@ -70,6 +70,12 @@ public:
      */
     QAbstractAnimation *play(QGraphicsItem *graphic);
     /**
+     * @brief playGroup 播放一组动画
+     * @param graphicGroup 图元集合
+     * @return 动画对象
+     */
+    QAbstractAnimation *playGroup(QList<QGraphicsItem *> graphicGroup);
+    /**
      * @brief playAll 播放所有动画
      * @return 动画对象
      */

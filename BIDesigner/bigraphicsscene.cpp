@@ -174,6 +174,7 @@ void BIGraphicsScene::addEditableItem(QGraphicsItem *item)
         setItemId(item, id);
     }
     addItem(item);
+    emit contentChanged(ItemAction::ADD, {item});
 }
 
 void BIGraphicsScene::addItems(QList<QGraphicsItem *> items)
@@ -195,6 +196,7 @@ void BIGraphicsScene::ungroup(QGraphicsItemGroup *group)
     blockSignals(false);
     group->setSelected(false);
     removeItem(group);
+    emit contentChanged(ItemAction::UNGROUP, {group});
 }
 
 void BIGraphicsScene::group(QGraphicsItemGroup *group, const QList<QGraphicsItem *> &items)
@@ -218,6 +220,7 @@ void BIGraphicsScene::group(QGraphicsItemGroup *group, const QList<QGraphicsItem
     group->update();
     group->setSelected(true);
     group->setFocus(Qt::MouseFocusReason);
+    emit contentChanged(ItemAction::GROUP, {group});
 }
 
 bool BIGraphicsScene::canGroup()
@@ -665,6 +668,7 @@ void BIGraphicsScene::deleteItems(QList<QGraphicsItem *> items)
         item->setSelected(false);
         removeItem(item);
     }
+    emit contentChanged(ItemAction::REMOVE, items);
 }
 
 void BIGraphicsScene::undo(QVariant undoData)
@@ -680,6 +684,7 @@ void BIGraphicsScene::redo(QVariant redoData)
 void BIGraphicsScene::setItemName(QGraphicsItem *item, QString name)
 {
     item->setData(itemNameIndex, name);
+    emit contentChanged(ItemAction::RENAME, {item});
 }
 
 QString BIGraphicsScene::itemName(QGraphicsItem *item)
@@ -813,6 +818,23 @@ void BIGraphicsScene::setSelectionArea(const QPainterPath &path,
     blockSignals(false);
     if (changed)
         emit selectionChanged();
+}
+
+QList<QGraphicsItem *> BIGraphicsScene::getGroupItems(QGraphicsItem *group)
+{
+    QList<QGraphicsItem *> items{group};
+    if (typeid(*group) != typeid(GraphicsItemGroup)){
+        return items;
+    }
+    auto childs = group->childItems();
+    foreach (auto child, childs) {
+        if (typeid(*child) == typeid(QGraphicsItemGroup)) {
+            items << getGroupItems(dynamic_cast<QGraphicsItemGroup*>(child));
+        }else{
+            items << child;
+        }
+    }
+    return items;
 }
 
 void BIGraphicsScene::drawBackground(QPainter *painter, const QRectF &rect)

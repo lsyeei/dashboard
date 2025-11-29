@@ -45,6 +45,7 @@
 #include "icustomgraphic.h"
 #include "graphicsitemgroup.h"
 #include "xmlHelper.h"
+#include "graphiclistform.h"
 #include "animation/animationform.h"
 #include "animation/animationfactory.h"
  #include <QtConcurrent>
@@ -63,6 +64,9 @@ MainWindow::MainWindow(QWidget *parent)
     loadPlugin();
     // 设置场景
     setScene();
+    // 创建图层窗口
+    layerForm = new GraphicListForm(scene, this);
+    layerForm->hide();
     // 配置工具栏
     initToolBar();
     // 配置状态栏
@@ -341,6 +345,8 @@ void MainWindow::initToolBar()
 void MainWindow::initMenu()
 {
     ui->menuBar->setVisible(false);
+    ui->viewMenu->insertAction(ui->showViewGrid, layerForm->toggleViewAction());
+    ui->viewMenu->insertSeparator(ui->showViewGrid);
     auto menuChildrens = ui->menuBar->findChildren<QMenu *>(Qt::FindDirectChildrenOnly);
     menu = new QMenu(ui->toolBar);
     foreach (auto subMenu, menuChildrens) {
@@ -405,6 +411,7 @@ void MainWindow::setMenuEvent()
     connect(ui->undo, SIGNAL(triggered(bool)), this, SLOT(undo()));
     connect(ui->redo, SIGNAL(triggered(bool)), this, SLOT(redo()));
     // 视图
+    connect(ui->showLayer, SIGNAL(toggled(bool)), this, SLOT(showLayer(bool)));
     connect(ui->showViewGrid, SIGNAL(toggled(bool)), this, SLOT(showGrid(bool)));
     connect(ui->showViewRuler, SIGNAL(toggled(bool)), this, SLOT(showRuler(bool)));
     connect(ui->showViewRefLine, SIGNAL(toggled(bool)), this, SLOT(showRefLine(bool)));
@@ -903,6 +910,15 @@ void MainWindow::doZoom()
     }
     zoomBtn->setText(QString::asprintf("%d%", qRound(ratio * 100)));
     scaleInfo->setText(tr(" 缩放：") + zoomBtn->text());
+}
+
+void MainWindow::showLayer(bool flag)
+{
+    if (layerForm.isNull()) {
+        layerForm = new GraphicListForm(scene, this);
+        layerForm->setScene(scene);
+    }
+    layerForm->setVisible(flag);
 }
 
 void MainWindow::showRuler(bool flag)

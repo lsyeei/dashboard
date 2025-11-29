@@ -44,5 +44,6 @@
         <file>animation/path/icons/curvedLine.svg</file>
         <file>animation/path/icons/polygonLine.svg</file>
         <file>animation/path/icons/straightLine.svg</file>
+        <file>icons/list.svg</file>
     </qresource>
 </RCC>

@@ -259,8 +259,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>239</width>
-              <height>482</height>
+              <width>234</width>
+              <height>475</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -381,7 +381,7 @@
      <x>0</x>
      <y>0</y>
      <width>1038</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -1144,6 +1144,20 @@
    </property>
    <property name="toolTip">
     <string>数据源</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="showLayer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>图层</string>
+   </property>
+   <property name="toolTip">
+    <string>打开图层窗口</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

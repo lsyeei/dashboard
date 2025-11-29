@@ -196,6 +196,26 @@ QAbstractAnimation *AnimationFactory::play(QGraphicsItem *graphic)
     return player;
 }
 
+QAbstractAnimation *AnimationFactory::playGroup(QList<QGraphicsItem *> graphicGroup)
+{
+    if (!player.isNull()) {
+        player->stop();
+        player.clear();
+    }
+    player = new QParallelAnimationGroup();
+    foreach (auto graphic, graphicGroup) {
+        auto actions = animations[scene->getItemId(graphic)];
+        foreach (auto act, actions) {
+            auto type = getAnimateType(act.getTypeId());
+            if (!type->isEmpty()){
+                player->addAnimation(type->createAnimation(graphic, act));
+            }
+        }
+    }
+    player->start();
+    return player;
+}
+
 QAbstractAnimation *AnimationFactory::playAll()
 {
     if (!player.isNull()) {
