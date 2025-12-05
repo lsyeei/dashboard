@@ -87,7 +87,8 @@ QList<QGraphicsItem *> BIGraphicsScene::toItems(const QString &xmlText)
                 group->setData(itemIdIndex, attr.value(temp::groupTemplate::groupId).toString());
             }
             if (attr.hasAttribute(temp::groupTemplate::groupName)){
-                group->setData(itemNameIndex, attr.value(temp::groupTemplate::groupName).toUtf8());
+                auto name = QString::fromUtf8(attr.value(temp::groupTemplate::groupName).toUtf8());
+                group->setData(itemNameIndex, name);
             }
             items.append(group);
         } else if(itemName.compare(temp::item) ==0) {
@@ -99,7 +100,8 @@ QList<QGraphicsItem *> BIGraphicsScene::toItems(const QString &xmlText)
                     item->setData(itemIdIndex, attr.value(itemTemplate::itemId).toString());
                 }
                 if (attr.hasAttribute(itemTemplate::itemName)){
-                    item->setData(itemNameIndex, attr.value(itemTemplate::itemName).toUtf8());
+                    auto name = QString::fromUtf8(attr.value(itemTemplate::itemName).toUtf8());
+                    item->setData(itemNameIndex, name);
                 }
                 if (item) {
                     items.append(item);

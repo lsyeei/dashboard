@@ -40,7 +40,8 @@ GraphicsItemGroup::GraphicsItemGroup(QGraphicsItem *parent)
     PenProperty pen;
     pen.setStyle(Qt::NoPen);
     attr->setPen(pen);
-    connect(this, SIGNAL(itemAddEvent(QGraphicsItem*)), this, SLOT(onItemAdd(QGraphicsItem*)), Qt::QueuedConnection);
+    connect(this, &GraphicsItemGroup::itemAddEvent,
+            this, &GraphicsItemGroup::onItemAdd, Qt::QueuedConnection);
     connect(this, &GraphicsItemGroup::editEnableEvent, this,
             &GraphicsItemGroup::receiveEditEnableEvent, Qt::QueuedConnection);
     connect(this, &GraphicsItemGroup::editFinishEvent, this,
@@ -97,11 +98,6 @@ QVariant GraphicsItemGroup::itemChange(GraphicsItemChange change, const QVariant
         }
     } else if (change == QGraphicsItem::ItemSceneHasChanged && !value.isNull()){
         // 加入 scene
-        auto attr = attribute();
-        if (attr->getWidth() > 0 || attr->getHeight() > 0) {
-            // 重新组合时，宽高及位置无需重新计算
-            isParsing = true;
-        }
     }
     return AbstractZoneItem::itemChange(change, value);
 }
