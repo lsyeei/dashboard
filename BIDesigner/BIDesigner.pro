@@ -51,6 +51,9 @@ SOURCES += \
     customgraphic/userpluginmanageform.cpp \
     customgraphic/userpluginpropertyform.cpp \
     customgraphic/usersvgitem.cpp \
+    datasource/customtreewidget.cpp \
+    datasource/datadirdialog.cpp \
+    datasource/datasourceform.cpp \
     exportdialog.cpp \
     graphicgroupwidget.cpp \
     graphiclistform.cpp \
@@ -120,12 +123,22 @@ HEADERS += \
     customgraphic/userpluginservice.h \
     customgraphic/userplugintype.h \
     customgraphic/usersvgitem.h \
+    datasource/customtreewidget.h \
+    datasource/datadirdialog.h \
+    datasource/datadirdo.h \
+    datasource/datadirservice.h \
+    datasource/datamarketdo.h \
+    datasource/datamarketservice.h \
+    datasource/datasourcedo.h \
+    datasource/datasourceform.h \
+    datasource/datasourceservice.h \
     dbutil/basemapper.h \
     dbutil/baseservice.h \
     dbutil/entity.h \
     dbutil/entitytablemodel.h \
     dbutil/imagedelegate.h \
     dbutil/tablemodelevent.h \
+    dbutil/transactionmanager.h \
     exportdialog.h \
     filetemplate.h \
     graphicgroupwidget.h \
@@ -147,6 +160,8 @@ FORMS += \
     customgraphic/userplugingroupdialog.ui \
     customgraphic/userpluginmanageform.ui \
     customgraphic/userpluginpropertyform.ui \
+    datasource/datadirdialog.ui \
+    datasource/datasourceform.ui \
     exportdialog.ui \
     graphiclistform.ui \
     graphicproperty.ui \

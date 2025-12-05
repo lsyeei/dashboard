@@ -16,3 +16,34 @@ CREATE TABLE userPlugin (
 	modify_time REAL NOT NULL,
 	CONSTRAINT userPlugin_FK FOREIGN KEY (group_id) REFERENCES userPluginGroup(id)
 );
+CREATE TABLE dataDir (
+	id INTEGER DEFAULT (0) NOT NULL PRIMARY KEY AUTOINCREMENT,
+	parent_id INTEGER DEFAULT (0) NOT NULL,
+	group_id INTEGER NOT NULL,
+	name TEXT NOT NULL,
+	value BLOB,
+	property BLOB,
+	create_time REAL, 
+    modify_time REAL
+);
+CREATE TABLE dataSource (
+	id INTEGER DEFAULT (0) NOT NULL PRIMARY KEY AUTOINCREMENT,
+	data_dir_id INTEGER NOT NULL,
+	source_plugin_id TEXT NOT NULL,
+	source_args TEXT NOT NULL,
+	create_time REAL, 
+    modify_time REAL,
+	CONSTRAINT dataSource_dataDir_FK FOREIGN KEY (data_dir_id) REFERENCES dataDir(id)
+);
+CREATE TABLE dataMarket (
+	id INTEGER DEFAULT (0) NOT NULL PRIMARY KEY AUTOINCREMENT,
+	data_source_id INTEGER NOT NULL,
+	data_name TEXT NOT NULL,
+	request_method TEXT,
+	request_args TEXT,
+	request_period INTEGER,
+	process_code TEXT,	
+	create_time REAL, 
+    modify_time REAL,
+	CONSTRAINT dataMarket_dataSource_FK FOREIGN KEY (data_source_id) REFERENCES dataSource(id)
+);

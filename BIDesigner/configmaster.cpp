@@ -25,7 +25,7 @@
 #include <customgraphic/userplugingroupdo.h>
 
 Configs appConfigs = Configs();
-static const QString connName{"masterConn"};
+const QString ConfigMaster::connName{"masterConn"};
 ConfigMaster *ConfigMaster::master{nullptr};
 
 ConfigMaster::ConfigMaster() {

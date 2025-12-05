@@ -31,6 +31,7 @@ class ConfigMaster
 {
     ConfigMaster();
 public:
+    static const QString connName;
     static ConfigMaster *instance();
     ~ConfigMaster();
     UserPluginGroupService *userPluginGroup;

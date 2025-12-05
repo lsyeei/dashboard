@@ -25,6 +25,7 @@
 #include <QObject>
 #include <QList>
 #include "qobjectdefs.h"
+#include "serializable.h"
 
 #ifndef Q_MOC_RUN
 // define the tag text as empty, so the compiler doesn't see it
@@ -57,7 +58,7 @@ public:\
     Q_INVOKABLE GETTER_FLAG __type_##field get_##field() const {return field;}\
     Q_INVOKABLE SETTER_FLAG void set_##field(const __type_##field &value){if (value != field) field = value;}
 
-class Entity
+class Entity:public Serializable
 {
 public:
     Entity(){};

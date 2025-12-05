@@ -27,8 +27,10 @@ class BaseService{
 public:
     explicit BaseService(QSqlDatabase db);
     ~BaseService();
+    T getOne(QVariant id);
     QList<T> list();
     QList<T> list(const QString &where);
+    bool deleteBatch(const QString &where);
     bool deleteById(T data);
     bool deleteById(QVariant id);
     bool updateById(T data);
@@ -55,6 +57,12 @@ inline BaseService<T>::~BaseService()
 }
 
 template<typename T>
+inline T BaseService<T>::getOne(QVariant id)
+{
+    return mapper->selectById(id);
+}
+
+template<typename T>
 inline QList<T> BaseService<T>::list()
 {
     return mapper->selectList();
@@ -64,6 +72,12 @@ template<typename T>
 inline QList<T> BaseService<T>::list(const QString &where)
 {
     return mapper->selectList(where);
+}
+
+template<typename T>
+inline bool BaseService<T>::deleteBatch(const QString &where)
+{
+    return mapper->deleteBatch(where);
 }
 
 template<typename T>

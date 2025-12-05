@@ -46,6 +46,7 @@
 #include "graphicsitemgroup.h"
 #include "xmlHelper.h"
 #include "graphiclistform.h"
+#include "datasource/datasourceform.h"
 #include "animation/animationform.h"
 #include "animation/animationfactory.h"
  #include <QtConcurrent>
@@ -432,6 +433,8 @@ void MainWindow::setMenuEvent()
 
     connect(ui->doAbout, SIGNAL(triggered(bool)), this, SLOT(showAbout()));
     connect(ui->saveToLib, SIGNAL(triggered(bool)), this, SLOT(saveToLib()));
+
+    connect(ui->dataSource, &QAction::triggered, this, &MainWindow::showDataSource);
 }
 
 void MainWindow::initGraphicsWidget()
@@ -1004,6 +1007,14 @@ void MainWindow::saveToLib()
             graphicPluginWidget->addGraphic(groupId, graphic);
         }
     }
+}
+
+void MainWindow::showDataSource(bool flag)
+{
+    if (dataSource.isNull()) {
+        dataSource = new DataSourceForm(this);
+    }
+    dataSource->setVisible(!dataSource->isVisible());
 }
 
 void MainWindow::onViewMenuEvent(QContextMenuEvent *event)

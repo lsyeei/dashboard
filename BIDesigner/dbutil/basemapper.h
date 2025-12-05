@@ -23,12 +23,24 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlResult>
+#include <QSqlError>
+
+class AbstractMapper {
+public:
+    virtual ~AbstractMapper() = default;
+
+    virtual bool startBatchMode() = 0;
+    virtual void endBatchMode() = 0;
+    virtual bool isBatchMode() = 0;
+};
 
 template <typename T>
-class BaseMapper{
+class BaseMapper : public AbstractMapper{
 public:
     explicit BaseMapper(QSqlDatabase db);
+    QSqlDatabase *getDataBase();
     T selectById(QVariant id);
+    bool deleteBatch(const QString &where);
     bool deleteById(const T &data);
     bool deleteById(QVariant id);
     bool updateById(const T &data);
@@ -36,12 +48,16 @@ public:
     QList<T> selectList(const QString &where);
     bool insert(T *data);
     bool execSql(const QString &sql, bool autoCommit = true);
+    bool startBatchMode() override;
+    void endBatchMode() override;
+    bool isBatchMode() override;
 private:
     QSqlDatabase database;
     QSqlQuery query;
     QString table;
     QList<QString> pkList;
     QMap<QString,QString> fieldMap;
+    bool batchMode{false};
 
     bool isValid();
     bool isPrimaryKey(const QString col);
@@ -65,11 +81,27 @@ inline BaseMapper<T>::BaseMapper(QSqlDatabase db)
 }
 
 template<typename T>
+inline QSqlDatabase *BaseMapper<T>::getDataBase()
+{
+    return &database;
+}
+
+template<typename T>
 inline T BaseMapper<T>::selectById(QVariant id)
 {
     T data;
     selectById(id, &data);
     return data;
+}
+
+template<typename T>
+inline bool BaseMapper<T>::deleteBatch(const QString &where)
+{
+    if(!isValid()){
+        return false;
+    }
+    QString sql = QString("delete from %1 where %2").arg(table, where);
+    return execSql(sql);
 }
 
 template<typename T>
@@ -132,9 +164,9 @@ inline bool BaseMapper<T>::updateById(const T &data)
             values += (values.isEmpty()?"":",") + item.value() + "=";
             values += "'" + value.toString() + "'";
             break;            
-        case QMetaType::QByteArray:
-            values += values.isEmpty()?"thumb=X'":",thumb=X'";
-            values += QString(value.toByteArray().toHex(0)) + "'";
+        case QMetaType::QByteArray:            
+            values += (values.isEmpty()?"":",") + item.value() + "=";
+            values += "X'" + QString(value.toByteArray().toHex(0)) + "'";
             break;
         default:
             if (value.toString().isEmpty()) {
@@ -246,9 +278,13 @@ inline bool BaseMapper<T>::insert(T *data)
         auto id = query.lastInsertId();
         // obj->setValueByColName(pkList[0], id);
         selectById(id, data);
-        database.commit();
+        if(!batchMode){
+            database.commit();
+        }
     } else {
-        database.rollback();
+        if(!batchMode){
+            database.rollback();
+        }
     }
 
     return result;
@@ -261,15 +297,39 @@ inline bool BaseMapper<T>::execSql(const QString &sql, bool autoCommit)
         return false;
     }
     auto result = query.exec(sql);
-    if (autoCommit) {
+    if (!batchMode && autoCommit) {
         if (result) {
             database.commit();
         }else{
+            qWarning() << "execute sql:" << sql << ";error happend." << database.lastError().text();
             database.rollback();
         }
     }
 
     return result;
+}
+
+template<typename T>
+inline bool BaseMapper<T>::startBatchMode()
+{
+    if (batchMode) {
+        // 禁止重入事务模式
+        return false;
+    }
+    batchMode = true;
+    return true;
+}
+
+template<typename T>
+inline void BaseMapper<T>::endBatchMode()
+{
+    batchMode = false;
+}
+
+template<typename T>
+inline bool BaseMapper<T>::isBatchMode()
+{
+    return batchMode;
 }
 
 template<typename T>

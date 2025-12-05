@@ -39,6 +39,7 @@ class BIGraphicsScene;
 class GraphicRootWidget;
 class QGraphicsItem;
 class GraphicListForm;
+class DataSourceForm;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -97,6 +98,8 @@ private slots:
     void showAbout();
     void saveToLib();
 
+    void showDataSource(bool flag);
+
 private:
     Ui::MainWindow *ui;
     // 图层窗口
@@ -122,6 +125,8 @@ private:
     // 右键菜单
     QPointer<QMenu> graphicMenu;
     QPointer<QMenu> viewMenu;
+    // 数据源
+    QPointer<DataSourceForm> dataSource;
     // void drawShape();
     void setScene();
     void initStatusBar();

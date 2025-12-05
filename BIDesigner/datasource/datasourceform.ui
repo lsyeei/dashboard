@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DataSourceForm</class>
+ <widget class="QDialog" name="DataSourceForm">
+  <property name="windowModality">
+   <enum>Qt::WindowModality::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>620</width>
+    <height>410</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>数据源</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QWidget" name="toolWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>24</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <widget class="CustomTreeWidget" name="dataDir">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <attribute name="headerVisible">
+       <bool>false</bool>
+      </attribute>
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
+       </property>
+      </column>
+     </widget>
+     <widget class="QListWidget" name="dataList"/>
+    </widget>
+   </item>
+  </layout>
+  <action name="addCategory">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/icons/icons/tree_add.svg</normaloff>:/icons/icons/tree_add.svg</iconset>
+   </property>
+   <property name="text">
+    <string>新建分类</string>
+   </property>
+   <property name="toolTip">
+    <string>添加数据分类</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="delCategory">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/icons/icons/tree_delete.svg</normaloff>:/icons/icons/tree_delete.svg</iconset>
+   </property>
+   <property name="text">
+    <string>删除分类</string>
+   </property>
+   <property name="toolTip">
+    <string>删除数据分类</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="editCategory">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/icons/icons/tree_edit.svg</normaloff>:/icons/icons/tree_edit.svg</iconset>
+   </property>
+   <property name="text">
+    <string>编辑分类</string>
+   </property>
+   <property name="toolTip">
+    <string>编辑数据分类</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="addData">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/icons/icons/data_add.svg</normaloff>:/icons/icons/data_add.svg</iconset>
+   </property>
+   <property name="text">
+    <string>添加数据</string>
+   </property>
+   <property name="toolTip">
+    <string>添加数据</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="editData">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/icons/icons/data_edit.svg</normaloff>:/icons/icons/data_edit.svg</iconset>
+   </property>
+   <property name="text">
+    <string>修改数据</string>
+   </property>
+   <property name="toolTip">
+    <string>修改数据</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="delData">
+   <property name="icon">
+    <iconset resource="../icons.qrc">
+     <normaloff>:/icons/icons/data_delete.svg</normaloff>:/icons/icons/data_delete.svg</iconset>
+   </property>
+   <property name="text">
+    <string>删除数据</string>
+   </property>
+   <property name="toolTip">
+    <string>删除数据</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header location="global">datasource/customtreewidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>
