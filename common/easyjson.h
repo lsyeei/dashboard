@@ -31,6 +31,14 @@ public:
     virtual QString toJsonString(const Serializable &obj) = 0;
     virtual QVariant parseObject(QJsonObject json, QMetaType typeName) = 0;
     virtual QVariant parseObject(QString json, QMetaType typeName) = 0;
+    template<class T>
+    T parseObject(QJsonObject json){
+        return parseObject(json, QMetaType::fromType<T>()).template value<T>();
+    }
+    template<class T>
+    T parseObject(QString json){
+        return parseObject(json, QMetaType::fromType<T>()).template value<T>();
+    }
 };
 
 extern EasyJson *EASYJSON;

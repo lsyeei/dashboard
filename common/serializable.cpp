@@ -178,16 +178,6 @@ QVariant Serializable::getValue(QString fieldName)
     return field.readOnGadget(this);
 }
 
-template<typename T>
-T Serializable::invokeMethod(const QMetaObject *metaInfo, int index){
-    T result;
-    void** voidPtr = new void*();
-    *voidPtr = reinterpret_cast<void *>(&result);
-    metaInfo->static_metacall(QMetaObject::InvokeMetaMethod, index, voidPtr);
-    delete voidPtr;
-    return result;
-}
-
 QDataStream &operator<<(QDataStream &stream, const Serializable &data){
     Serializable *dataPtr = const_cast<Serializable *>(&data);
     const QMetaObject *metaInfo = data.getMetaInfo();

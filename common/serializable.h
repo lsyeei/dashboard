@@ -127,7 +127,15 @@ public:
     virtual bool operator==(Serializable &obj);
     virtual QString toString();
     template<typename T>
-    T invokeMethod(const QMetaObject *metaInfo, int index);
+    T invokeMethod(const QMetaObject *metaInfo, int index)
+    {
+        T result;
+        void** voidPtr = new void*();
+        *voidPtr = reinterpret_cast<void *>(&result);
+        metaInfo->static_metacall(QMetaObject::InvokeMetaMethod, index, voidPtr);
+        delete voidPtr;
+        return result;
+    }
     virtual QVariant getValue(QString fieldName);
     virtual void setValue(QString fieldName, QVariant value);
 
