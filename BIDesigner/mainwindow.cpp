@@ -18,6 +18,7 @@
 
 #include "QtWebEngineWidgets/qwebengineview.h"
 #include "animation/path/imovepath.h"
+#include "datasource/datasourcemanager.h"
 #include "filetemplate.h"
 #include "bigraphicsscene.h"
 #include "graphicrootwidget.h"
@@ -52,6 +53,7 @@
  #include <QtConcurrent>
 #include <QNetworkProxyFactory>
 #include <QWebEnginePage>
+#include <QDockWidget>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -66,8 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
     // 设置场景
     setScene();
     // 创建图层窗口
-    layerForm = new GraphicListForm(scene, this);
-    layerForm->hide();
+    initLayerDocker();
     // 配置工具栏
     initToolBar();
     // 配置状态栏
@@ -346,7 +347,7 @@ void MainWindow::initToolBar()
 void MainWindow::initMenu()
 {
     ui->menuBar->setVisible(false);
-    ui->viewMenu->insertAction(ui->showViewGrid, layerForm->toggleViewAction());
+    ui->viewMenu->insertAction(ui->showViewGrid, layerDocker->toggleViewAction());
     ui->viewMenu->insertSeparator(ui->showViewGrid);
     auto menuChildrens = ui->menuBar->findChildren<QMenu *>(Qt::FindDirectChildrenOnly);
     menu = new QMenu(ui->toolBar);
@@ -412,7 +413,6 @@ void MainWindow::setMenuEvent()
     connect(ui->undo, SIGNAL(triggered(bool)), this, SLOT(undo()));
     connect(ui->redo, SIGNAL(triggered(bool)), this, SLOT(redo()));
     // 视图
-    connect(ui->showLayer, SIGNAL(toggled(bool)), this, SLOT(showLayer(bool)));
     connect(ui->showViewGrid, SIGNAL(toggled(bool)), this, SLOT(showGrid(bool)));
     connect(ui->showViewRuler, SIGNAL(toggled(bool)), this, SLOT(showRuler(bool)));
     connect(ui->showViewRefLine, SIGNAL(toggled(bool)), this, SLOT(showRefLine(bool)));
@@ -449,6 +449,18 @@ void MainWindow::initGraphicsWidget()
     // connect(manager, &GraphicsManager::loadEndEvent,
     //         propertyWidget, &GraphicPropertyForm::onGraphicPluginLoaded,
     //         Qt::QueuedConnection);
+}
+
+void MainWindow::initLayerDocker()
+{
+    layerDocker = new QDockWidget(this);
+    layerDocker->setWindowTitle(tr("项目结构"));
+    layerDocker->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea |
+                                 Qt::DockWidgetArea::RightDockWidgetArea);
+    layerDocker->hide();
+    addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, layerDocker);
+    layerForm = new GraphicListForm(scene,layerDocker);
+    layerDocker->setWidget(layerForm);
 }
 
 void MainWindow::initProjectPropertyForm()
@@ -494,6 +506,8 @@ void MainWindow::loadPlugin()
     connect(manager, &GraphicsManager::loadEndEvent,
             graphicPluginWidget, &GraphicRootWidget::onGraphicPluginLoaded,
             Qt::QueuedConnection);
+    // 加载数据源插件
+    DataSourceManager::instance()->loadDataSource();
 }
 
 void MainWindow::setScene()
@@ -690,12 +704,10 @@ void MainWindow::zoomMenuPopup()
     zoomMenu->popup(ui->toolBar->mapToGlobal(menuPos));
 }
 
-
 void MainWindow::doExit()
 {
     QApplication::exit(0);
 }
-
 
 void MainWindow::doSave()
 {
@@ -751,7 +763,6 @@ void MainWindow::doSave()
 
     QMessageBox::information(this, tr("提示"), tr("文件保存成功"));
 }
-
 
 void MainWindow::doOpen()
 {
@@ -913,15 +924,6 @@ void MainWindow::doZoom()
     }
     zoomBtn->setText(QString::asprintf("%d%", qRound(ratio * 100)));
     scaleInfo->setText(tr(" 缩放：") + zoomBtn->text());
-}
-
-void MainWindow::showLayer(bool flag)
-{
-    if (layerForm.isNull()) {
-        layerForm = new GraphicListForm(scene, this);
-        layerForm->setScene(scene);
-    }
-    layerForm->setVisible(flag);
 }
 
 void MainWindow::showRuler(bool flag)

@@ -30,11 +30,8 @@ ConfigMaster *ConfigMaster::master{nullptr};
 
 ConfigMaster::ConfigMaster() {
     connectDB();
-    // if(db == nullptr){
-    //     return;
-    // }
-    userPluginGroup = new UserPluginGroupService(QSqlDatabase::database(connName));
-    userPlugin = new UserPluginService(QSqlDatabase::database(connName));
+    userPluginGroup = new UserPluginGroupService(connName);
+    userPlugin = new UserPluginService(connName);
 }
 
 ConfigMaster *ConfigMaster::instance()
@@ -61,14 +58,6 @@ ConfigMaster::~ConfigMaster()
         delete query;
         query = nullptr;
     }
-    // if (db) {
-    //     if(db->isOpen()){
-    //         db->commit();
-    //         db->close();
-    //     }
-    //     delete db;
-    //     db = nullptr;
-    // }
 }
 
 void ConfigMaster::connectDB()

@@ -25,12 +25,10 @@ const static int PointerRole = Qt::UserRole;
 const static int IDRole = Qt::UserRole + 1;
 
 GraphicListForm::GraphicListForm(BIGraphicsScene *scene, QWidget *parent)
-    : QDockWidget(parent)
+    : QWidget(parent)
     , ui(new Ui::GraphicListForm)
 {
     ui->setupUi(this);
-    // 内部控件最大化
-    widget()->setWindowState(Qt::WindowMaximized);
     connect(ui->graphicTree, &QTreeWidget::itemSelectionChanged,
             this, &GraphicListForm::onSelectChanged);
     connect(ui->searchBtn, &QToolButton::clicked,

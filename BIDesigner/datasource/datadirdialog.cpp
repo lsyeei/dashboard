@@ -16,15 +16,23 @@
  * limitations under the License.
  */
 #include "datadirdialog.h"
+#include "datasourcemanager.h"
+#include "idatasourceplugin.h"
 #include "ui_datadirdialog.h"
 
 #include <QMessageBox>
+#include <QResizeEvent>
 
 DataDirDialog::DataDirDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DataDirDialog)
 {
     ui->setupUi(this);
+    layout()->setAlignment(Qt::AlignTop);
+    layout()->setSizeConstraint(QLayout::SetFixedSize);
+    setSizePolicy(QSizePolicy{QSizePolicy::Preferred,QSizePolicy::Preferred});
+
+    initDataSourceOption();
     toInitState();
     connect(ui->dataSourceCheckBox, &QCheckBox::checkStateChanged,
             this, &DataDirDialog::onCheckDataSource);
@@ -67,10 +75,23 @@ void DataDirDialog::setData(DataDirDO dataDir)
     }else{
         ui->dataSourceCheckBox->setChecked(true);
         // 查找数据源
-
+        auto pluginId = dataSource.get_sourcePluginId();
+        auto index = ui->dataSourceComboBox->findData(pluginId);
+        if (index < 0) {
+            return;
+        }
         // 选中数据源
-
+        ui->dataSourceComboBox->setCurrentIndex(index);
+        auto plugin = DataSourceManager::instance()->getPluginById(pluginId);
+        auto widget = plugin->connectWidget();
         // 显示数据源参数
+        widget->setArgs(dataSource.get_sourceArgs());
+        if (!connectWidget.isNull()) {
+            ui->dataSourceWidget->layout()->removeWidget(connectWidget);
+            connectWidget.clear();
+        }
+        connectWidget = widget;
+        ui->dataSourceWidget->layout()->addWidget(connectWidget);
     }
 }
 
@@ -83,9 +104,14 @@ DataDirDO DataDirDialog::getData()
     }
     if (ui->dataSourceCheckBox->isChecked()) {
         auto source = data.getDataSource();
-        // 设置数据源参数
-        // source.set_sourcePluginId();
-        // source.set_sourceArgs();
+        auto pluginId = ui->dataSourceComboBox->currentData().toString();
+        if(!connectWidget.isNull()){
+            auto args = connectWidget->getArgs();
+            // 设置数据源参数
+            source.set_sourcePluginId(pluginId);
+            source.set_sourceArgs(args);
+        }
+        data.setDataSource(source);
     } else {
         data.setDataSource(DataSourceDO{});
     }
@@ -107,15 +133,37 @@ void DataDirDialog::onCheckDataSource(Qt::CheckState state)
 void DataDirDialog::onDataSourceChanged(int index)
 {
     // 获取选中数据源信息
-
+    auto pluginId = ui->dataSourceComboBox->currentData().toString();
+    if (pluginId.isEmpty()) {
+        return;
+    }
+    auto plugin = DataSourceManager::instance()->getPluginById(pluginId);
+    if (plugin == nullptr) {
+        return;
+    }
+    auto widget = plugin->connectWidget();
+    widget->setArgs(data.getDataSource().get_sourceArgs());
     // 显示选中的数据源配置页面
-    // ui->dataSourceWidget->layout()->addWidget();
+    if (!connectWidget.isNull()) {
+        ui->dataSourceWidget->layout()->removeWidget(connectWidget);
+        connectWidget.clear();
+    }
+    connectWidget = widget;
+    ui->dataSourceWidget->layout()->addWidget(connectWidget);
     ui->dataSourceWidget->setVisible(true);
 }
 
 void DataDirDialog::onTopChecked()
 {
     ui->parentItem->setVisible(ui->childRadio->isChecked());
+}
+
+void DataDirDialog::initDataSourceOption()
+{
+    auto plugins = DataSourceManager::instance()->getAllPlugins();
+    foreach (auto plugin, plugins) {
+        ui->dataSourceComboBox->addItem(plugin->name(), plugin->id());
+    }
 }
 
 void DataDirDialog::toInitState()

@@ -25,6 +25,7 @@
 
 class DataMarketService : public BaseService<DataMarketDO>{
 public:
-    DataMarketService(QSqlDatabase db):BaseService<DataMarketDO>(db){}
+    DataMarketService(const QString &connectionName)
+        :BaseService<DataMarketDO>(connectionName){}
 };
 #endif // DATAMARKETSERVICE_H

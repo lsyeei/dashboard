@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>syntax-highlighting/syntax/alert.xml</file>
+        <file>syntax-highlighting/syntax/comments.xml</file>
+        <file>syntax-highlighting/syntax/doxygen.xml</file>
+        <file>syntax-highlighting/syntax/javascript.xml</file>
+        <file>syntax-highlighting/syntax/javascript-react.xml</file>
+        <file>syntax-highlighting/syntax/modelines.xml</file>
+        <file>syntax-highlighting/syntax/spdx-comments.xml</file>
+        <file>syntax-highlighting/syntax/sql.xml</file>
+        <file>syntax-highlighting/syntax/sql-mysql.xml</file>
+        <file>syntax-highlighting/syntax/sql-oracle.xml</file>
+        <file>syntax-highlighting/syntax/sql-postgresql.xml</file>
+        <file>syntax-highlighting/themes/dracula.theme</file>
+        <file>syntax-highlighting/themes/falcon.theme</file>
+    </qresource>
+</RCC>

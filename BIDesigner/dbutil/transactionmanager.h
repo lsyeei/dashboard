@@ -34,7 +34,7 @@ public:
     bool isInTransaction() const;
 
 private:
-    QMap<QString, QSqlDatabase*> dbMap;
+    QSet<QString> dbConnName;
     QSet<AbstractMapper*> mapperSet;
     bool inTransaction{false};
 
@@ -45,7 +45,7 @@ private:
 inline TransactionManager::TransactionManager(){}
 
 inline TransactionManager::~TransactionManager(){
-    dbMap.clear();
+    dbConnName.clear();
     mapperSet.clear();
 }
 
@@ -58,12 +58,13 @@ inline bool TransactionManager::addService(BaseService<T> *service){
     if (!mapper || mapper->isBatchMode()){
         return false;
     }
-    auto dataBase = mapper->getDataBase();
-    if (!dataBase->driver()->hasFeature(QSqlDriver::Transactions)){
+    auto connName = mapper->databaseConnectionName();
+    auto dataBase = QSqlDatabase::database(connName);
+    if (!dataBase.driver()->hasFeature(QSqlDriver::Transactions)){
         return false;
     }
     mapperSet.insert(mapper);
-    dbMap[dataBase->connectionName()] = dataBase;
+    dbConnName.insert(connName);
     return true;
 }
 
@@ -88,9 +89,10 @@ inline bool TransactionManager::beginTransaction() {
         return false;
     }
     // 开启事务
-    QList<QSqlDatabase*> doneDB;
-    foreach (auto db, dbMap) {
-        if (!db->transaction()){
+    QList<QSqlDatabase> doneDB;
+    foreach (auto connName, dbConnName) {
+        auto db = QSqlDatabase::database(connName);
+        if (!db.transaction()){
             errorFlag = true;
             break;
         }
@@ -98,8 +100,9 @@ inline bool TransactionManager::beginTransaction() {
     }
     if (errorFlag) {
         foreach (auto db, doneDB) {
-            db->commit();
+            db.commit();
         }
+        doneDB.clear();
         return false;
     }
     // 开启事务完成
@@ -112,10 +115,11 @@ inline bool TransactionManager::commit() {
         return false;
     }
     bool errorFlag{false};
-    foreach (auto db, dbMap) {
-        if (!db->commit()){
+    foreach (auto connName, dbConnName) {
+        auto db = QSqlDatabase::database(connName);
+        if (!db.commit()){
             errorFlag = true;
-            qWarning() << "事务提交失败！"  << db->lastError().text();
+            qWarning() << "事务提交失败！"  << db.lastError().text();
         }
     }
     restore();
@@ -127,10 +131,11 @@ inline bool TransactionManager::rollback() {
         return false;
     }
     bool errorFlag{false};
-    foreach (auto db, dbMap) {
-        if (!db->rollback()){
+    foreach (auto connName, dbConnName) {
+        auto db = QSqlDatabase::database(connName);
+        if (!db.rollback()){
             errorFlag = true;
-            qWarning() << "事务回滚失败！"  << db->lastError().text();
+            qWarning() << "事务回滚失败！"  << db.lastError().text();
         }
     }
     restore();

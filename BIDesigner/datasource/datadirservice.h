@@ -23,7 +23,8 @@
 
 class DataDirService : public BaseService<DataDirDO>{
 public:
-    DataDirService(QSqlDatabase db):BaseService<DataDirDO>(db){}
+    DataDirService(const QString &connectionName)
+        :BaseService<DataDirDO>(connectionName){}
 };
 
 #endif // DATADIRSERVICE_H

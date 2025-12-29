@@ -21,17 +21,14 @@
 #include "datasourceform.h"
 #include "datasourceservice.h"
 #include "dbutil/transactionmanager.h"
+#include "datadialog.h"
 #include "svghelper.h"
 #include "ui_datasourceform.h"
-
 #include <QDropEvent>
 #include <QMessageBox>
 #include <QToolBar>
 #include <configmaster.h>
 
-// static const int ID_ROLE = QTreeWidgetItem::UserType + 1;
-// static const int SOURCE_PLUGIN_ROLE = ID_ROLE + 1;
-// static const int SOURCE_ARG_ROLE = SOURCE_PLUGIN_ROLE + 1;
 static const int DATA_ROLE = QTreeWidgetItem::UserType + 10;
 DataSourceForm::DataSourceForm(QWidget *parent)
     : QDialog(parent)
@@ -41,18 +38,22 @@ DataSourceForm::DataSourceForm(QWidget *parent)
     ui->splitter->setStretchFactor(0, 1);
     ui->splitter->setStretchFactor(1, 3);
     // 建立数据库表映射
-    dataDirService = new DataDirService(QSqlDatabase::database(ConfigMaster::connName));
-    dataSourceService = new DataSourceService(QSqlDatabase::database(ConfigMaster::connName));
-    dataMarketService = new DataMarketService(QSqlDatabase::database(ConfigMaster::connName));
+    dataDirService = new DataDirService(ConfigMaster::connName);
+    dataSourceService = new DataSourceService(ConfigMaster::connName);
+    dataMarketService = new DataMarketService(ConfigMaster::connName);
     // 初始化工具栏
     initToolBar();
     // 初始化数据目录
     initDataDir();
+    // 初始化数据表格
+    initDataTable();
     // 加载配置
     loadConfig();
 
     dataDirDlg = new DataDirDialog(this);
     dataDirDlg->hide();
+    dataDlg = new DataDialog(this);
+    dataDlg->hide();
 }
 
 DataSourceForm::~DataSourceForm()
@@ -79,6 +80,7 @@ void DataSourceForm::onAddCategory(bool flag)
         dataDir.set_parentId(parentDir.get_id());
         dataDir.setParentName(treeItem->text(0));
     }
+    dataDirDlg->setWindowTitle(tr("添加分类"));
     dataDirDlg->setData(dataDir);
     if (dataDirDlg->exec() == QDialog::Accepted) {
         dataDir = dataDirDlg->getData();
@@ -90,6 +92,7 @@ void DataSourceForm::onAddCategory(bool flag)
             if (dataSourceService->save(&dataSource)){
                 sourceMap[dataSource.get_dataDirId()] = dataSource;
             }
+            dataDir.setDataSource(dataSource);
             // 新建树节点
             auto newItem = newTreeItem(dataDir);
 
@@ -133,6 +136,8 @@ void DataSourceForm::onDelCategory(bool flag)
         }
     }else{
         transaction.rollback();
+        QMessageBox::information(this, tr("提示"), tr("删除失败"));
+        return;
     }
     // 删除节点
     auto parent = treeItem->parent();
@@ -157,6 +162,7 @@ void DataSourceForm::onEditCategory(bool flag)
         dataDir.setParentName(parentItem->text(0));
     }
     dataDir.setDataSource(sourceMap[dataDir.get_id()]);
+    dataDirDlg->setWindowTitle(tr("编辑分类"));
     dataDirDlg->setData(dataDir);
     if (dataDirDlg->exec() == QDialog::Accepted){
         // 获取更新并存储
@@ -172,8 +178,9 @@ void DataSourceForm::onEditCategory(bool flag)
             return;
         }
         bool success = dataDirService->updateById(dataDir);
-        auto source = dataDir.getDataSource();
+        auto source = dataDir.getDataSource();qDebug() << __FUNCTION__ << "sourceArgs=" << source.getColPropery("sourceArgs");
         if(!source.isEmpty()){
+            source.set_dataDirId(dataDir.get_id());
             if (source.get_id() > 0) {
                 success &= dataSourceService->updateById(source);
             } else {
@@ -184,6 +191,7 @@ void DataSourceForm::onEditCategory(bool flag)
             if (!trans.commit()){
                 QMessageBox::information(this, tr("提示"), tr("更新失败"));
             }else{
+                dataDir.setDataSource(source);
                 // 更新树节点
                 treeItem->setText(0, dataDir.get_name());
                 treeItem->setData(0, DATA_ROLE, QVariant::fromValue(dataDir));
@@ -205,39 +213,93 @@ void DataSourceForm::onEditCategory(bool flag)
 void DataSourceForm::onAddData(bool flag)
 {
     Q_UNUSED(flag)
+    auto item = ui->dataDir->currentItem();
+    if (item == nullptr) {
+        return;
+    }
+    auto dataDir = item->data(0, DATA_ROLE).value<DataDirDO>();
+    auto source = dataDir.getDataSource();
+    if (source.isEmpty()) {
+        return;
+    }
+    dataDlg->setWindowTitle(tr("添加数据"));
+    DataMarketDO dataMarket;
+    dataMarket.setDataSource(source);
+    dataDlg->setData(dataMarket);
+    if (dataDlg->exec() == QDialog::Accepted) {
+        dataMarket = dataDlg->getData();
+        // 保存数据
+        if(dataMarketService->save(&dataMarket)){
+            addDataTableItem(dataMarket);
+        }
+    }
 }
 
 void DataSourceForm::onDelData(bool flag)
 {
-    Q_UNUSED(flag)
+    Q_UNUSED(flag)    
+    int row = ui->dataTable->currentRow();
+    auto item = ui->dataTable->item(row, 0);
+    if (item == nullptr){
+        return;
+    }
+    if (QMessageBox::question(this, tr("删除确认"), tr("确定要删除") + item->text()) != QMessageBox::Yes){
+        return;
+    }
+    auto dataMarket = item->data(DATA_ROLE).value<DataMarketDO>();
+    // 执行删除
+    if(dataMarketService->deleteById(dataMarket)){
+        ui->dataTable->removeRow(row);
+    }else{
+        QMessageBox::information(this, tr("提示"), tr("删除失败！"));
+    }
 }
 
 void DataSourceForm::onEditData(bool flag)
 {
     Q_UNUSED(flag)
+    int row = ui->dataTable->currentRow();
+    auto item = ui->dataTable->item(row, 0);
+    if (item == nullptr){
+        return;
+    }
+    auto dataMarket = item->data(DATA_ROLE).value<DataMarketDO>();
+    dataDlg->setWindowTitle(tr("编辑数据"));
+    dataDlg->setData(dataMarket);
+    if (dataDlg->exec() == QDialog::Accepted) {
+        dataMarket = dataDlg->getData();
+        // 保存数据
+        if(dataMarketService->updateById(dataMarket)){
+            updateDataTableItem(row, dataMarket);
+        }
+    }
 }
 
 void DataSourceForm::onTreeItemClicked(const QModelIndex &index)
 {
     auto treeItem = ui->dataDir->itemFromIndex(index);
+    auto dataDir = treeItem->data(0, DATA_ROLE).value<DataDirDO>();
+    auto source = dataDir.getDataSource();
+    // 使能添加数据按钮
+    if (source.isEmpty()){
+        ui->addData->setDisabled(true);
+    }else{
+        ui->addData->setEnabled(true);
+    }
     if (treeItem->childCount() > 0) {
+        // 展开下级
         ui->dataDir->expandItem(treeItem);
         return;
     }
-    auto dataDir = treeItem->data(0, DATA_ROLE).value<DataDirDO>();
-    auto source = dataDir.getDataSource();
-    if (source.isEmpty()){
-        // 获取下级数据并展开下级
-        auto items = getDataDir(dataDir.get_id());
+    // 获取下级数据并展开下级
+    auto items = getDataDir(dataDir.get_id());
+    if (items.count() > 0){
         foreach (auto item, items) {
             item.setDataSource(sourceMap[item.get_id()]);
             treeItem->addChild(newTreeItem(item));
         }
         ui->dataDir->expandItem(treeItem);
-        return;
     }
-    // 刷新数据列表
-    updateDataMarket(source.get_id());
 }
 
 void DataSourceForm::onTreeItemChanged(QTreeWidgetItem *item, int column)
@@ -266,9 +328,17 @@ void DataSourceForm::onTreeItemDroped(QTreeWidgetItem *item, QTreeWidgetItem *fr
         dir.set_parentId(-1);
     }
     if (!dataDirService->updateById(dir)){
-        to->removeChild(item);
-        from->addChild(item);
+        if(to) to->removeChild(item);
+        if(from) from->addChild(item);
     }
+}
+
+void DataSourceForm::onTreeSelectionChanged()
+{
+    auto item = ui->dataDir->currentItem();
+    auto dataDir = item->data(0, DATA_ROLE).value<DataDirDO>();
+    // 刷新数据列表
+    updateDataMarket(dataDir.get_id());
 }
 
 void DataSourceForm::paletteCanged()
@@ -302,6 +372,9 @@ void DataSourceForm::initToolBar()
     toolBar->addAction(ui->editData);
     toolBar->addAction(ui->delData);
     layout()->replaceWidget(ui->toolWidget, toolBar);
+    ui->addData->setEnabled(false);
+    ui->editData->setEnabled(false);
+    ui->delData->setEnabled(false);
     // 链接事件
     connect(ui->addCategory, &QAction::triggered, this, &DataSourceForm::onAddCategory);
     connect(ui->delCategory, &QAction::triggered, this, &DataSourceForm::onDelCategory);
@@ -319,11 +392,31 @@ void DataSourceForm::initDataDir()
             this, &DataSourceForm::onTreeItemChanged);
     connect(ui->dataDir, &CustomTreeWidget::itemDroped,
             this, &DataSourceForm::onTreeItemDroped);
-    // ui->dataDir->setDragEnabled(true);
-    // ui->dataDir->setAcceptDrops(true);
-    // ui->dataDir->setDropIndicatorShown(true);
-    // ui->dataDir->setDragDropMode(QAbstractItemView::InternalMove);
+    connect(ui->dataDir, &QTreeWidget::itemSelectionChanged,
+            this, &DataSourceForm::onTreeSelectionChanged);
     ui->dataDir->setEditTriggers(QAbstractItemView::DoubleClicked);
+}
+
+void DataSourceForm::initDataTable()
+{
+    ui->dataTable->setColumnCount(5);
+    ui->dataTable->setHorizontalHeaderLabels({tr("数据"), tr("刷新周期（秒）"),
+                                tr("注释"),tr("创建时间"),tr("修改时间")});
+    ui->dataTable->setColumnWidth(0, 100);
+    ui->dataTable->setColumnWidth(1, 90);
+    ui->dataTable->setColumnWidth(2, 200);
+    ui->dataTable->setColumnWidth(3, 140);
+    ui->dataTable->setColumnWidth(4, 140);
+    // ui->dataTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->dataTable->horizontalHeader()->setDefaultAlignment(Qt::AlignCenter);
+    ui->dataTable->setVerticalHeader(new NumberHeader{Qt::Vertical});
+    ui->dataTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    connect(ui->dataTable, &QTableWidget::itemSelectionChanged, this,[&]{
+        auto items = ui->dataTable->selectedItems();
+        bool flag = items.count() > 0;
+        ui->editData->setEnabled(flag);
+        ui->delData->setEnabled(flag);
+    });
 }
 
 void DataSourceForm::getDataSourceMap()
@@ -373,9 +466,75 @@ QTreeWidgetItem *DataSourceForm::newTreeItem(const DataDirDO &item)
 }
 
 
-void DataSourceForm::updateDataMarket(int id)
+void DataSourceForm::updateDataMarket(int dirId)
 {
+    ui->dataTable->clearContents();
+    ui->dataTable->setRowCount(0);
+    // 获取下级目录ID
+    auto childDirIds = childDir(dirId);
+    QString idSet{""};
+    foreach (auto id, childDirIds) {
+        idSet += QString("%1").arg(id) + ",";
+    }
+    idSet += QString("%1").arg(dirId);
+    // 获取数据源ID
+    auto sourceList = dataSourceService->list(QString("data_dir_id in(%1)").arg(idSet));
+    QString sourceIds{""};
+    QMap<int, DataSourceDO> sourceMap;
+    foreach (auto source, sourceList) {
+        if (!sourceIds.isEmpty()){
+            sourceIds += ",";
+        }
+        sourceIds += QString("%1").arg(source.get_id());
+        sourceMap[source.get_id()] = source;
+    }
+    // 获取数据点
+    auto dataList = dataMarketService->list(QString("data_source_id in(%1)").arg(sourceIds));
+    // 显示数据
+    foreach (auto data, dataList) {
+        data.setDataSource(sourceMap[data.get_dataSourceId()]);
+        addDataTableItem(data);
+    }
+}
 
+void DataSourceForm::addDataTableItem(DataMarketDO dataMarket)
+{
+    auto count = ui->dataTable->rowCount();
+    ui->dataTable->insertRow(count);
+    auto data = new QTableWidgetItem{dataMarket.get_dataName()};
+    data->setTextAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+    data->setData(DATA_ROLE, QVariant::fromValue(dataMarket));
+    ui->dataTable->setItem(count,0,data);
+    auto period = new QTableWidgetItem{QString("%1").arg(dataMarket.get_requestPeriod())};
+    period->setTextAlignment(Qt::AlignCenter|Qt::AlignVCenter);
+    ui->dataTable->setItem(count,1,period);
+    auto note = new QTableWidgetItem{dataMarket.get_note()};
+    note->setTextAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+    note->setToolTip(dataMarket.get_note());
+    ui->dataTable->setItem(count,2,note);
+    QString format{"yyyy-MM-dd hh:mm:ss"};
+    auto create = new QTableWidgetItem{dataMarket.get_createTime().toString(format)};
+    create->setTextAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+    ui->dataTable->setItem(count,3,create);
+    auto modify = new QTableWidgetItem{dataMarket.get_modifyTime().toString(format)};
+    modify->setTextAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+    ui->dataTable->setItem(count,4,modify);
+}
+
+void DataSourceForm::updateDataTableItem(int row, DataMarketDO dataMarket)
+{
+    auto item = ui->dataTable->item(row, 0);
+    item->setText(dataMarket.get_dataName());
+    item->setData(DATA_ROLE, QVariant::fromValue(dataMarket));
+    item = ui->dataTable->item(row, 1);
+    item->setText(QString("%1").arg(dataMarket.get_requestPeriod()));
+    item = ui->dataTable->item(row, 2);
+    item->setText(dataMarket.get_note());
+    QString format{"yyyy-MM-dd hh:mm:ss"};
+    item = ui->dataTable->item(row, 3);
+    item->setText(dataMarket.get_createTime().toString(format));
+    item = ui->dataTable->item(row, 4);
+    item->setText(dataMarket.get_modifyTime().toString(format));
 }
 
 bool DataSourceForm::delDataDir(int id)
@@ -393,7 +552,7 @@ bool DataSourceForm::delDataDir(int id)
     foreach (auto source, sourceList) {
         auto sourceId = source.get_id();
         if (!dataSourceService->deleteById(sourceId) ||
-            !dataMarketService->deleteBatch(QString{"where data_source_id=%1"}.arg(sourceId))){
+            !dataMarketService->deleteBatch(QString{"data_source_id=%1"}.arg(sourceId))){
             result = false;
             break;
         }
@@ -404,43 +563,19 @@ bool DataSourceForm::delDataDir(int id)
     return result;
 }
 
-// void CustomTreeWidget::dropEvent(QDropEvent *event)
-// {
-//     // 在放下操作发生前，先获取当前选中的项（即被拖动的源节点）
-//     QTreeWidgetItem *draggedItem = this->currentItem();
-//     if (!draggedItem) {
-//         // 如果意外没有源节点，调用基类方法或直接返回
-//         QTreeWidget::dropEvent(event);
-//         return;
-//     }
+QList<int> DataSourceForm::childDir(int dirId)
+{
+    QList<int> childs;
+    auto list = dataDirService->list(QString("parent_id=%1").arg(dirId));
+    foreach (auto item, list) {
+        auto id = item.get_id();
+        childs << id << childDir(id);
+    }
+    return childs;
+}
 
-//     // 获取源节点的原父节点
-//     auto *originalParent = draggedItem->parent();
-//     // 如果 originalParent 为空，表示源节点原先是顶级节点
-//     // 顶级节点可以理解为属于 invisibleRootItem[citation:10]
-//     if (!originalParent) {
-//         originalParent = this->invisibleRootItem();
-//     }
-
-//     // 获取放下事件发生位置的目标项（新位置的父节点或兄弟节点）
-//     // QTreeWidgetItem *targetItem = this->itemAt(event->pos());
-//     // QTreeWidgetItem *newParent = nullptr;
-//     // bool isOnItem = (targetItem != nullptr);
-
-//     // if (isOnItem) {
-//     //     // 如果放在了某个项上，这个项就是新的父节点
-//     //     newParent = targetItem;
-//     // } else {
-//     //     // 如果放到了空白区域，新父节点就是虚拟根节点（即成为顶级节点）
-//     //     newParent = this->invisibleRootItem();
-//     // }
-//     // 必须调用基类的 dropEvent，让 Qt 完成默认的移动操作
-//     QTreeWidget::dropEvent(event);
-
-//     // 拖放完成后，可以再次验证节点的新位置（可选）
-//     QTreeWidgetItem *actualNewParent = draggedItem->parent();
-//     // if (!actualNewParent) {
-//     //     actualNewParent = this->invisibleRootItem();
-//     // }
-//     emit itemDroped(draggedItem, originalParent, actualNewParent);
-// }
+void NumberHeader::paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const
+{
+    QString index = QString{"%1"}.arg(visualIndex(logicalIndex)+1);
+    painter->drawText(rect,Qt::AlignCenter|Qt::AlignVCenter,index);
+}

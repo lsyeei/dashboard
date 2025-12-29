@@ -53,9 +53,15 @@ public:
         if (DataDirDialog->objectName().isEmpty())
             DataDirDialog->setObjectName("DataDirDialog");
         DataDirDialog->resize(221, 184);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(DataDirDialog->sizePolicy().hasHeightForWidth());
+        DataDirDialog->setSizePolicy(sizePolicy);
+        DataDirDialog->setAutoFillBackground(true);
         verticalLayout = new QVBoxLayout(DataDirDialog);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setObjectName("horizontalLayout_4");
         topRadio = new QRadioButton(DataDirDialog);
@@ -102,11 +108,11 @@ public:
         horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         dataSourceCheckBox = new QCheckBox(DataDirDialog);
         dataSourceCheckBox->setObjectName("dataSourceCheckBox");
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(dataSourceCheckBox->sizePolicy().hasHeightForWidth());
-        dataSourceCheckBox->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(dataSourceCheckBox->sizePolicy().hasHeightForWidth());
+        dataSourceCheckBox->setSizePolicy(sizePolicy1);
 
         horizontalLayout_2->addWidget(dataSourceCheckBox);
 
@@ -124,9 +130,14 @@ public:
 
         dataSourceWidget = new QWidget(DataDirDialog);
         dataSourceWidget->setObjectName("dataSourceWidget");
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(dataSourceWidget->sizePolicy().hasHeightForWidth());
+        dataSourceWidget->setSizePolicy(sizePolicy2);
         verticalLayout_2 = new QVBoxLayout(dataSourceWidget);
         verticalLayout_2->setObjectName("verticalLayout_2");
-        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMaximumSize);
+        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
 
         verticalLayout->addWidget(dataSourceWidget);
 

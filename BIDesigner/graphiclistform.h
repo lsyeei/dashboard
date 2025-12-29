@@ -19,8 +19,6 @@
 #define GRAPHICLISTFORM_H
 
 #include "bigraphicsscene.h"
-
-#include <QDockWidget>
 #include <QPointer>
 
 namespace Ui {
@@ -28,7 +26,7 @@ class GraphicListForm;
 }
 class QTreeWidgetItem;
 
-class GraphicListForm : public QDockWidget
+class GraphicListForm : public QWidget
 {
     Q_OBJECT
 

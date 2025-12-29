@@ -321,11 +321,20 @@ QString GraphicGroupWidget::createId(QString name, qint32 index)
 void GraphicGroupWidget::paletteChanged()
 {
     auto p = palette();
-    auto textColor = p.brush(QPalette::Text).color().name();
-    auto windowColor = p.brush(QPalette::Window).color().name();
-    auto windowLightColor = p.brush(QPalette::Light).color().name();
+    auto textColor = p.color(QPalette::Active, QPalette::WindowText).name();//p.brush(QPalette::Text).color().name();
+    auto windowColor = p.color(QPalette::Active, QPalette::Window).name();//p.brush(QPalette::Window).color().name();
+    auto windowLightColor = p.color(QPalette::Inactive, QPalette::Window).name();//p.brush(QPalette::Light).color().name();
     auto buttonColor = p.brush(QPalette::Button).color().name();
     auto baseColor = p.brush(QPalette::Base).color().name();
+    if (windowColor.compare("#000000") == 0) {
+        windowColor = "Silver";
+    }
+    if (windowLightColor.compare("#000000") == 0) {
+        windowLightColor = "gray";
+    }
+    if (buttonColor.compare("#000000") == 0) {
+        buttonColor = "gray";
+    }
     titleWidget->setStyleSheet("#titlePanel{border-bottom: 1px solid "+buttonColor+
                                "; background:"+windowColor+";} #titlePanel:hover{ background:"+windowLightColor+";}");
     title->setStyleSheet("#title{font-size:10pt; color:"+textColor+";}");

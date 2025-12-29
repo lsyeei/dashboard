@@ -19,9 +19,12 @@
 #define DATASOURCEFORM_H
 
 #include "datadirdo.h"
+#include "datamarketdo.h"
 #include "datasourcedo.h"
 
 #include <QDialog>
+#include <QHeaderView>
+#include <QPointer>
 // #include <QTreeWidget>
 
 namespace Ui {
@@ -32,6 +35,7 @@ class DataDirService;
 class DataSourceService;
 class DataMarketService;
 class DataDirDialog;
+class DataDialog;
 class QTreeWidgetItem;
 
 class DataSourceForm : public QDialog
@@ -55,6 +59,7 @@ protected Q_SLOTS:
     void onTreeItemClicked(const QModelIndex &index);
     void onTreeItemChanged(QTreeWidgetItem *item, int column);
     void onTreeItemDroped(QTreeWidgetItem *item,QTreeWidgetItem *from,QTreeWidgetItem *to);
+    void onTreeSelectionChanged();
 private:
     Ui::DataSourceForm *ui;
     QToolBar *toolBar;
@@ -62,11 +67,13 @@ private:
     DataSourceService *dataSourceService;
     DataMarketService *dataMarketService;
     QMap<int, DataSourceDO> sourceMap;
-    DataDirDialog *dataDirDlg;
+    QPointer<DataDirDialog> dataDirDlg;
+    QPointer<DataDialog> dataDlg;
 
     void paletteCanged();
     void initToolBar();    
     void initDataDir();
+    void initDataTable();
     /**
      * @brief getDataSourceMap 获取全部数据源
      */
@@ -91,29 +98,38 @@ private:
      * @brief updateDataMarket 更新数据集
      * @param id 数据目录 ID
      */
-    void updateDataMarket(int id);
+    void updateDataMarket(int dirId);
+    /**
+     * @brief addDataTableItem 将 DataMarketDO 对象加入控件
+     * @param dataMarket DataMarketDO对象
+     */
+    void addDataTableItem(DataMarketDO dataMarket);
+    /**
+     * @brief updateDataTableItem 更新打他他变了数据
+     * @param row 指定行号
+     * @param dataMarket 需要更新的数据
+     */
+    void updateDataTableItem(int row, DataMarketDO dataMarket);
     /**
      * @brief delDataDir 删除存储的数据目录
      * @param id 目录 ID
      * @return true 删除成功，false 删除失败
      */
     bool delDataDir(int id);
+    /**
+     * @brief childDir 获取所有下级目录ID
+     * @param dirId 当前目录ID
+     * @return 所有下级目录ID集合
+     */
+    QList<int> childDir(int dirId);
 };
+class NumberHeader : public QHeaderView{
+public:
+    NumberHeader(Qt::Orientation orientation, QWidget *parent = nullptr)
+        :QHeaderView(orientation, parent){}
 
-// class CustomTreeWidget:public QTreeWidget{
-//     Q_OBJECT
-// public:
-//     CustomTreeWidget(QWidget *parent=nullptr):QTreeWidget(parent){
-//         // 启用拖放模式（控件内部移动）
-//         setDragEnabled(true);
-//         setAcceptDrops(true);
-//         setDropIndicatorShown(true);
-//         setDragDropMode(QAbstractItemView::InternalMove);
-//     };
-// Q_SIGNALS:
-//     void itemDroped(QTreeWidgetItem *item,QTreeWidgetItem *from,QTreeWidgetItem *to);
-//     // QWidget interface
-// protected:
-//     void dropEvent(QDropEvent *event) override;
-// };
+    // QHeaderView interface
+protected:
+    void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const override;
+};
 #endif // DATASOURCEFORM_H

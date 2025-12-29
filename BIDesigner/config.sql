@@ -21,7 +21,6 @@ CREATE TABLE dataDir (
 	parent_id INTEGER DEFAULT (0) NOT NULL,
 	group_id INTEGER NOT NULL,
 	name TEXT NOT NULL,
-	value BLOB,
 	property BLOB,
 	create_time REAL, 
     modify_time REAL
@@ -39,7 +38,7 @@ CREATE TABLE dataMarket (
 	id INTEGER DEFAULT (0) NOT NULL PRIMARY KEY AUTOINCREMENT,
 	data_source_id INTEGER NOT NULL,
 	data_name TEXT NOT NULL,
-	request_method TEXT,
+	note TEXT,
 	request_args TEXT,
 	request_period INTEGER,
 	process_code TEXT,	

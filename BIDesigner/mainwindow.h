@@ -87,7 +87,6 @@ private slots:
     void undo();
     void redo();
     void doZoom();
-    void showLayer(bool flag);
     void showRuler(bool flag);
     void showGrid(bool flag);
     void showRefLine(bool flag);
@@ -103,6 +102,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     // 图层窗口
+    QPointer<QDockWidget> layerDocker;
     QPointer<GraphicListForm> layerForm;
     // 图元属性窗口
     GraphicPropertyForm *propertyWidget{nullptr};
@@ -141,7 +141,7 @@ private:
     void initMenu();
     void setMenuEvent();
     void initGraphicsWidget();
-
+    void initLayerDocker();
     void initProjectPropertyForm();
     void initAnimateForm();
     void enableAlignAction(bool flag);

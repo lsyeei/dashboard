@@ -26,6 +26,7 @@ template<typename T>
 class BaseService{
 public:
     explicit BaseService(QSqlDatabase db);
+    explicit BaseService(const QString &connectionName);
     ~BaseService();
     T getOne(QVariant id);
     QList<T> list();
@@ -42,7 +43,14 @@ private:
 
 template<typename T>
 inline BaseService<T>::BaseService(QSqlDatabase db)
-    : mapper(new BaseMapper<T>(db))
+    : BaseService(db.connectionName())
+{
+
+}
+
+template<typename T>
+inline BaseService<T>::BaseService(const QString &connectionName)
+    : mapper(new BaseMapper<T>(connectionName))
 {
 
 }

@@ -14,8 +14,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHeaderView>
-#include <QtWidgets/QListWidget>
 #include <QtWidgets/QSplitter>
+#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include <datasource/customtreewidget.h>
@@ -35,7 +35,7 @@ public:
     QWidget *toolWidget;
     QSplitter *splitter;
     CustomTreeWidget *dataDir;
-    QListWidget *dataList;
+    QTableWidget *dataTable;
 
     void setupUi(QDialog *DataSourceForm)
     {
@@ -107,9 +107,10 @@ public:
         dataDir->setSizePolicy(sizePolicy1);
         splitter->addWidget(dataDir);
         dataDir->header()->setVisible(false);
-        dataList = new QListWidget(splitter);
-        dataList->setObjectName("dataList");
-        splitter->addWidget(dataList);
+        dataTable = new QTableWidget(splitter);
+        dataTable->setObjectName("dataTable");
+        splitter->addWidget(dataTable);
+        dataTable->verticalHeader()->setProperty("showSortIndicator", QVariant(true));
 
         verticalLayout->addWidget(splitter);
 

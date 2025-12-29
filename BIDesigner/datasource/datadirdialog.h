@@ -20,11 +20,12 @@
 
 #include "datadirdo.h"
 #include <QDialog>
+#include <QPointer>
 
 namespace Ui {
 class DataDirDialog;
 }
-
+class IDataSourceWidget;
 class DataDirDialog : public QDialog
 {
     Q_OBJECT
@@ -45,6 +46,11 @@ protected Q_SLOTS:
 private:
     Ui::DataDirDialog *ui;
     DataDirDO data;
+    QPointer<IDataSourceWidget> connectWidget;
+    /**
+     * @brief initDataSourceOption 舒适化数据源选项
+     */
+    void initDataSourceOption();
     /**
      * @brief toInitState 定位到初始状态
      */
@@ -54,6 +60,7 @@ private:
      * @return true 校验成功， false 校验失败
      */
     bool validation();
+
 };
 
 #endif // DATADIRDIALOG_H

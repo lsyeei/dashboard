@@ -19,6 +19,7 @@
 #define WEBITEM_H
 
 #include <QGraphicsProxyWidget>
+#include <QPointer>
 #include <QScopedPointer>
 #include "abstractzoneitem.h"
 #include "webproperty.h"

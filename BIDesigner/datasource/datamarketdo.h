@@ -19,6 +19,8 @@
 #define DATAMARKETDO_H
 #include "dbutil/entity.h"
 
+#include "datasourcedo.h"
+
 #include <QDateTime>
 
 class DataMarketDO : public Entity{
@@ -26,21 +28,27 @@ class DataMarketDO : public Entity{
     TABLE(dataMarket, id)
 public:
     DataMarketDO(){}
+    void setDataSource(DataSourceDO source){
+        dataSource = source;
+        dataSourceId = source.get_id();
+    }
+    DataSourceDO getDataSource(){return dataSource;}
 private:
     int id;
     int dataSourceId;
     QString dataName;
-    QString requestMethod;
+    QString note;
     QString requestArgs;
     QString processCode;
     int requestPeriod;
     QDateTime createTime;
     QDateTime modifyTime;
+    DataSourceDO dataSource;
 
     TABLE_FIELD(id, id, AUTO)
     TABLE_FIELD(dataSourceId, data_source_id)
     TABLE_FIELD(dataName, data_name)
-    TABLE_FIELD(requestMethod, request_method)
+    TABLE_FIELD(note, note)
     TABLE_FIELD(requestArgs, request_args)
     TABLE_FIELD(requestPeriod, request_period)
     TABLE_FIELD(processCode, process_code)

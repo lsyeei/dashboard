@@ -144,7 +144,7 @@ public:
     friend QDebug operator<<(QDebug dbg, const Serializable &data);
 
 private:
-    QString id;
+    QString hashId;
 };
 
 Q_DECLARE_METATYPE(Serializable)

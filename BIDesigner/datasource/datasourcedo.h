@@ -39,10 +39,22 @@ private:
     QDateTime createTime;
     QDateTime modifyTime;
 
+    QString encodeArgs(const QString &arg) const
+    {
+        auto base64 = arg.toUtf8().toBase64();
+        return QString::fromUtf8(base64);
+    }
+    QString decodeArgs(const QString &arg) const
+    {
+        auto hex = arg.toUtf8();
+        auto base64 = QByteArray::fromBase64Encoding(hex).decoded;
+        return QString::fromUtf8(base64);
+    }
+
     TABLE_FIELD(id, id, AUTO)
     TABLE_FIELD(dataDirId, data_dir_id)
     TABLE_FIELD(sourcePluginId, source_plugin_id)
-    TABLE_FIELD(sourceArgs, source_args)
+    TABLE_FIELD(sourceArgs, source_args, encodeArgs, decodeArgs)
     TABLE_FIELD(createTime, create_time)
     TABLE_FIELD(modifyTime, modify_time)
 };

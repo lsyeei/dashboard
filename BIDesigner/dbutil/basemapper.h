@@ -38,7 +38,8 @@ template <typename T>
 class BaseMapper : public AbstractMapper{
 public:
     explicit BaseMapper(QSqlDatabase db);
-    QSqlDatabase *getDataBase();
+    explicit BaseMapper(const QString &connectionName);
+    QString databaseConnectionName() const;
     T selectById(QVariant id);
     bool deleteBatch(const QString &where);
     bool deleteById(const T &data);
@@ -52,7 +53,7 @@ public:
     void endBatchMode() override;
     bool isBatchMode() override;
 private:
-    QSqlDatabase database;
+    QString connectionName;
     QSqlQuery query;
     QString table;
     QList<QString> pkList;
@@ -67,9 +68,15 @@ private:
 
 template<typename T>
 inline BaseMapper<T>::BaseMapper(QSqlDatabase db)
-    :database(db)
+    :BaseMapper(db.databaseName())
 {
-    query = QSqlQuery(db);
+}
+
+template<typename T>
+inline BaseMapper<T>::BaseMapper(const QString &connectionName)
+    : connectionName(connectionName)
+{
+    query = QSqlQuery(QSqlDatabase::database(connectionName, true));
     T item;
     auto obj = dynamic_cast<Entity*>(&item);
     if (obj == nullptr) {
@@ -81,9 +88,9 @@ inline BaseMapper<T>::BaseMapper(QSqlDatabase db)
 }
 
 template<typename T>
-inline QSqlDatabase *BaseMapper<T>::getDataBase()
+inline QString BaseMapper<T>::databaseConnectionName() const
 {
-    return &database;
+    return connectionName;
 }
 
 template<typename T>
@@ -215,7 +222,7 @@ inline QList<T> BaseMapper<T>::selectList(const QString &where)
         T data;
         auto temp = dynamic_cast<Entity*>(&data);
         for(auto i=fieldMap.cbegin(); i != fieldMap.cend(); i++){
-            temp->setValue(i.key(),query.value(i.value()));
+            temp->setValueByColName(i.value(),query.value(i.value()));
         }
         result << data;
     }
@@ -231,8 +238,8 @@ inline bool BaseMapper<T>::insert(T *data)
     auto obj = dynamic_cast<Entity*>(data);
     QString cols{""}, values{""};
     for (auto item=fieldMap.cbegin(); item!=fieldMap.cend(); item++) {
-        if (isPrimaryKey(item.value()) &&
-            obj->getColPropery(item.value()).compare("AUTO") == 0) {
+        auto property = obj->getColPropery(item.value());
+        if (isPrimaryKey(item.value()) && property.compare("AUTO") == 0) {
             continue;
         }
         if (item.value().compare("modify_time") == 0 ||
@@ -276,14 +283,13 @@ inline bool BaseMapper<T>::insert(T *data)
     auto result = execSql(sql, false);
     if (result) {
         auto id = query.lastInsertId();
-        // obj->setValueByColName(pkList[0], id);
         selectById(id, data);
         if(!batchMode){
-            database.commit();
+            QSqlDatabase::database(connectionName).commit();
         }
     } else {
         if(!batchMode){
-            database.rollback();
+            QSqlDatabase::database(connectionName).rollback();
         }
     }
 
@@ -293,6 +299,7 @@ inline bool BaseMapper<T>::insert(T *data)
 template<typename T>
 inline bool BaseMapper<T>::execSql(const QString &sql, bool autoCommit)
 {
+    auto database = QSqlDatabase::database(connectionName);
     if (!database.isValid() || !database.isOpen()) {
         return false;
     }
@@ -301,10 +308,12 @@ inline bool BaseMapper<T>::execSql(const QString &sql, bool autoCommit)
         if (result) {
             database.commit();
         }else{
-            qWarning() << "execute sql:" << sql << ";error happend." << database.lastError().text();
+            qWarning() << "execute sql:" << sql << ";error happend." << query.lastError().text();
             database.rollback();
         }
-    }
+    }else if (!result) {
+        qWarning() << "execute sql:" << sql << ";error happend." << query.lastError().text();
+     }
 
     return result;
 }
@@ -335,6 +344,7 @@ inline bool BaseMapper<T>::isBatchMode()
 template<typename T>
 inline bool BaseMapper<T>::isValid()
 {
+    auto database = QSqlDatabase::database(connectionName);
     return database.isValid() && database.isOpen() &&
            !table.isEmpty() && !pkList.isEmpty() && !fieldMap.isEmpty();
 }
@@ -364,7 +374,7 @@ inline bool BaseMapper<T>::selectById(QVariant id, T *data)
     auto obj = dynamic_cast<Entity*>(data);
     query.first();
     for(auto i=fieldMap.cbegin(); i != fieldMap.cend(); i++){
-        obj->setValue(i.key(),query.value(i.value()));
+        obj->setValueByColName(i.value(),query.value(i.value()));
     }
     return true;
 }

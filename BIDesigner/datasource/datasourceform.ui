@@ -54,7 +54,11 @@
        </property>
       </column>
      </widget>
-     <widget class="QListWidget" name="dataList"/>
+     <widget class="QTableWidget" name="dataTable">
+      <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+       <bool>true</bool>
+      </attribute>
+     </widget>
     </widget>
    </item>
   </layout>

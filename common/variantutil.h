@@ -185,6 +185,11 @@ inline QVariant VariantUtil::fromJsonValue(const QJsonValue &val, QMetaType type
 
 inline QString VariantUtil::toString(const QVariant &var)
 {
+    if (var.canConvert(QMetaType::fromType<QString>())) {
+        auto value = var;
+        value.convert(QMetaType::fromType<QString>());
+        return value.toString();
+    }
     QString str = QDebug::toString(var);
     str = str.replace(QRegularExpression("QVariant\\([^,]+, (.+)\\)$"), "\\1");
     int len = str.length();

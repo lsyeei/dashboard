@@ -1,5 +1,5 @@
-QT  += core gui xml svg webenginewidgets concurrent
-
+QT  += core gui xml svg concurrent
+QT  += webenginewidgets
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TEMPLATE = lib

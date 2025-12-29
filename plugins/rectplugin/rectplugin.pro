@@ -1,5 +1,5 @@
-QT       += core gui xml svg
-QT  += webenginewidgets
+QT += core gui xml svg
+QT += webenginewidgets
 QT += concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -197,11 +197,11 @@ INCLUDEPATH += \
 win32:CONFIG(release, debug|release):DEPENDPATH += $$OUT_PWD/../../common/release
 else:win32:CONFIG(debug, debug|release):DEPENDPATH += $$OUT_PWD/../../common/debug
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/release/libcommon.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/libcommon.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/release/common.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/common.lib
-else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../common/release/libcommon.a
+# win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/release/libcommon.a
+# else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/libcommon.a
+# else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/release/common.lib
+# else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/common.lib
+# else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../common/release/libcommon.a
 
 
 # win32:CONFIG(debug, debug|release): QMAKE_POST_LINK += xcopy /F /E /Y \"$${OUT_PWD}/debug/rectplugind.dll\" \"$${PWD}/../../BIDesigner/plugins/\"

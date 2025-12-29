@@ -23,7 +23,8 @@
 
 class DataSourceService : public BaseService<DataSourceDO>{
 public:
-    DataSourceService(QSqlDatabase db):BaseService<DataSourceDO>(db){}
+    DataSourceService(const QString &connectionName)
+        :BaseService<DataSourceDO>(connectionName){}
 };
 
 #endif // DATASOURCESERVICE_H

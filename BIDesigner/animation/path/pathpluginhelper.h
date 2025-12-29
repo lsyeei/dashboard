@@ -37,12 +37,12 @@ QString PATHITEM##Plugin::id() const\
 \
 QString PATHITEM##Plugin::name() const\
 {\
-    return tr(u8##NAME);\
+    return tr(##NAME);\
 }\
 \
 QString PATHITEM##Plugin::group() const\
 {\
-    return tr(u8##GROUP);\
+    return tr(##GROUP);\
 }\
 \
 QIcon PATHITEM##Plugin::icon() const\

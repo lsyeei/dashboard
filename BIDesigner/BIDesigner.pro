@@ -3,10 +3,10 @@ QT += core-private
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 QMAKE_CXXFLAGS += /MP
 QT += webenginewidgets
+QT += qml
 QT += network
-#webenginecore
 
-CONFIG += c++17
+CONFIG += c++20
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -52,8 +52,10 @@ SOURCES += \
     customgraphic/userpluginpropertyform.cpp \
     customgraphic/usersvgitem.cpp \
     datasource/customtreewidget.cpp \
+    datasource/datadialog.cpp \
     datasource/datadirdialog.cpp \
     datasource/datasourceform.cpp \
+    datasource/datasourcemanager.cpp \
     exportdialog.cpp \
     graphicgroupwidget.cpp \
     graphiclistform.cpp \
@@ -62,6 +64,7 @@ SOURCES += \
     graphicsitemgroup.cpp \
     graphicsmanager.cpp \
     grouppropertyform.cpp \
+    jsutil/jsutil.cpp \
     main.cpp \
     mainwindow.cpp \
     projectpropertyform.cpp \
@@ -124,6 +127,7 @@ HEADERS += \
     customgraphic/userplugintype.h \
     customgraphic/usersvgitem.h \
     datasource/customtreewidget.h \
+    datasource/datadialog.h \
     datasource/datadirdialog.h \
     datasource/datadirdo.h \
     datasource/datadirservice.h \
@@ -131,6 +135,7 @@ HEADERS += \
     datasource/datamarketservice.h \
     datasource/datasourcedo.h \
     datasource/datasourceform.h \
+    datasource/datasourcemanager.h \
     datasource/datasourceservice.h \
     dbutil/basemapper.h \
     dbutil/baseservice.h \
@@ -149,6 +154,7 @@ HEADERS += \
     graphicsmanager.h \
     grouppropertyform.h \
     igraphicsscene.h \
+    jsutil/jsutil.h \
     mainwindow.h \
     pageproperty.h \
     projectProperty.h \
@@ -160,6 +166,7 @@ FORMS += \
     customgraphic/userplugingroupdialog.ui \
     customgraphic/userpluginmanageform.ui \
     customgraphic/userpluginpropertyform.ui \
+    datasource/datadialog.ui \
     datasource/datadirdialog.ui \
     datasource/datasourceform.ui \
     exportdialog.ui \
@@ -170,11 +177,13 @@ FORMS += \
     projectpropertyform.ui
 
 RESOURCES += \
+    editor.qrc \
     icons.qrc
 
 INCLUDEPATH += $$PWD/../plugins/interface \
     $$PWD/../common \
-    $$PWD/../plugins/common
+    $$PWD/../plugins/common \
+    $$PWD/../datasourceplugins/interface \    
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -199,10 +208,8 @@ else:unix: LIBS += -L$$OUT_PWD/../common/ -lcommon
 # INCLUDEPATH += $$PWD/../common
 DEPENDPATH += $$PWD/../common
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../common/release/libcommon.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../common/debug/libcommon.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../common/release/common.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../common/debug/common.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../common/libcommon.a
-
-DISTFILES +=
+# win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../common/release/libcommon.a
+# else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../common/debug/libcommon.a
+# else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../common/release/common.lib
+# else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../common/debug/common.lib
+# else:unix: PRE_TARGETDEPS += $$OUT_PWD/../common/libcommon.a

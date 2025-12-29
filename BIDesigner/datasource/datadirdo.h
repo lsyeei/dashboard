@@ -42,7 +42,6 @@ private:
     int parentId;
     QString name;
     int groupId;
-    QByteArray data;
     QByteArray property;
     QDateTime createTime;
     QDateTime modifyTime;
@@ -55,7 +54,6 @@ private:
     TABLE_FIELD(parentId, parent_id)
     TABLE_FIELD(name, name)
     TABLE_FIELD(groupId, group_id)
-    TABLE_FIELD(data, value)
     TABLE_FIELD(property, property)
     TABLE_FIELD(createTime, create_time)
     TABLE_FIELD(modifyTime, modify_time)

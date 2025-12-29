@@ -25,7 +25,8 @@
 class UserPluginService : public BaseService<UserPluginDO>
 {
 public:
-    UserPluginService(QSqlDatabase db):BaseService<UserPluginDO>(db){}
+    UserPluginService(const QString &connectionName)
+        :BaseService<UserPluginDO>(connectionName){}
 };
 
 #endif // USERPLUGINSERVICE_H

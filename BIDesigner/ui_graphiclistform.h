@@ -12,7 +12,6 @@
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QDockWidget>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLineEdit>
@@ -26,39 +25,43 @@ QT_BEGIN_NAMESPACE
 class Ui_GraphicListForm
 {
 public:
-    QWidget *dockWidgetContents;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
     QLineEdit *queryText;
     QToolButton *searchBtn;
     QTreeWidget *graphicTree;
 
-    void setupUi(QDockWidget *GraphicListForm)
+    void setupUi(QWidget *GraphicListForm)
     {
         if (GraphicListForm->objectName().isEmpty())
             GraphicListForm->setObjectName("GraphicListForm");
-        GraphicListForm->resize(154, 484);
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Preferred);
+        GraphicListForm->resize(128, 309);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(GraphicListForm->sizePolicy().hasHeightForWidth());
         GraphicListForm->setSizePolicy(sizePolicy);
-        GraphicListForm->setFloating(true);
-        GraphicListForm->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea|Qt::DockWidgetArea::RightDockWidgetArea);
-        dockWidgetContents = new QWidget();
-        dockWidgetContents->setObjectName("dockWidgetContents");
-        verticalLayout = new QVBoxLayout(dockWidgetContents);
+        GraphicListForm->setProperty("floating", QVariant(false));
+        verticalLayout = new QVBoxLayout(GraphicListForm);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setContentsMargins(2, -1, 2, 2);
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName("horizontalLayout");
-        queryText = new QLineEdit(dockWidgetContents);
+        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        queryText = new QLineEdit(GraphicListForm);
         queryText->setObjectName("queryText");
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(queryText->sizePolicy().hasHeightForWidth());
+        queryText->setSizePolicy(sizePolicy1);
+        queryText->setMaxLength(32767);
 
         horizontalLayout->addWidget(queryText);
 
-        searchBtn = new QToolButton(dockWidgetContents);
+        searchBtn = new QToolButton(GraphicListForm);
         searchBtn->setObjectName("searchBtn");
         QIcon icon(QIcon::fromTheme(QIcon::ThemeIcon::EditFind));
         searchBtn->setIcon(icon);
@@ -70,28 +73,33 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
-        graphicTree = new QTreeWidget(dockWidgetContents);
+        graphicTree = new QTreeWidget(GraphicListForm);
         QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
         __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
         graphicTree->setHeaderItem(__qtreewidgetitem);
         graphicTree->setObjectName("graphicTree");
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(graphicTree->sizePolicy().hasHeightForWidth());
+        graphicTree->setSizePolicy(sizePolicy2);
         graphicTree->setFrameShape(QFrame::Shape::Box);
         graphicTree->setFrameShadow(QFrame::Shadow::Plain);
         graphicTree->setLineWidth(0);
+        graphicTree->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
         graphicTree->setRootIsDecorated(true);
         graphicTree->setColumnCount(1);
         graphicTree->header()->setVisible(false);
 
         verticalLayout->addWidget(graphicTree);
 
-        GraphicListForm->setWidget(dockWidgetContents);
 
         retranslateUi(GraphicListForm);
 
         QMetaObject::connectSlotsByName(GraphicListForm);
     } // setupUi
 
-    void retranslateUi(QDockWidget *GraphicListForm)
+    void retranslateUi(QWidget *GraphicListForm)
     {
         GraphicListForm->setWindowTitle(QCoreApplication::translate("GraphicListForm", "\347\273\223\346\236\204\350\247\206\345\233\276", nullptr));
         searchBtn->setText(QCoreApplication::translate("GraphicListForm", "...", nullptr));

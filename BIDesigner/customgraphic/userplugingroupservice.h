@@ -25,7 +25,8 @@
 class UserPluginGroupService : public BaseService<UserPluginGroupDO>
 {
 public:
-    UserPluginGroupService(QSqlDatabase db):BaseService<UserPluginGroupDO>(db){}
+    UserPluginGroupService(const QString &connectionName)
+        :BaseService<UserPluginGroupDO>(connectionName){}
 };
 
 #endif // USERPLUGINGROUPSERVICE_H

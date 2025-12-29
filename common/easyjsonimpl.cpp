@@ -52,13 +52,9 @@ QJsonObject EasyJsonImpl::toJson(const Serializable &obj)
                 QVariant value = objPtr->getValue(jsonInfo["name"]);
                 QMetaType type = value.metaType();
                 // 对 Serializable 子类递归转换
-                if (type.id() > QMetaType::User) {
-                    auto valueMeta = type.metaObject();
-                    auto classInfo = valueMeta->classInfo(valueMeta->indexOfClassInfo("base"));
-                    if (QString("Serializable").compare(classInfo.value()) == 0) {
-                        json.insert(alias, toJson(*reinterpret_cast<const Serializable*>(value.constData())));
-                        continue;
-                    }
+                if (Serializable::isSubClass(type)) {
+                    json.insert(alias, toJson(*reinterpret_cast<const Serializable*>(value.constData())));
+                    continue;
                 }
                 // 转为json对象
                 json.insert(alias, VariantUtil::toJsonValue(value));
@@ -94,15 +90,12 @@ QVariant EasyJsonImpl::parseObject(QJsonObject json, QMetaType typeName)
                     continue;
                 }
                 QJsonValueRef jsonValue = json[jsonInfo["alias"]];
+                auto type = fieldType.metaType();
                 // 对 Serializable 子类递归解析
-                if (fieldType.metaType().id() > QMetaType::User) {
-                    auto valueMeta = fieldType.metaType().metaObject();
-                    auto classInfo = valueMeta->classInfo(valueMeta->indexOfClassInfo("base"));
-                    if (QString("Serializable").compare(classInfo.value()) == 0) {
-                        obj->setValue(fieldName,
-                                         parseObject(jsonValue.toObject(), fieldType.metaType()));
-                        continue;
-                    }
+                if (Serializable::isSubClass(type)) {
+                    obj->setValue(fieldName,
+                                     parseObject(jsonValue.toObject(), fieldType.metaType()));
+                    continue;
                 }
                 // 设置字段值
                 obj->setValue(fieldName,

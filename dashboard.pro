@@ -4,6 +4,7 @@ SUBDIRS    += \
     # CustomWidget/ColorPicker \
     # CustomWidget/linestylewidget \
     BIWidgets \
+    datasourceplugins \
     plugins\
     BIDesigner \
     # test/CommonTest \

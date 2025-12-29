@@ -205,6 +205,9 @@ QString GraphicsManager::removeGraphic(const UserPluginDO &data)
             graphic = item;
         }
     }
+    if (graphic == nullptr) {
+        return "";
+    }
     auto graphicId = graphic->id();
     if (graphic) {
         if (!ConfigMaster::instance()->userPlugin->deleteById(data)){
