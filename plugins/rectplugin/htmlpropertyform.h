@@ -20,15 +20,8 @@
 #define HTMLPROPERTYFORM_H
 
 #include "isubwidget.h"
-#include "ksyntaxhighlighting/repository.h"
 #include <QWidget>
 
-namespace KSyntaxHighlighting
-{
-class SyntaxHighlighter;
-}
-
-class HtmlEditorForm;
 namespace Ui {
 class HtmlPropertyForm;
 }
@@ -53,11 +46,6 @@ protected Q_SLOTS:
 
 private:
     Ui::HtmlPropertyForm *ui;
-    KSyntaxHighlighting::Repository m_repository;
-    KSyntaxHighlighting::SyntaxHighlighter *m_highlighter;
-    // HtmlEditorForm *editor{nullptr};
-
-    void setEditorHighlight();
     
     void createEditor();
 

@@ -18,6 +18,7 @@
 
 #include "chartpropertyform.h"
 #include "abstractgooglechart.h"
+#include "syntaxfactory.h"
 #include "ui_chartpropertyform.h"
 #include <QComboBox>
 #include <QResizeEvent>
@@ -28,6 +29,8 @@ ChartPropertyForm::ChartPropertyForm(QWidget *parent)
 {
     ui->setupUi(this);
     layout()->setAlignment(Qt::AlignTop);
+    SyntaxFactory::instance()->highlightDocument(ui->options->document(), "json");
+    SyntaxFactory::instance()->highlightDocument(ui->defaultData->document(), "json");
     // 关联事件
     connect(ui->posProperty, SIGNAL(propertyChanged(qint32,qint32,qint32,qint32,bool)),
             this, SLOT(posChanged(qint32,qint32,qint32,qint32,bool)));

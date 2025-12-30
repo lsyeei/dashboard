@@ -35,13 +35,11 @@ SOURCES += \
     dotline.cpp \
     dotlineplugin.cpp \
     endtypefactory.cpp \
-    # lineItemproperty.cpp \
     formfactory.cpp \
     horizontalelbow.cpp \
     horizontalelbowplugin.cpp \
     lineplugincollection.cpp \
     linepropertyform.cpp \
-    # straightlineitem.cpp \
     polygonline.cpp \
     polygonlineplugin.cpp \
     solidline.cpp \
@@ -79,20 +77,14 @@ HEADERS += \
     horizontalelbowplugin.h \
     linebaseproperty.h \
     lineendtype.h \
-    # lineitemproperty.h \
     lineplugincollection.h \
     linepropertyform.h \
-    # straightlineitem.h \
     polygonline.h \
     polygonlineplugin.h \
     solidline.h \
     solidlineplugin.h \
-    # stable.h \
     verticalelbow.h \
     verticalelbowplugin.h
-
-# PRECOMPILED_HEADER = \
-#     stable.h
 
 INCLUDEPATH += \
     ../interface \
@@ -112,13 +104,14 @@ FORMS += \
 RESOURCES += \
     lineicons.qrc
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../BIWidgets/release/ -lBIWidgets
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../BIWidgets/debug/ -lBIWidgetsd
-
 INCLUDEPATH += \
     $$PWD/../../BIWidgets/linepropertywidget \
     $$PWD/../../BIWidgets/colorpickerwidget \
     $$PWD/../../BIWidgets/bicomboboxwidget \
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../BIWidgets/release/ -lBIWidgets
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../BIWidgets/debug/ -lBIWidgetsd
+else:unix: LIBS += -L$$OUT_PWD/../../BIWidgets/ -lBIWidgets
 
 win32:CONFIG(release, debug|release): DEPENDPATH += $$OUT_PWD/../../BIWidgets/release
 else:win32:CONFIG(debug, debug|release): DEPENDPATH += $$OUT_PWD/../../BIWidgets/debug
@@ -127,14 +120,20 @@ win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidget
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/debug/libBIWidgetsd.a
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/release/BIWidgets.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/debug/BIWidgetsd.lib
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../common/release/ -lcommon
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../common/debug/ -lcommon
+else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../BIWidgets/libBIWidgets.a
 
 INCLUDEPATH += $$PWD/../../common
 DEPENDPATH += $$PWD/../../common
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../common/release/ -lcommon
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../common/debug/ -lcommon
+else:unix: LIBS += -L$$OUT_PWD/../../common/ -lcommon
+
+win32:CONFIG(release, debug|release):DEPENDPATH += $$OUT_PWD/../../common/release
+else:win32:CONFIG(debug, debug|release):DEPENDPATH += $$OUT_PWD/../../common/debug
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/release/libcommon.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/libcommon.a
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/release/common.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/common.lib
+else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../common/libcommon.a

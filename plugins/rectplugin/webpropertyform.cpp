@@ -17,12 +17,8 @@
  */
 #include "webpropertyform.h"
 #include "ui_webpropertyform.h"
-#include "ksyntaxhighlighting/repository.h"
-#include "ksyntaxhighlighting/repository_p.h"
-#include "ksyntaxhighlighting/syntaxhighlighter.h"
-#include "ksyntaxhighlighting/definition_p.h"
-#include "ksyntaxhighlighting/themedata_p.h"
 #include <QFileDialog>
+#include <syntaxfactory.h>
 
 WebPropertyForm::WebPropertyForm(QWidget *parent)
     : ISubWidget(parent)
@@ -30,7 +26,6 @@ WebPropertyForm::WebPropertyForm(QWidget *parent)
 {
     ui->setupUi(this);
     initUI();
-    setEditorHighlight();
 }
 
 WebPropertyForm::~WebPropertyForm()
@@ -128,6 +123,7 @@ void WebPropertyForm::onSelectFile()
 
 void WebPropertyForm::initUI()
 {
+    SyntaxFactory::instance()->highlightDocument(ui->codeEdit->document(), "html");
     layout()->setAlignment(Qt::AlignTop);
     ui->codeRadio->setChecked(true);
     ui->urlWidget->hide();
@@ -137,20 +133,4 @@ void WebPropertyForm::initUI()
     connect(ui->codeRadio, SIGNAL(toggled(bool)), this, SLOT(onValueChanged()));
     connect(ui->fileBtn, SIGNAL(clicked(bool)), this, SLOT(onSelectFile()));
     connect(ui->updateBtn, SIGNAL(clicked(bool)), this, SLOT(onValueChanged()));
-}
-
-void WebPropertyForm::setEditorHighlight()
-{
-    using namespace KSyntaxHighlighting;
-    m_highlighter = new SyntaxHighlighter(ui->codeEdit->document());
-
-    auto repoData = RepositoryPrivate::get(&m_repository);
-    repoData->loadSyntaxFolder(&m_repository, ":/html");
-    repoData->computeAlternativeDefLists();
-    m_highlighter->setDefinition(m_repository.definitionForName("HTML"));
-
-    Theme themeDef;
-    auto themeData = ThemeData::get(themeDef);
-    themeData->load(":/html/atom-one-light.theme");
-    m_highlighter->setTheme(themeDef);
 }

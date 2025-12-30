@@ -46,12 +46,27 @@ HEADERS += \
 INCLUDEPATH += \
         ../interface \
         ../common \
-        $$PWD/../../common \
         $$PWD/../../BIWidgets/fillpropertywidget \
         $$PWD/../../BIWidgets/linepropertywidget \
         $$PWD/../../BIWidgets/pospropertywidget \
         $$PWD/../../BIWidgets/bicomboboxwidget \
         $$PWD/../../BIWidgets/colorpickerwidget \
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../BIWidgets/release/ -lBIWidgets
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../BIWidgets/debug/ -lBIWidgetsd
+else:unix: LIBS += -L$$OUT_PWD/../../BIWidgets/ -lBIWidgets
+
+win32:CONFIG(release, debug|release): DEPENDPATH += $$OUT_PWD/../../BIWidgets/release
+else:win32:CONFIG(debug, debug|release): DEPENDPATH += $$OUT_PWD/../../BIWidgets/debug
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/release/libBIWidgets.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/debug/libBIWidgetsd.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/release/BIWidgets.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/debug/BIWidgetsd.lib
+else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../BIWidgets/libBIWidgets.a
+
+INCLUDEPATH += \
+    $$PWD/../../common \
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../common/release -lcommon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../common/debug -lcommon
@@ -64,13 +79,7 @@ win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../comm
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/libcommon.a
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/release/common.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/common.lib
-else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../common/release/libcommon.a
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../BIWidgets/release/ -lBIWidgets
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../BIWidgets/debug/ -lBIWidgetsd
-else:unix: LIBS += -L$$OUT_PWD/../../BIWidgets/ -lBIWidgets
-win32:CONFIG(release, debug|release): DEPENDPATH += $$OUT_PWD/../../BIWidgets/release
-else:win32:CONFIG(debug, debug|release): DEPENDPATH += $$OUT_PWD/../../BIWidgets/debug
+else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../common/libcommon.a
 
 # Default rules for deployment.
 unix {

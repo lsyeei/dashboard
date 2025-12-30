@@ -22,13 +22,8 @@
 #include "qjsonarray.h"
 #include "qjsondocument.h"
 #include "ui_datadialog.h"
-#include "ksyntaxhighlighting/repository.h"
-#include "ksyntaxhighlighting/repository_p.h"
-#include "ksyntaxhighlighting/syntaxhighlighter.h"
-#include "ksyntaxhighlighting/definition_p.h"
-#include "ksyntaxhighlighting/themedata_p.h"
-
 #include <QJSEngine>
+#include <syntaxfactory.h>
 
 DataDialog::DataDialog(QWidget *parent)
     : QDialog(parent)
@@ -40,7 +35,7 @@ DataDialog::DataDialog(QWidget *parent)
     ui->codeTestBtn->setVisible(false);
     ui->processSplitter->setStretchFactor(0,3);
     ui->processSplitter->setStretchFactor(1,1);
-    setEditorHighlight();
+    SyntaxFactory::instance()->highlightDocument(ui->processCodeEdit->document(), "javascript");
     ui->processCodeEdit->setPlainText(R"((data)=>{
         return{
             value:data
@@ -158,20 +153,4 @@ bool DataDialog::validate()
         return false;
     }
     return true;
-}
-
-void DataDialog::setEditorHighlight()
-{
-    using namespace KSyntaxHighlighting;
-    m_highlighter = new SyntaxHighlighter(ui->processCodeEdit->document());
-
-    auto repoData = RepositoryPrivate::get(&m_repository);
-    repoData->loadSyntaxFolder(&m_repository, ":/syntax-highlighting/syntax");
-    repoData->computeAlternativeDefLists();
-    m_highlighter->setDefinition(m_repository.definitionForName("javascript"));
-
-    Theme themeDef;
-    auto themeData = ThemeData::get(themeDef);
-    themeData->load(":/syntax-highlighting/themes/falcon.theme");
-    m_highlighter->setTheme(themeDef);
 }

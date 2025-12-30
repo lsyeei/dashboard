@@ -16,12 +16,8 @@
  * limitations under the License.
  */
 #include "dataqueryform.h"
-#include "ksyntaxhighlighting/repository_p.h"
-#include "ksyntaxhighlighting/syntaxhighlighter.h"
-#include "ksyntaxhighlighting/theme.h"
-#include "ksyntaxhighlighting/themedata_p.h"
+#include "syntaxfactory.h"
 #include "ui_dataqueryform.h"
-
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QJsonDocument>
@@ -48,7 +44,7 @@ DataQueryForm::DataQueryForm(QWidget *parent)
     fieldFilter->setFilterCaseSensitivity(Qt::CaseInsensitive);
     ui->fieldList->setModel(fieldFilter);
 
-    setEditorHighlight();
+    SyntaxFactory::instance()->highlightDocument(ui->sqlEdit->document(), "sql");
 
     connect(ui->testButton, &QPushButton::clicked,
             this, &DataQueryForm::onTestBtnClicked);
@@ -123,20 +119,4 @@ void DataQueryForm::onFindTable(const QString &text)
 void DataQueryForm::onFindField(const QString &text)
 {
     fieldFilter->setFilterRegularExpression(text);
-}
-
-void DataQueryForm::setEditorHighlight()
-{
-    using namespace KSyntaxHighlighting;
-    m_highlighter = new SyntaxHighlighter(ui->sqlEdit->document());
-
-    auto repoData = RepositoryPrivate::get(&m_repository);
-    repoData->loadSyntaxFolder(&m_repository, ":/syntax-highlighting/syntax");
-    repoData->computeAlternativeDefLists();
-    m_highlighter->setDefinition(m_repository.definitionForName("sql"));
-
-    Theme themeDef;
-    auto themeData = ThemeData::get(themeDef);
-    themeData->load(":/syntax-highlighting/themes/dracula.theme");
-    m_highlighter->setTheme(themeDef);
 }

@@ -19,13 +19,9 @@
 #define DATADIALOG_H
 
 #include "datamarketdo.h"
-#include "ksyntaxhighlighting/repository.h"
-
 #include <QDialog>
 #include <QPointer>
 
-
-namespace KSyntaxHighlighting { class SyntaxHighlighter; }
 namespace Ui {
 class DataDialog;
 }
@@ -45,11 +41,9 @@ private:
     Ui::DataDialog *ui;
     DataMarketDO data;
     QPointer<IDataQueryWidget> queryWidget;
-    KSyntaxHighlighting::Repository m_repository;
-    QPointer<KSyntaxHighlighting::SyntaxHighlighter> m_highlighter;
+
     void updateData();
     bool validate();
-    void setEditorHighlight();
 };
 
 #endif // DATADIALOG_H

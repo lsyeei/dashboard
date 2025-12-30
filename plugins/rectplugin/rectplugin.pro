@@ -7,6 +7,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TEMPLATE = lib
 
 CONFIG += c++17 plugin
+QMAKE_CXXFLAGS += /MP
 
 TARGET = $$qtLibraryTarget(rectplugin)
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -28,7 +29,6 @@ SOURCES += \
     formfactory.cpp \
     hexagonitem.cpp \
     hexagonplugin.cpp \
-    # htmleditorform.cpp \
     obtusetriangleitem.cpp \
     obtusetriangleplugin.cpp \
     octagonitem.cpp \
@@ -96,7 +96,6 @@ HEADERS += \
     formfactory.h \
     hexagonitem.h \
     hexagonplugin.h \
-    # htmleditorform.h \
     obtusetriangleitem.h \
     obtusetriangleplugin.h \
     octagonitem.h \
@@ -120,7 +119,6 @@ HEADERS += \
     rightttriangleitem.h \
     sectoritem.h \
     sectorplugin.h \
-    # stable.h \
     star4item.h \
     star4plugin.h \
     star5item.h \
@@ -162,7 +160,6 @@ unix {
 !isEmpty(target.path): INSTALLS += target
 
 FORMS += \
-    # htmleditorform.ui \
     rectpropertyform.ui \
     textpropertyform.ui \
     htmlpropertyform.ui \
@@ -172,42 +169,41 @@ FORMS += \
 RESOURCES += \
     icons.qrc
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../BIWidgets/release/ -lBIWidgets
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../BIWidgets/debug/ -lBIWidgetsd
-else:unix: LIBS += -L$$OUT_PWD/../../BIWidgets/ -lBIWidgets
-
 INCLUDEPATH += \
     $$PWD/../../BIWidgets/fillpropertywidget \
     $$PWD/../../BIWidgets/linepropertywidget \
     $$PWD/../../BIWidgets/pospropertywidget \
     $$PWD/../../BIWidgets/bicomboboxwidget \
     $$PWD/../../BIWidgets/colorpickerwidget \
-    # $$PWD/../../BIWidgets/textpropertywidget \
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../BIWidgets/release/ -lBIWidgets
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../BIWidgets/debug/ -lBIWidgetsd
+else:unix: LIBS += -L$$OUT_PWD/../../BIWidgets/ -lBIWidgets
 
 win32:CONFIG(release, debug|release): DEPENDPATH += $$OUT_PWD/../../BIWidgets/release
 else:win32:CONFIG(debug, debug|release): DEPENDPATH += $$OUT_PWD/../../BIWidgets/debug
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/release/libBIWidgets.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/debug/libBIWidgetsd.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/release/BIWidgets.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../BIWidgets/debug/BIWidgetsd.lib
+else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../BIWidgets/libBIWidgets.a
+
+INCLUDEPATH += \
+    $$PWD/../../common
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../common/release -lcommon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../common/debug -lcommon
 else:unix:!macx: LIBS += -L$$OUT_PWD/../../common/release -lcommon
 
-INCLUDEPATH += \
-    $$PWD/../../common
-
 win32:CONFIG(release, debug|release):DEPENDPATH += $$OUT_PWD/../../common/release
 else:win32:CONFIG(debug, debug|release):DEPENDPATH += $$OUT_PWD/../../common/debug
 
-# win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/release/libcommon.a
-# else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/libcommon.a
-# else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/release/common.lib
-# else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/common.lib
-# else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../common/release/libcommon.a
-
-
-# win32:CONFIG(debug, debug|release): QMAKE_POST_LINK += xcopy /F /E /Y \"$${OUT_PWD}/debug/rectplugind.dll\" \"$${PWD}/../../BIDesigner/plugins/\"
-# else:win32:CONFIG(release, debug|release): QMAKE_POST_LINK += xcopy /F /E /Y \"$${OUT_PWD}/release/rectplugin.dll\" \"$${PWD}/../../BIDesigner/plugins/\"
-
-# DLLDESTDIR = $$PWD/../../BIDesigner/plugins
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/release/libcommon.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/libcommon.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/release/common.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/common.lib
+else:unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../../common/libcommon.a
 
 DESTDIR = $$PWD/../../BIDesigner/plugins
 

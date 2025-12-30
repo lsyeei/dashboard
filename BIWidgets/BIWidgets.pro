@@ -52,12 +52,13 @@ include(gradientcolorpicker/gradientcolorpicker.pri)
 # win32:CONFIG(debug, debug|release): QMAKE_POST_LINK += xcopy /F /E /Y \"$${PWD}/debug/colorpickerplugind.dll\" \"$${PWD}/dll/\"
 # else:win32:CONFIG(release, debug|release): QMAKE_POST_LINK += xcopy /F /E /Y \"$${PWD}/release/colorpickerplugin.dll\" \"$${PWD}/dll/\"
 
+
+INCLUDEPATH += $$PWD/../common
+
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../common/release/ -lcommon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../common/debug/ -lcommon
 else:unix:!macx: LIBS += -L$$OUT_PWD/../common/ -lcommon
 
-INCLUDEPATH += $$PWD/../common
-DEPENDPATH += $$PWD/../common
 win32:CONFIG(release, debug|release):DEPENDPATH += $$OUT_PWD/../common/release
 else:win32:CONFIG(debug, debug|release):DEPENDPATH += $$OUT_PWD/../common/debug
 

@@ -20,12 +20,6 @@
 
 #include "webproperty.h"
 #include "isubwidget.h"
-#include "ksyntaxhighlighting/repository.h"
-
-namespace KSyntaxHighlighting
-{
-class SyntaxHighlighter;
-}
 
 namespace Ui {
 class WebPropertyForm;
@@ -46,11 +40,8 @@ protected Q_SLOTS:
 private:
     Ui::WebPropertyForm *ui;
     WebProperty attr;
-    KSyntaxHighlighting::Repository m_repository;
-    KSyntaxHighlighting::SyntaxHighlighter *m_highlighter;
 
     void initUI();
-    void setEditorHighlight();
 
 };
 

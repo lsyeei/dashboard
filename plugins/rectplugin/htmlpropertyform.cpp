@@ -17,14 +17,8 @@
 */
 
 #include "htmlpropertyform.h"
-#include "ksyntaxhighlighting/repository.h"
-#include "ksyntaxhighlighting/repository_p.h"
-// #include "htmleditorform.h"
+#include "syntaxfactory.h"
 #include "ui_htmlpropertyform.h"
-
-#include "ksyntaxhighlighting/syntaxhighlighter.h"
-#include "ksyntaxhighlighting/definition_p.h"
-#include "ksyntaxhighlighting/themedata_p.h"
 
 HtmlPropertyForm::HtmlPropertyForm(QWidget *parent)
     : ISubWidget(parent)
@@ -37,23 +31,17 @@ HtmlPropertyForm::HtmlPropertyForm(QWidget *parent)
 
     createEditor();
 
-    setEditorHighlight();
+    SyntaxFactory::instance()->highlightDocument(ui->textEdit->document(), "html");
 }
 
 HtmlPropertyForm::~HtmlPropertyForm()
 {
     delete ui;
-    // if (editor) {
-    //     editor->deleteLater();
-    // }
 }
 
 void HtmlPropertyForm::createEditor()
 {
     ui->eidtBtn->hide();
-    // editor = new HtmlEditorForm();
-    // connect(editor, SIGNAL(editEnd(QString)), this, SLOT(onEditEnd(QString)));
-    // connect(ui->eidtBtn, SIGNAL(clicked(bool)), this, SLOT(onEditButtonClicked()));
 }
 
 void HtmlPropertyForm::setData(const QVariant &data)
@@ -65,9 +53,6 @@ void HtmlPropertyForm::setData(const QVariant &data)
 
 void HtmlPropertyForm::onEditButtonClicked()
 {
-    // editor->setHTML(ui->textEdit->toPlainText());
-    // editor->setParent(this);
-    // editor->exec();//->show();
 }
 
 void HtmlPropertyForm::onEditEnd(const QString &data)
@@ -78,19 +63,4 @@ void HtmlPropertyForm::onEditEnd(const QString &data)
 void HtmlPropertyForm::syncText()
 {
     emit dataChanged(ui->textEdit->toPlainText());
-}
-
-void HtmlPropertyForm::setEditorHighlight()
-{
-    using namespace KSyntaxHighlighting;
-    m_highlighter = new SyntaxHighlighter(ui->textEdit->document());
-
-    auto repoData = RepositoryPrivate::get(&m_repository);
-    repoData->loadSyntaxFolder(&m_repository, ":/html");
-    repoData->computeAlternativeDefLists();
-    m_highlighter->setDefinition(m_repository.definitionForName("HTML"));
-    Theme themeDef;
-    auto themeData = ThemeData::get(themeDef);
-    themeData->load(":/html/atom-one-light.theme");
-    m_highlighter->setTheme(themeDef);
 }

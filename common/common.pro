@@ -13,43 +13,44 @@ QMAKE_CXXFLAGS += /MP
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-HEADERS     = svghelper.h \
+HEADERS     = \
+    svghelper.h \
     brushproperty.h \
     cursorlib.h \
     easyjson.h \
     PropertyHelper.h \
     easyjsonimpl.h \
     flowlayout.h \
-    ksyntaxhighlighting/abstracthighlighter.h \
-    ksyntaxhighlighting/abstracthighlighter_p.h \
-    ksyntaxhighlighting/ansihighlighter.h \
-    ksyntaxhighlighting/context_p.h \
-    ksyntaxhighlighting/contextswitch_p.h \
-    ksyntaxhighlighting/definition.h \
-    ksyntaxhighlighting/definition_p.h \
-    ksyntaxhighlighting/dynamicregexpcache_p.h \
-    ksyntaxhighlighting/foldingregion.h \
-    ksyntaxhighlighting/format.h \
-    ksyntaxhighlighting/format_p.h \
-    ksyntaxhighlighting/highlightingdata_p.hpp \
-    ksyntaxhighlighting/htmlhighlighter.h \
-    ksyntaxhighlighting/keywordlist_p.h \
-    ksyntaxhighlighting/ksyntaxhighlighting_export.h \
-    ksyntaxhighlighting/ksyntaxhighlighting_logging.h \
-    ksyntaxhighlighting/ksyntaxhighlighting_version.h \
-    ksyntaxhighlighting/matchresult_p.h \
-    ksyntaxhighlighting/repository.h \
-    ksyntaxhighlighting/repository_p.h \
-    ksyntaxhighlighting/rule_p.h \
-    ksyntaxhighlighting/state.h \
-    ksyntaxhighlighting/state_p.h \
-    ksyntaxhighlighting/syntaxhighlighter.h \
-    ksyntaxhighlighting/textstyledata_p.h \
-    ksyntaxhighlighting/theme.h \
-    ksyntaxhighlighting/themedata_p.h \
-    ksyntaxhighlighting/wildcardmatcher.h \
-    ksyntaxhighlighting/worddelimiters_p.h \
-    ksyntaxhighlighting/xml_p.h \
+    ksyntaxhighlighting/include/abstracthighlighter.h \
+    ksyntaxhighlighting/include/abstracthighlighter_p.h \
+    ksyntaxhighlighting/include/ansihighlighter.h \
+    ksyntaxhighlighting/include/context_p.h \
+    ksyntaxhighlighting/include/contextswitch_p.h \
+    ksyntaxhighlighting/include/definition.h \
+    ksyntaxhighlighting/include/definition_p.h \
+    ksyntaxhighlighting/include/dynamicregexpcache_p.h \
+    ksyntaxhighlighting/include/foldingregion.h \
+    ksyntaxhighlighting/include/format.h \
+    ksyntaxhighlighting/include/format_p.h \
+    ksyntaxhighlighting/include/highlightingdata_p.hpp \
+    ksyntaxhighlighting/include/htmlhighlighter.h \
+    ksyntaxhighlighting/include/keywordlist_p.h \
+    ksyntaxhighlighting/include/ksyntaxhighlighting_export.h \
+    ksyntaxhighlighting/include/ksyntaxhighlighting_logging.h \
+    ksyntaxhighlighting/include/ksyntaxhighlighting_version.h \
+    ksyntaxhighlighting/include/matchresult_p.h \
+    ksyntaxhighlighting/include/repository.h \
+    ksyntaxhighlighting/include/repository_p.h \
+    ksyntaxhighlighting/include/rule_p.h \
+    ksyntaxhighlighting/include/state.h \
+    ksyntaxhighlighting/include/state_p.h \
+    ksyntaxhighlighting/include/syntaxhighlighter.h \
+    ksyntaxhighlighting/include/textstyledata_p.h \
+    ksyntaxhighlighting/include/theme.h \
+    ksyntaxhighlighting/include/themedata_p.h \
+    ksyntaxhighlighting/include/wildcardmatcher.h \
+    ksyntaxhighlighting/include/worddelimiters_p.h \
+    ksyntaxhighlighting/include/xml_p.h \
     paintHelper.h \
     pathimage.h \
     penproperty.h \
@@ -57,6 +58,7 @@ HEADERS     = svghelper.h \
     snowflake.h \
     svghelperprivate.h \
     svgparser.h \
+    syntaxfactory.h \
     textproperty.h \
     variantutil.h \
     xmlHelper.h \
@@ -68,31 +70,32 @@ SOURCES     = svghelper.cpp \
     cursorlib.cpp \
     easyjsonimpl.cpp \
     flowlayout.cpp \
-    ksyntaxhighlighting/abstracthighlighter.cpp \
-    ksyntaxhighlighting/ansihighlighter.cpp \
-    ksyntaxhighlighting/context.cpp \
-    ksyntaxhighlighting/contextswitch.cpp \
-    ksyntaxhighlighting/definition.cpp \
-    ksyntaxhighlighting/foldingregion.cpp \
-    ksyntaxhighlighting/format.cpp \
-    ksyntaxhighlighting/highlightingdata.cpp \
-    ksyntaxhighlighting/htmlhighlighter.cpp \
-    ksyntaxhighlighting/keywordlist.cpp \
-    ksyntaxhighlighting/ksyntaxhighlighting_logging.cpp \
-    ksyntaxhighlighting/repository.cpp \
-    ksyntaxhighlighting/rule.cpp \
-    ksyntaxhighlighting/state.cpp \
-    ksyntaxhighlighting/syntaxhighlighter.cpp \
-    ksyntaxhighlighting/theme.cpp \
-    ksyntaxhighlighting/themedata.cpp \
-    ksyntaxhighlighting/wildcardmatcher.cpp \
-    ksyntaxhighlighting/worddelimiters.cpp \
+    ksyntaxhighlighting/include/abstracthighlighter.cpp \
+    ksyntaxhighlighting/include/ansihighlighter.cpp \
+    ksyntaxhighlighting/include/context.cpp \
+    ksyntaxhighlighting/include/contextswitch.cpp \
+    ksyntaxhighlighting/include/definition.cpp \
+    ksyntaxhighlighting/include/foldingregion.cpp \
+    ksyntaxhighlighting/include/format.cpp \
+    ksyntaxhighlighting/include/highlightingdata.cpp \
+    ksyntaxhighlighting/include/htmlhighlighter.cpp \
+    ksyntaxhighlighting/include/keywordlist.cpp \
+    ksyntaxhighlighting/include/ksyntaxhighlighting_logging.cpp \
+    ksyntaxhighlighting/include/repository.cpp \
+    ksyntaxhighlighting/include/rule.cpp \
+    ksyntaxhighlighting/include/state.cpp \
+    ksyntaxhighlighting/include/syntaxhighlighter.cpp \
+    ksyntaxhighlighting/include/theme.cpp \
+    ksyntaxhighlighting/include/themedata.cpp \
+    ksyntaxhighlighting/include/wildcardmatcher.cpp \
+    ksyntaxhighlighting/include/worddelimiters.cpp \
     pathimage.cpp \
     serializable.cpp \
     snowflake.cpp \
     svgparser.cpp \
     painterpathex.cpp \
     svgpathdevice.cpp \
+    syntaxfactory.cpp
 
 # Default rules for deployment.
 unix {
@@ -100,5 +103,8 @@ unix {
 }
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    ksyntaxhighlighting/CMakeLists.txt
+# DISTFILES += \
+#     ksyntaxhighlighting/CMakeLists.txt
+
+RESOURCES += \
+    syntax.qrc

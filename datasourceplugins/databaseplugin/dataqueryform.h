@@ -20,13 +20,10 @@
 
 #include "database.h"
 #include "idatasourceplugin.h"
-#include "ksyntaxhighlighting/repository.h"
 #include "queryarg.h"
 #include <QModelIndex>
 #include <QPointer>
 
-
-namespace KSyntaxHighlighting { class SyntaxHighlighter; }
 namespace Ui {
 class DataQueryForm;
 }
@@ -57,10 +54,6 @@ private:
     Database db;
     QPointer<QStandardItemModel> tableModel, fieldModel;
     QPointer<QSortFilterProxyModel> tableFilter, fieldFilter;
-    KSyntaxHighlighting::Repository m_repository;
-    QPointer<KSyntaxHighlighting::SyntaxHighlighter> m_highlighter;
-
-    void setEditorHighlight();
 };
 
 #endif // DATAQUERYFORM_H
