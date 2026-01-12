@@ -28,16 +28,19 @@ public:
     DataSourceDO(){
         id = -1;
         dataDirId = -1;
+        uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
     }
 
     bool isEmpty(){return id <= -1 && sourcePluginId.isEmpty();}
 private:
     int id;
     int dataDirId;
+    QString uuid;
     QString sourcePluginId;
     QString sourceArgs;
     QDateTime createTime;
     QDateTime modifyTime;
+    QString sourceName;
 
     QString encodeArgs(const QString &arg) const
     {
@@ -52,11 +55,13 @@ private:
     }
 
     TABLE_FIELD(id, id, AUTO)
+    TABLE_FIELD(uuid, uuid)
     TABLE_FIELD(dataDirId, data_dir_id)
     TABLE_FIELD(sourcePluginId, source_plugin_id)
     TABLE_FIELD(sourceArgs, source_args, encodeArgs, decodeArgs)
     TABLE_FIELD(createTime, create_time)
     TABLE_FIELD(modifyTime, modify_time)
+    JSONFIELD(sourceName, SourceName)
 };
 
 #endif // DATASOURCEDO_H

@@ -12,7 +12,6 @@
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QDialog>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QTableWidget>
@@ -37,11 +36,10 @@ public:
     CustomTreeWidget *dataDir;
     QTableWidget *dataTable;
 
-    void setupUi(QDialog *DataSourceForm)
+    void setupUi(QWidget *DataSourceForm)
     {
         if (DataSourceForm->objectName().isEmpty())
             DataSourceForm->setObjectName("DataSourceForm");
-        DataSourceForm->setWindowModality(Qt::WindowModality::ApplicationModal);
         DataSourceForm->resize(620, 410);
         addCategory = new QAction(DataSourceForm);
         addCategory->setObjectName("addCategory");
@@ -81,6 +79,7 @@ public:
         delData->setMenuRole(QAction::MenuRole::NoRole);
         verticalLayout = new QVBoxLayout(DataSourceForm);
         verticalLayout->setObjectName("verticalLayout");
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
         toolWidget = new QWidget(DataSourceForm);
         toolWidget->setObjectName("toolWidget");
         QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
@@ -120,7 +119,7 @@ public:
         QMetaObject::connectSlotsByName(DataSourceForm);
     } // setupUi
 
-    void retranslateUi(QDialog *DataSourceForm)
+    void retranslateUi(QWidget *DataSourceForm)
     {
         DataSourceForm->setWindowTitle(QCoreApplication::translate("DataSourceForm", "\346\225\260\346\215\256\346\272\220", nullptr));
         addCategory->setText(QCoreApplication::translate("DataSourceForm", "\346\226\260\345\273\272\345\210\206\347\261\273", nullptr));

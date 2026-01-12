@@ -51,11 +51,17 @@ SOURCES += \
     customgraphic/userpluginmanageform.cpp \
     customgraphic/userpluginpropertyform.cpp \
     customgraphic/usersvgitem.cpp \
+    datahandler/dataassignform.cpp \
+    datahandler/datacontrolform.cpp \
+    datahandler/dataeditorform.cpp \
+    datahandler/abstractaction.cpp \
+    datahandler/dataactionmanager.cpp \
+    datapropertyform.cpp \
     datasource/customtreewidget.cpp \
     datasource/datadialog.cpp \
     datasource/datadirdialog.cpp \
     datasource/datasourceform.cpp \
-    datasource/datasourcemanager.cpp \
+    datasource/datasourcepluginmanager.cpp \
     exportdialog.cpp \
     graphicgroupwidget.cpp \
     graphiclistform.cpp \
@@ -126,6 +132,15 @@ HEADERS += \
     customgraphic/userpluginservice.h \
     customgraphic/userplugintype.h \
     customgraphic/usersvgitem.h \
+    datahandler/dataassignform.h \
+    datahandler/datacontrolform.h \
+    datahandler/dataeditorform.h \
+    datahandler/abstractaction.h \
+    datahandler/assignaction.h \
+    datahandler/controlaction.h \
+    datahandler/dataaction.h \
+    datahandler/dataactionmanager.h \
+    datapropertyform.h \
     datasource/customtreewidget.h \
     datasource/datadialog.h \
     datasource/datadirdialog.h \
@@ -135,7 +150,7 @@ HEADERS += \
     datasource/datamarketservice.h \
     datasource/datasourcedo.h \
     datasource/datasourceform.h \
-    datasource/datasourcemanager.h \
+    datasource/datasourcepluginmanager.h \
     datasource/datasourceservice.h \
     dbutil/basemapper.h \
     dbutil/baseservice.h \
@@ -144,6 +159,7 @@ HEADERS += \
     dbutil/imagedelegate.h \
     dbutil/tablemodelevent.h \
     dbutil/transactionmanager.h \
+    enuminfo.h \
     exportdialog.h \
     filetemplate.h \
     graphicgroupwidget.h \
@@ -166,6 +182,10 @@ FORMS += \
     customgraphic/userplugingroupdialog.ui \
     customgraphic/userpluginmanageform.ui \
     customgraphic/userpluginpropertyform.ui \
+    datahandler/dataassignform.ui \
+    datahandler/datacontrolform.ui \
+    datahandler/dataeditorform.ui \
+    datapropertyform.ui \
     datasource/datadialog.ui \
     datasource/datadirdialog.ui \
     datasource/datasourceform.ui \

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "datasourcemanager.h"
+#include "datasourcepluginmanager.h"
 #include "idatasourceplugin.h"
  #include <QtConcurrent>
 #include <QCoreApplication>
@@ -24,9 +24,9 @@
 #include <QMessageBox>
 #include <QPluginLoader>
 
-DataSourceManager::DataSourceManager(QObject *parent) : QObject(parent){}
+DataSourcePluginManager::DataSourcePluginManager(QObject *parent) : QObject(parent){}
 
-DataSourceManager::~DataSourceManager()
+DataSourcePluginManager::~DataSourcePluginManager()
 {
     foreach (auto item, pluginList) {
         delete item;
@@ -34,13 +34,13 @@ DataSourceManager::~DataSourceManager()
     pluginList.clear();
 }
 
-DataSourceManager *DataSourceManager::instance()
+DataSourcePluginManager *DataSourcePluginManager::instance()
 {
-    static DataSourceManager *manager = new DataSourceManager();
+    static DataSourcePluginManager *manager = new DataSourcePluginManager();
     return manager;
 }
 
-void DataSourceManager::loadDataSource()
+void DataSourcePluginManager::loadDataSource()
 {
     if (isLoaded) {
         return;
@@ -51,11 +51,11 @@ void DataSourceManager::loadDataSource()
         });
     watcher = new QFutureWatcher<IDataSourcePlugin*>();
     connect(watcher, &QFutureWatcher<IDataSourcePlugin*>::finished,
-            this, &DataSourceManager::onPluginLoadEnd);
+            this, &DataSourcePluginManager::onPluginLoadEnd);
     watcher->setFuture(future);
 }
 
-IDataSourcePlugin *DataSourceManager::getPluginById(const QString id)
+IDataSourcePlugin *DataSourcePluginManager::getPluginById(const QString id)
 {
     foreach (auto plugin, pluginList) {
         if(plugin->id().compare(id) == 0){
@@ -65,7 +65,7 @@ IDataSourcePlugin *DataSourceManager::getPluginById(const QString id)
     return nullptr;
 }
 
-IDataSource *DataSourceManager::createDataSource(const QString &pluginId)
+IDataSource *DataSourcePluginManager::createDataSource(const QString &pluginId)
 {
     auto plugin = getPluginById(pluginId);
     if (plugin) {
@@ -74,19 +74,19 @@ IDataSource *DataSourceManager::createDataSource(const QString &pluginId)
     return nullptr;
 }
 
-QList<IDataSourcePlugin *> DataSourceManager::getAllPlugins()
+QList<IDataSourcePlugin *> DataSourcePluginManager::getAllPlugins()
 {
     return pluginList;
 }
 
-void DataSourceManager::onPluginLoadEnd()
+void DataSourcePluginManager::onPluginLoadEnd()
 {
     pluginList = watcher->future().results();
     delete watcher;
     isLoaded = true;
 }
 
-QList<IDataSourcePlugin *> DataSourceManager::loadPlugins()
+QList<IDataSourcePlugin *> DataSourcePluginManager::loadPlugins()
 {
     QList<IDataSourcePlugin *> result;
     QDir pluginsDir(QCoreApplication::applicationDirPath());

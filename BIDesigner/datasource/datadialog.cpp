@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 #include "datadialog.h"
-#include "datasourcemanager.h"
+#include "datasourcepluginmanager.h"
 #include "idatasourceplugin.h"
 #include "jsutil/jsutil.h"
 #include "qjsonarray.h"
@@ -67,7 +67,7 @@ void DataDialog::setData(DataMarketDO dataObj)
     if (pluginId.isEmpty()) {
         return;
     }
-    auto plugin = DataSourceManager::instance()->getPluginById(pluginId);
+    auto plugin = DataSourcePluginManager::instance()->getPluginById(pluginId);
     if (plugin == nullptr) {
         return;
     }
@@ -111,7 +111,7 @@ void DataDialog::onTestProcessCode()
     updateData();
     // 获取数据源内容
     auto source = data.getDataSource();
-    auto plugin = DataSourceManager::instance()->getPluginById(source.get_sourcePluginId());
+    auto plugin = DataSourcePluginManager::instance()->getPluginById(source.get_sourcePluginId());
     if (plugin == nullptr) {
         ui->codeTestEdit->setPlainText("data source not found");
         return;

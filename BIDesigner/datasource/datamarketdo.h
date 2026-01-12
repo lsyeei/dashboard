@@ -27,7 +27,11 @@ class DataMarketDO : public Entity{
     Q_GADGET
     TABLE(dataMarket, id)
 public:
-    DataMarketDO(){}
+    DataMarketDO(){
+        id = -1;
+        dataSourceId = -1;
+        uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    }
     void setDataSource(DataSourceDO source){
         dataSource = source;
         dataSourceId = source.get_id();
@@ -36,6 +40,7 @@ public:
 private:
     int id;
     int dataSourceId;
+    QString uuid;
     QString dataName;
     QString note;
     QString requestArgs;
@@ -47,6 +52,7 @@ private:
 
     TABLE_FIELD(id, id, AUTO)
     TABLE_FIELD(dataSourceId, data_source_id)
+    TABLE_FIELD(uuid, uuid)
     TABLE_FIELD(dataName, data_name)
     TABLE_FIELD(note, note)
     TABLE_FIELD(requestArgs, request_args)

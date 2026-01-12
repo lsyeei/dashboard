@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>DataSourceForm</class>
- <widget class="QDialog" name="DataSourceForm">
-  <property name="windowModality">
-   <enum>Qt::WindowModality::ApplicationModal</enum>
-  </property>
+ <widget class="QWidget" name="DataSourceForm">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,6 +14,9 @@
    <string>数据源</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+   </property>
    <item>
     <widget class="QWidget" name="toolWidget" native="true">
      <property name="sizePolicy">

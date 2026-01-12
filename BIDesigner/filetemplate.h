@@ -71,5 +71,20 @@ public:
         };
     };
     constexpr static char dataSource[] = "dataSource";
+    class dataSourceTemplate {
+    public:
+        constexpr static char source[] = "sourceList";
+        constexpr static char data[] = "dataList";
+        constexpr static char action[] = "actionList";
+        class actionTemplate {
+        public:
+            constexpr static char graphicAction[] = "graphicAction";
+            class graphicActionTemplate {
+            public:
+                constexpr static char graphicId[] = "graphicId";
+                constexpr static char actions[] = "actions";
+            };
+        };
+    };
 };
 #endif // FILETEMPLATE_H

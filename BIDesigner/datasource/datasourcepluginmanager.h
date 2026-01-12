@@ -15,21 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DATASOURCEMANAGER_H
-#define DATASOURCEMANAGER_H
+#ifndef DATASOURCEPLUGINMANAGER_H
+#define DATASOURCEPLUGINMANAGER_H
 
 #include <QFutureWatcher>
 #include <QObject>
 
 class IDataSourcePlugin;
 class IDataSource;
-class DataSourceManager:public QObject
+class DataSourcePluginManager:public QObject
 {
     Q_OBJECT
-    DataSourceManager(QObject *parent = nullptr);
-    ~DataSourceManager();
+    DataSourcePluginManager(QObject *parent = nullptr);
+    ~DataSourcePluginManager();
 public:
-    static DataSourceManager *instance();
+    static DataSourcePluginManager *instance();
     /**
      * @brief loadGraphics 加载图元
      * @return true 成功，false 失败
@@ -37,8 +37,8 @@ public:
     void loadDataSource();
     bool loaded(){return isLoaded;}
     // 删除拷贝构造函数和赋值运算符
-    DataSourceManager(const DataSourceManager&) = delete;
-    DataSourceManager& operator=(const DataSourceManager&) = delete;
+    DataSourcePluginManager(const DataSourcePluginManager&) = delete;
+    DataSourcePluginManager& operator=(const DataSourcePluginManager&) = delete;
     /**
      * @brief 通过ID获取数据源插件
      * @param id 数据源ID
@@ -67,4 +67,4 @@ private:
     QList<IDataSourcePlugin*> loadPlugins();
 };
 
-#endif // DATASOURCEMANAGER_H
+#endif // DATASOURCEPLUGINMANAGER_H

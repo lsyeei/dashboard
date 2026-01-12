@@ -120,8 +120,8 @@ public:
     virtual ~Serializable();
     static bool isSubClass(QMetaType type);
     virtual const QMetaObject* getMetaInfo() const = 0;
-    void copy(const Serializable &from, Serializable &to);
-    void copy(const Serializable &from);
+    virtual void copy(const Serializable &from, Serializable &to);
+    virtual void copy(const Serializable &from);
     virtual QString hashCode();
     virtual bool equals(Serializable &obj);
     virtual bool operator==(Serializable &obj);

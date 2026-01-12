@@ -18,7 +18,7 @@
 
 #include "QtWebEngineWidgets/qwebengineview.h"
 #include "animation/path/imovepath.h"
-#include "datasource/datasourcemanager.h"
+#include "datasource/datasourcepluginmanager.h"
 #include "filetemplate.h"
 #include "bigraphicsscene.h"
 #include "graphicrootwidget.h"
@@ -47,13 +47,15 @@
 #include "graphicsitemgroup.h"
 #include "xmlHelper.h"
 #include "graphiclistform.h"
+#include "datapropertyform.h"
 #include "datasource/datasourceform.h"
 #include "animation/animationform.h"
 #include "animation/animationfactory.h"
- #include <QtConcurrent>
+#include <QtConcurrent>
 #include <QNetworkProxyFactory>
 #include <QWebEnginePage>
 #include <QDockWidget>
+#include <datahandler/dataactionmanager.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -79,6 +81,8 @@ MainWindow::MainWindow(QWidget *parent)
     initProjectPropertyForm();
     // 动画属性
     initAnimateForm();
+    // 数据属性
+    initDataPropertyForm();
     // 初始化右键菜单
     initPopMenu();
     ui->graphicsView->installEventFilter(this);
@@ -495,6 +499,14 @@ void MainWindow::initAnimateForm()
     AnimationFactory::instance()->bindScene(scene);
 }
 
+void MainWindow::initDataPropertyForm()
+{
+    dataPropertyForm = new DataPropertyForm();
+    auto index = ui->propertyWidget->addTab(dataPropertyForm, tr("数据"));
+    ui->propertyWidget->setTabVisible(index, false);
+    DataActionManager::instance()->setGraphicsScene(scene);
+}
+
 void MainWindow::loadPlugin()
 {
     graphicPluginWidget = new GraphicRootWidget(ui->graphicItems);
@@ -507,7 +519,7 @@ void MainWindow::loadPlugin()
             graphicPluginWidget, &GraphicRootWidget::onGraphicPluginLoaded,
             Qt::QueuedConnection);
     // 加载数据源插件
-    DataSourceManager::instance()->loadDataSource();
+    DataSourcePluginManager::instance()->loadDataSource();
 }
 
 void MainWindow::setScene()
@@ -582,6 +594,10 @@ void MainWindow::oneGraphSelected(QGraphicsItem *item)
     ui->propertyWidget->setTabVisible(ui->propertyWidget->indexOf(animationForm),
                                       true);
     animationForm->setGraphicItem(dynamic_cast<ICustomGraphic*>(item));
+    // 启用数据属性
+    ui->propertyWidget->setTabVisible(
+        ui->propertyWidget->indexOf(dataPropertyForm), true);
+    dataPropertyForm->setGraphicItem(dynamic_cast<ICustomGraphic*>(item));
     // 启/禁用组合
     if (typeid(*item) == typeid(GraphicsItemGroup)) {
         ui->group->setDisabled(true);
@@ -615,6 +631,8 @@ void MainWindow::noGraphSelected()
     // 禁用动画
     ui->propertyWidget->setTabVisible(ui->propertyWidget->indexOf(animationForm),
                                       false);
+    ui->propertyWidget->setTabVisible(ui->propertyWidget->indexOf(dataPropertyForm),
+                                      false);
 }
 
 void MainWindow::multiGraphSelected()
@@ -630,6 +648,8 @@ void MainWindow::multiGraphSelected()
     propertyWidget->setDisabled(true);
     // 禁用动画
     ui->propertyWidget->setTabVisible(ui->propertyWidget->indexOf(animationForm),
+                                      false);
+    ui->propertyWidget->setTabVisible(ui->propertyWidget->indexOf(dataPropertyForm),
                                       false);
 }
 
@@ -752,9 +772,13 @@ void MainWindow::doSave()
     xmlWriter.writeEndElement();
 
     xmlWriter.writeStartElement(XmlTemplate::animates);
+    xmlWriter.writeCharacters("");
+    xmlWriter.device()->write(AnimationFactory::instance()->toXml().toUtf8());
     xmlWriter.writeEndElement();
 
     xmlWriter.writeStartElement(XmlTemplate::dataSource);
+    xmlWriter.writeCharacters("");
+    xmlWriter.device()->write(DataActionManager::instance()->toXml().toUtf8());
     xmlWriter.writeEndElement();
 
     xmlWriter.writeEndElement();
@@ -796,7 +820,7 @@ void MainWindow::doOpen()
             } else if (startName.compare(XmlTemplate::animates) == 0){
                 AnimationFactory::instance()->parseXml(XmlHelper::rawText(&reader, false));
             } else if (startName.compare(XmlTemplate::dataSource) == 0){
-                // qDebug() << reader.name() << XmlHelper::rawText(&reader, false);
+                DataActionManager::instance()->parseXml(XmlHelper::rawText(&reader, false));
             }
         }
     }
@@ -1015,6 +1039,8 @@ void MainWindow::showDataSource(bool flag)
 {
     if (dataSource.isNull()) {
         dataSource = new DataSourceForm(this);
+        dataSource->setWindowFlag(Qt::Dialog);
+        dataSource->setWindowModality(Qt::WindowModality::ApplicationModal);
     }
     dataSource->setVisible(!dataSource->isVisible());
 }

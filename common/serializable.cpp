@@ -228,7 +228,7 @@ QDataStream &operator<<(QDataStream &stream, const Serializable &data){
         for(int i=0; i< count; i++){
             auto property = metaInfo->property(i);
             auto name = property.name();
-            QVariant value =dataPtr->getValue(name);
+            QVariant value = dataPtr->getValue(name);
             if (property.metaType().id() == QMetaType::QVariant){
                 VariantUtil::streamIn(stream, value);
             }else{
@@ -299,7 +299,7 @@ QDataStream &operator>>(QDataStream &stream, Serializable &data){
     }while(metaInfo != nullptr);
     return stream;
 }
-
+#include <QList>
 QDebug operator<<(QDebug dbg, const Serializable &data){
     Serializable *dataPtr = const_cast<Serializable *>(&data);
     const QMetaObject *metaInfo = data.getMetaInfo();

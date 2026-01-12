@@ -21,8 +21,6 @@
 #include "datadirdo.h"
 #include "datamarketdo.h"
 #include "datasourcedo.h"
-
-#include <QDialog>
 #include <QHeaderView>
 #include <QPointer>
 // #include <QTreeWidget>
@@ -38,7 +36,7 @@ class DataDirDialog;
 class DataDialog;
 class QTreeWidgetItem;
 
-class DataSourceForm : public QDialog
+class DataSourceForm : public QWidget
 {
     Q_OBJECT
 
@@ -47,6 +45,16 @@ public:
     ~DataSourceForm();
     // QObject interface
     bool event(QEvent *event) override;
+    /**
+     * @brief setEditable 切换编辑状态
+     * @param flag true 允许编辑，false 不允许编辑
+     */
+    void setEditable(bool flag);
+    /**
+     * @brief getSelectedData 获取当前选中的数据
+     * @return 数据对象
+     */
+    DataMarketDO getSelectedData();
 protected Q_SLOTS:
     void onAddCategory(bool flag);
     void onDelCategory(bool flag);

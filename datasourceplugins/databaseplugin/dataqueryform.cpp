@@ -37,12 +37,14 @@ DataQueryForm::DataQueryForm(QWidget *parent)
     tableFilter->setSourceModel(tableModel);
     tableFilter->setFilterCaseSensitivity(Qt::CaseInsensitive);
     ui->tableList->setModel(tableFilter);
+    ui->tableList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     fieldModel = new QStandardItemModel(this);
     fieldFilter = new QSortFilterProxyModel(this);
     fieldFilter->setSourceModel(fieldModel);
     fieldFilter->setFilterCaseSensitivity(Qt::CaseInsensitive);
     ui->fieldList->setModel(fieldFilter);
+    ui->fieldList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     SyntaxFactory::instance()->highlightDocument(ui->sqlEdit->document(), "sql");
 

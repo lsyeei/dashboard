@@ -28,6 +28,7 @@ CREATE TABLE dataDir (
 CREATE TABLE dataSource (
 	id INTEGER DEFAULT (0) NOT NULL PRIMARY KEY AUTOINCREMENT,
 	data_dir_id INTEGER NOT NULL,
+	uuid TEXT NOT NULL,
 	source_plugin_id TEXT NOT NULL,
 	source_args TEXT NOT NULL,
 	create_time REAL, 
@@ -36,6 +37,7 @@ CREATE TABLE dataSource (
 );
 CREATE TABLE dataMarket (
 	id INTEGER DEFAULT (0) NOT NULL PRIMARY KEY AUTOINCREMENT,
+	uuid TEXT NOT NULL,
 	data_source_id INTEGER NOT NULL,
 	data_name TEXT NOT NULL,
 	note TEXT,

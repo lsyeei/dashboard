@@ -56,6 +56,7 @@ public:
         if (DataQueryForm->objectName().isEmpty())
             DataQueryForm->setObjectName("DataQueryForm");
         DataQueryForm->resize(226, 222);
+        DataQueryForm->setAutoFillBackground(true);
         verticalLayout_2 = new QVBoxLayout(DataQueryForm);
         verticalLayout_2->setObjectName("verticalLayout_2");
         verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);

@@ -31,7 +31,7 @@
 
 static const int DATA_ROLE = QTreeWidgetItem::UserType + 10;
 DataSourceForm::DataSourceForm(QWidget *parent)
-    : QDialog(parent)
+    : QWidget(parent)
     , ui(new Ui::DataSourceForm)
 {
     ui->setupUi(this);
@@ -66,7 +66,31 @@ bool DataSourceForm::event(QEvent *event)
     if (event->type() == QEvent::PaletteChange) {
         paletteCanged();
     }
-    return QDialog::event(event);
+    return QWidget::event(event);
+}
+
+void DataSourceForm::setEditable(bool flag)
+{
+    toolBar->setVisible(flag);
+    ui->dataDir->setDragEnabled(flag);
+    ui->dataDir->setEditTriggers(flag?QAbstractItemView::DoubleClicked:QAbstractItemView::NoEditTriggers);
+}
+
+DataMarketDO DataSourceForm::getSelectedData()
+{
+    auto index = ui->dataTable->currentIndex();
+    if (!index.isValid()) {
+        return DataMarketDO();
+    }
+    auto item = ui->dataTable->item(index.row(), 0);
+    auto data = item->data(DATA_ROLE).value<DataMarketDO>();
+    auto dirItem = ui->dataDir->currentItem();
+    auto dir = dirItem->data(0, DATA_ROLE).value<DataDirDO>();
+    auto source = data.getDataSource();
+    source.setSourceName(dir.get_name());
+    data.setDataSource(source);
+
+    return data;
 }
 
 void DataSourceForm::onAddCategory(bool flag)
@@ -178,7 +202,7 @@ void DataSourceForm::onEditCategory(bool flag)
             return;
         }
         bool success = dataDirService->updateById(dataDir);
-        auto source = dataDir.getDataSource();qDebug() << __FUNCTION__ << "sourceArgs=" << source.getColPropery("sourceArgs");
+        auto source = dataDir.getDataSource();
         if(!source.isEmpty()){
             source.set_dataDirId(dataDir.get_id());
             if (source.get_id() > 0) {
@@ -407,10 +431,11 @@ void DataSourceForm::initDataTable()
     ui->dataTable->setColumnWidth(2, 200);
     ui->dataTable->setColumnWidth(3, 140);
     ui->dataTable->setColumnWidth(4, 140);
-    // ui->dataTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->dataTable->horizontalHeader()->setDefaultAlignment(Qt::AlignCenter);
     ui->dataTable->setVerticalHeader(new NumberHeader{Qt::Vertical});
     ui->dataTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->dataTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->dataTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     connect(ui->dataTable, &QTableWidget::itemSelectionChanged, this,[&]{
         auto items = ui->dataTable->selectedItems();
         bool flag = items.count() > 0;
@@ -450,12 +475,9 @@ QTreeWidgetItem *DataSourceForm::newTreeItem(const DataDirDO &item)
 {
     auto treeItem = new QTreeWidgetItem();
     treeItem->setText(0, item.get_name());
-    // treeItem->setData(0, ID_ROLE, item.get_id());
     treeItem->setData(0, DATA_ROLE, QVariant::fromValue(item));
     auto source = item.getDataSource();
     if (source.get_id() >= 0) {
-        // treeItem->setData(0, SOURCE_PLUGIN_ROLE, source.get_sourcePluginId());
-        // treeItem->setData(0, SOURCE_ARG_ROLE, source.get_sourceArgs());
         treeItem->setIcon(0, QIcon::fromTheme(QIcon::ThemeIcon::EditCopy));
     }else{
         treeItem->setIcon(0, QIcon::fromTheme(QIcon::ThemeIcon::FolderOpen));
@@ -464,7 +486,6 @@ QTreeWidgetItem *DataSourceForm::newTreeItem(const DataDirDO &item)
     treeItem->setFlags(treeItem->flags() | Qt::ItemIsEditable);
     return treeItem;
 }
-
 
 void DataSourceForm::updateDataMarket(int dirId)
 {

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 #include "datadirdialog.h"
-#include "datasourcemanager.h"
+#include "datasourcepluginmanager.h"
 #include "idatasourceplugin.h"
 #include "ui_datadirdialog.h"
 
@@ -82,7 +82,7 @@ void DataDirDialog::setData(DataDirDO dataDir)
         }
         // 选中数据源
         ui->dataSourceComboBox->setCurrentIndex(index);
-        auto plugin = DataSourceManager::instance()->getPluginById(pluginId);
+        auto plugin = DataSourcePluginManager::instance()->getPluginById(pluginId);
         auto widget = plugin->connectWidget();
         // 显示数据源参数
         widget->setArgs(dataSource.get_sourceArgs());
@@ -137,7 +137,7 @@ void DataDirDialog::onDataSourceChanged(int index)
     if (pluginId.isEmpty()) {
         return;
     }
-    auto plugin = DataSourceManager::instance()->getPluginById(pluginId);
+    auto plugin = DataSourcePluginManager::instance()->getPluginById(pluginId);
     if (plugin == nullptr) {
         return;
     }
@@ -160,7 +160,7 @@ void DataDirDialog::onTopChecked()
 
 void DataDirDialog::initDataSourceOption()
 {
-    auto plugins = DataSourceManager::instance()->getAllPlugins();
+    auto plugins = DataSourcePluginManager::instance()->getAllPlugins();
     foreach (auto plugin, plugins) {
         ui->dataSourceComboBox->addItem(plugin->name(), plugin->id());
     }

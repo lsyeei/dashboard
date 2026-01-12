@@ -65,6 +65,19 @@ public:
 
         return data;
     }
+
+    template<class T>
+    static QList<T> CDATA2List(QXmlStreamReader *reader){
+        QList<T> list;
+        auto type = reader->readNext();
+        if (type == QXmlStreamReader::Characters && reader->isCDATA()){
+            auto data = reader->text();
+            QByteArray array =  QByteArray::fromHex(data.toLocal8Bit());
+            QDataStream stream(&array, QIODeviceBase::ReadOnly);
+            stream >> list;
+        }
+        return list;
+    }
 };
 
 #endif // XMLHELPER_H

@@ -31,6 +31,7 @@ class GraphicPropertyForm;
 class ProjectPropertyForm;
 class AnimationForm;
 class QPropertyAnimation;
+class DataPropertyForm;
 namespace Ui {
 class MainWindow;
 }
@@ -122,6 +123,8 @@ private:
     AnimationForm *animationForm{nullptr};
     bool playFlag{false};
     qreal angle{0};
+    // 数据属性
+    DataPropertyForm *dataPropertyForm{nullptr};
     // 右键菜单
     QPointer<QMenu> graphicMenu;
     QPointer<QMenu> viewMenu;
@@ -144,6 +147,7 @@ private:
     void initLayerDocker();
     void initProjectPropertyForm();
     void initAnimateForm();
+    void initDataPropertyForm();
     void enableAlignAction(bool flag);
     void enableDistributeAction(bool flag);
     void enableLayerAction(bool flag);
