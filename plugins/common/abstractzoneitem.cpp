@@ -83,16 +83,74 @@ void AbstractZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->restore();
 }
 
-QMap<QString, QString> AbstractZoneItem::propertyDescription()
+QList<CustomMetadata> AbstractZoneItem::metadataList()
 {
-    auto result = AbstractItem::propertyDescription();
-    result["width"] = tr("RW|宽度");
-    result["height"] = tr("RW|高度");
-    result["size"] = tr("RW|大小");
-    // result["center"] = tr("RW|位置");
-    result["brushStyle"] = tr("RW|画刷样式");
-    result["color"] = tr("RW|背景颜色");
+    auto result = AbstractItem::metadataList();
+    result << CustomMetadata{"width", tr("宽度"), DataType::DOUBLE, OperateMode::ReadWrite, "15.5"}
+           << CustomMetadata{"height", tr("高度"), DataType::DOUBLE, OperateMode::ReadWrite, "15.5"}
+           << CustomMetadata{"size", tr("大小"), DataType::SIZE, OperateMode::ReadWrite, "[15.5,12.2]"}
+           << CustomMetadata{"color", tr("背景颜色"), DataType::STRING, OperateMode::ReadWrite, "#00FF00"};
     return result;
+}
+
+void AbstractZoneItem::setCustomData(const QString &name, const QString &value)
+{
+    if (name.isEmpty() || value.isEmpty()) {
+        return;
+    }
+    bool ok{false};
+    if (name.compare("width") == 0) {
+        auto width = value.trimmed().toDouble(&ok);
+        if (ok) {
+            setWidth(width);
+        }
+    }else if (name.compare("height") == 0) {
+        auto height = value.trimmed().toDouble(&ok);
+        if (ok) {
+            setHeight(height);
+        }
+    }else if (name.compare("size") == 0) {
+        auto values = value.split(",");
+        if (values.count() < 2) {
+            return;
+        }
+        bool xOk{false}, yOk{false};
+        auto xStr = values[0].trimmed().mid(1);
+        auto yStr = values[1].trimmed();
+        yStr = yStr.left(yStr.length() - 1);
+        auto x = xStr.toDouble(&xOk);
+        auto y = yStr.toDouble(&yOk);
+        if (xOk && yOk){
+            setSize({x, y});
+        }
+    }else if (name.compare("color") == 0) {
+        QColor color{value};
+        if (!color.isValid()) {
+            return;
+        }
+        setColor(color);
+    }else{
+        AbstractItem::setCustomData(name, value);
+    }
+}
+
+QString AbstractZoneItem::getCustomData(const QString &name)
+{
+    if (name.isEmpty()) {
+        return "";
+    }
+    if (name.compare("width") == 0) {
+        return QString("%1").arg(attribute()->getWidth());
+    }else if (name.compare("height") == 0) {
+        return QString("%1").arg(attribute()->getHeight());
+    }else if (name.compare("size") == 0) {
+        auto attr = attribute();
+        return QString("[%1,%2]").arg(attr->getWidth()).arg(attr->getHeight());
+    }else if (name.compare("color") == 0) {
+        return attribute()->getBrush().getColor().name();
+    }else{
+        return AbstractItem::getCustomData(name);
+    }
 }
 
 ZoneProperty *AbstractZoneItem::attribute() const
@@ -101,10 +159,10 @@ ZoneProperty *AbstractZoneItem::attribute() const
     return dynamic_cast<ZoneProperty*>(attr);
 }
 
-qreal AbstractZoneItem::width() const
-{
-    return attribute()->getWidth();
-}
+// qreal AbstractZoneItem::width() const
+// {
+//     return attribute()->getWidth();
+// }
 
 void AbstractZoneItem::setWidth(qreal newWidth)
 {
@@ -115,10 +173,10 @@ void AbstractZoneItem::setWidth(qreal newWidth)
 }
 
 
-qreal AbstractZoneItem::height() const
-{
-    return attribute()->getHeight();
-}
+// qreal AbstractZoneItem::height() const
+// {
+//     return attribute()->getHeight();
+// }
 
 
 void AbstractZoneItem::setHeight(qreal newHeight)
@@ -129,10 +187,10 @@ void AbstractZoneItem::setHeight(qreal newHeight)
     updateItem();
 }
 
-QColor AbstractZoneItem::color() const
-{
-    return attribute()->getBrush().getColor();
-}
+// QColor AbstractZoneItem::color() const
+// {
+//     return attribute()->getBrush().getColor();
+// }
 
 void AbstractZoneItem::setColor(const QColor &newColor)
 {
@@ -143,19 +201,19 @@ void AbstractZoneItem::setColor(const QColor &newColor)
     updateItem();
 }
 
-Qt::BrushStyle AbstractZoneItem::brushStyle() const
-{
-    return attribute()->getBrush().getStyle();
-}
+// Qt::BrushStyle AbstractZoneItem::brushStyle() const
+// {
+//     return attribute()->getBrush().getStyle();
+// }
 
-void AbstractZoneItem::setBrushStyle(Qt::BrushStyle newBrushStyle)
-{
-    auto attr = attribute();
-    auto brush = attr->getBrush();
-    brush.setStyle(newBrushStyle);
-    attr->setBrush(brush);
-    updateItem();
-}
+// void AbstractZoneItem::setBrushStyle(Qt::BrushStyle newBrushStyle)
+// {
+//     auto attr = attribute();
+//     auto brush = attr->getBrush();
+//     brush.setStyle(newBrushStyle);
+//     attr->setBrush(brush);
+//     updateItem();
+// }
 
 void AbstractZoneItem::sizeChanged(QRectF offsetValue)
 {

@@ -24,7 +24,6 @@
 #include "igraphicplugin.h"
 #include "bigraphicsview.h"
 #include "bigraphicsscene.h"
-
 #include <QResizeEvent>
 
 GraphicPropertyForm::GraphicPropertyForm(QWidget *parent)
@@ -116,7 +115,7 @@ bool GraphicPropertyForm::setGraphicItem(QGraphicsItem *item)
         ICustomGraphic *curItem = dynamic_cast<ICustomGraphic*>(item);
         if (curItem) {
             ui->graphicName->setText(itemName);
-            QWidget *property = findOrCreateForm(curItem->classId());//widgets[curItem->classId()];
+            QWidget *property = findOrCreateForm(curItem->classId());
             if (property){
                 curItem->setPropertyWidget(property);
                 layout()->addWidget(property);

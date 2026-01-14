@@ -208,6 +208,26 @@ void WebItem::updateAttribute(BaseProperty *attr)
     updateWeb();
 }
 
+QList<CustomMetadata> WebItem::metadataList()
+{
+    auto list = AbstractZoneItem::metadataList();
+    list << CustomMetadata{"html", tr("HTML代码"), DataType::STRING,
+                       OperateMode::WriteOnly, "<div>代码示例</div>"};
+    return list;
+}
+
+void WebItem::setCustomData(const QString &name, const QString &value)
+{
+    if (name.isEmpty() || value.isEmpty()) {
+        return;
+    }
+    if (name.compare("html") == 0) {
+        loadWeb(PageType::CODE, value);
+    }else{
+        AbstractZoneItem::setCustomData(name, value);
+    }
+}
+
 void WebItem::attributeSwitched(int oldIndex, int newIndex)
 {
     web->hide();

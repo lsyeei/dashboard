@@ -35,7 +35,7 @@ public:
     void setSize(const QSizeF &size) override;
     void setWidth(qreal newWidth) override;
     void setHeight(qreal newHeight) override;
-    void setColor(const QColor &newColor) override;
+    // void setColor(const QColor &newColor) override;
 
 protected:
     QPainterPath shapePath() const override;

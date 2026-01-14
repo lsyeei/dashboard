@@ -24,6 +24,42 @@
 #ifndef ICUSTOMGRAPHIC_H
 #define ICUSTOMGRAPHIC_H
 
+#include <QString>
+enum class OperateMode{ReadOnly, ReadWrite, WriteOnly};
+enum class DataType{BOOL, INT, DOUBLE, STRING, POINT, SIZE, JSON};
+struct CustomMetadata{
+    // 属性名
+    QString name;
+    // 属性别名，可读的名称
+    QString alias;
+    // 数据类型
+    DataType dataType;
+    // 操作模式
+    OperateMode mode;
+    // 数据示例
+    QString dataExample;
+    QString dataTypeName(){
+        switch (dataType) {
+        case DataType::BOOL:
+            return "布尔"; break;
+        case DataType::INT:
+            return "整形"; break;
+        case DataType::DOUBLE:
+            return "小数"; break;
+        case DataType::STRING:
+            return "字符串"; break;
+        case DataType::POINT:
+            return "坐标"; break;
+        case DataType::SIZE:
+            return "大小"; break;
+        case DataType::JSON:
+            return "json 字符串"; break;
+        default:
+            return "未知";break;
+        }
+    }
+};
+
 #ifdef BASE_FOR_GROUP
 #include <QGraphicsItemGroup>
 #else
@@ -31,7 +67,6 @@
 #endif
 
 class QXmlStreamWriter;
-
 class ICustomGraphic :
 #ifdef BASE_FOR_GROUP
     virtual public QGraphicsItemGroup
@@ -68,17 +103,22 @@ public:
      */
     virtual QString toXml() const = 0;
     /**
-     * @brief propertyDescription 获取插件的公开属性信息
-     * @return 属性信息集合，key 属性名，value 属性描述，
-     * 可以通过QObject的property()方法获取属性值，setProperty()方法设置属性值
-     * value 格式：以 | 作为分隔符，至少包括2个字段，字段顺序如下，
-     *           第一个字段表示属性的可读（R）和可写（W）特性，
-     *           第二个字段为属性的简称
-     *           第三个字段为属性的详细描述
-     *   例如：属性width，value可表示为：RW|宽度|图像的最大宽度；
-     *        属性center，value可表示为：R|中心位置|图形的中心在scene中的坐标位置
+     * @brief metadataList 获取插件的元数据信息
+     * @return 元数据信息列表
      */
-    virtual QMap<QString, QString> propertyDescription() = 0;
+    virtual QList<CustomMetadata> metadataList() = 0;
+    /**
+     * @brief setCustomData 给数据赋值
+     * @param name 数据名称
+     * @param value 值
+     */
+    virtual void setCustomData(const QString &name, const QString &value) = 0;
+    /**
+     * @brief getCustomData 获取指定数据的值
+     * @param name 数据名称
+     * @return 数据的值
+     */
+    virtual QString getCustomData(const QString &name) = 0;
 
 };
 // #define ICustomGraphic_iid "cn.devhome.BIDesigner.ICustomGraphic"

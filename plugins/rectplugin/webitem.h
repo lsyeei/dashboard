@@ -39,6 +39,9 @@ public:
     bool eventFilter(QObject *watched, QEvent *event) override;
     // AbstractItem interface
     void updateAttribute(BaseProperty *attr) override;
+    // ICustomGraphic interface
+    QList<CustomMetadata> metadataList() override;
+    void setCustomData(const QString &name, const QString &value) override;
 Q_SIGNALS:
     void WebCreateEvent();
     // AbstractZoneItem interface

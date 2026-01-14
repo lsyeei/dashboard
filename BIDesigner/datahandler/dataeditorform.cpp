@@ -60,6 +60,7 @@ void DataEditorForm::setData(DataAction data)
     if (data.getDataId().isEmpty()) {
         return;
     }
+    QSignalBlocker dataBlocker(ui->dataEdit);
     auto dataMarketDo = data.getData();
     auto source = dataMarketDo.getDataSource();
     updateDataEdit(dataMarketDo);
@@ -67,7 +68,10 @@ void DataEditorForm::setData(DataAction data)
     auto actionType = data.getActionType();
     QSignalBlocker controlBlocker(ui->controlRadio);
     QSignalBlocker assignBlocker(ui->assignmentRadio);
+    QSignalBlocker cFormlBlocker(controlForm);
+    QSignalBlocker aFormBlocker(assignForm);
     bool flag = actionType == ActionType::CONTROL_GRAPHIC;
+    ui->controlTypeWidget->setVisible(true);
     ui->controlRadio->setChecked(flag);
     controlForm->setVisible(flag);
     ui->assignmentRadio->setChecked(!flag);

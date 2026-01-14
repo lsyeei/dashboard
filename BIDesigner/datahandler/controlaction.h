@@ -37,8 +37,8 @@ public:
         uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
     }
 
-    QString getControlTypeName();
-    QString getSymbolSummary();
+    QString controlTypeName();
+    QString symbolSummary();
     void setThreshold(qreal val){minValue = val;}
     qreal getThreshold(){return minValue;}
     QPair<qreal,qreal> getRange(){return {minValue, maxValue};}
@@ -49,6 +49,9 @@ public:
      * @return true 成功，false 失败
      */
     bool testLogic(QVariant data);
+    void setSwitchStateAction(int id, const QString &name);
+    QPair<int, QString> getSwitchStateAction();
+    QString actionString();
 private:
     QString uuid;
     // 逻辑操作符
@@ -119,12 +122,12 @@ inline QList<EnumInfo> ControlAction::controlTypeList(){
                       QCoreApplication::tr("切换状态"),
                       QCoreApplication::tr("将图元切换到指定状态")}
           << EnumInfo{int(ControlType::SET_PROPERTY),
-                      QCoreApplication::tr("设置指定属性"),
+                      QCoreApplication::tr("设置属性"),
                       QCoreApplication::tr("为图元指定属性设置指定值")};
     return types;
 }
 
-inline QString ControlLogic::getControlTypeName()
+inline QString ControlLogic::controlTypeName()
 {
     QString name{""};
     auto controlTypeList = ControlAction::controlTypeList();
@@ -137,7 +140,7 @@ inline QString ControlLogic::getControlTypeName()
     return name;
 }
 
-inline QString ControlLogic::getSymbolSummary()
+inline QString ControlLogic::symbolSummary()
 {
     QString summary{""};
     auto symbolList = ControlAction::logicSymbolList();
@@ -189,6 +192,38 @@ inline bool ControlLogic::testLogic(QVariant data){
     return trigger;
 }
 
+inline void ControlLogic::setSwitchStateAction(int id, const QString &name)
+{
+    if (controlType != ControlType::SWITCH_STATE) {
+        return;
+    }
+    action = QVariant::fromValue(QPair{id, name});
+}
+
+inline QPair<int, QString> ControlLogic::getSwitchStateAction()
+{
+    if (controlType != ControlType::SWITCH_STATE) {
+         return QPair<int, QString>{};
+    }
+    return action.value<QPair<int, QString>>();
+}
+
+inline QString ControlLogic::actionString()
+{
+    switch (controlType) {
+    case ControlType::PLAY_ANIMATION:
+        return action.toString();
+        break;
+    case ControlType::SWITCH_STATE:
+        return getSwitchStateAction().second;
+        break;
+    case ControlType::SET_PROPERTY:
+        return action.value<AssignAction>().summary();
+        break;
+    }
+    return "";
+}
+
 inline void ControlAction::triggerAction(QVariant data, QGraphicsItem *graphic){
     foreach (auto logic, logicList) {
         bool flag = logic.testLogic(data);
@@ -216,7 +251,7 @@ inline QString ControlAction::summary()
 {
     QList<QString> result;
     foreach (auto logic, logicList) {
-        result << logic.getControlTypeName();
+        result << logic.controlTypeName();
     }
     return result.join(" / ");
 }

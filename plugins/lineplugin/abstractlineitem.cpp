@@ -168,44 +168,44 @@ QPainterPath AbstractLineItem::endShape() const
     return endPath;
 }
 
-qreal AbstractLineItem::width() const
-{
-    return attribute()->getWidth();
-}
+// qreal AbstractLineItem::width() const
+// {
+//     return attribute()->getWidth();
+// }
 
-void AbstractLineItem::setWidth(qreal newWidth)
-{
-    auto attr = attribute();
-    auto height = attr->getHeight();
-    setSize({newWidth, height});
-}
+// void AbstractLineItem::setWidth(qreal newWidth)
+// {
+//     auto attr = attribute();
+//     auto height = attr->getHeight();
+//     setSize({newWidth, height});
+// }
 
-qreal AbstractLineItem::height() const
-{
-    return attribute()->getHeight();
-}
+// qreal AbstractLineItem::height() const
+// {
+//     return attribute()->getHeight();
+// }
 
-void AbstractLineItem::setHeight(qreal newHeight)
-{
-    auto attr = attribute();
-    auto width = attr->getWidth();
-    setSize({width, newHeight});
-}
+// void AbstractLineItem::setHeight(qreal newHeight)
+// {
+//     auto attr = attribute();
+//     auto width = attr->getWidth();
+//     setSize({width, newHeight});
+// }
 
-QColor AbstractLineItem::color() const
-{
-    return attribute()->getPen().getColor();
-}
+// QColor AbstractLineItem::color() const
+// {
+//     return attribute()->getPen().getColor();
+// }
 
-void AbstractLineItem::setColor(const QColor &newColor)
-{
-    auto attr = attribute();
-    auto pen = attr->getPen();
-    pen.setColor(newColor);
-    attr->setPen(pen);
-    updateGraphic();
-    updateForm();
-}
+// void AbstractLineItem::setColor(const QColor &newColor)
+// {
+//     auto attr = attribute();
+//     auto pen = attr->getPen();
+//     pen.setColor(newColor);
+//     attr->setPen(pen);
+//     updateGraphic();
+//     updateForm();
+// }
 
 QPainterPath AbstractLineItem::previewPath(QList<QPointF> points, QVariant args) const
 {

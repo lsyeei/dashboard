@@ -18,8 +18,10 @@
 
 #include "textpropertyform.h"
 #include "ui_textpropertyform.h"
-
+#include <QTimer>
 #include <QFontDatabase>
+
+#include <QTime>
 
 TextPropertyForm::TextPropertyForm(QWidget *parent)
     : ISubWidget(parent)
@@ -29,7 +31,7 @@ TextPropertyForm::TextPropertyForm(QWidget *parent)
     ui->blockLine->hide();
     ui->blockWidget->hide();
     layout()->setAlignment(Qt::AlignTop);
-    initFontFamilies();
+    QTimer::singleShot(100, this, &TextPropertyForm::initFontFamilies);
     initEvent();
 }
 
@@ -244,7 +246,7 @@ void TextPropertyForm::onBlockFormatChanged()
         blockFormat.setAlignment(ui->alignJustifyBtn->isChecked()?Qt::AlignJustify:Qt::AlignLeft);
     }
     if (action.compare("increaseIndentBtn") == 0) {
-        auto indent = blockFormat.indent();qDebug() << "last indent:" << indent;
+        auto indent = blockFormat.indent();
         blockFormat.setIndent(indent + 1);
     }
     if (action.compare("decreaseIndentBtn") == 0) {
@@ -356,6 +358,7 @@ void TextPropertyForm::onListFormatChanged()
 
 void TextPropertyForm::initFontFamilies()
 {
+    QSignalBlocker familyBolcker(ui->fontFamily);
     auto families = QFontDatabase::families();
     ui->fontFamily->clear();
     foreach (auto name , families) {

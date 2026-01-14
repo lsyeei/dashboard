@@ -51,6 +51,7 @@ void DataPropertyForm::setGraphicItem(ICustomGraphic *item)
     dataEditor->setGraphicsItem(item);
     graphicId = graphicScene->getItemId(item);
     QSignalBlocker tableBlocker(ui->dataTable);
+    QSignalBlocker editorBlocker(dataEditor);
     ui->dataTable->clearContents();
     ui->dataTable->setRowCount(0);
     dataEditor->reset();

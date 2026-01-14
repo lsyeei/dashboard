@@ -25,11 +25,11 @@ class ZoneProperty;
 class AbstractZoneItem : public AbstractItem
 {
     Q_OBJECT
-    Q_PROPERTY(qreal width READ width WRITE setWidth FINAL)
-    Q_PROPERTY(qreal height READ height WRITE setHeight FINAL)
-    Q_PROPERTY(QSizeF size READ size WRITE setSize FINAL)
-    Q_PROPERTY(Qt::BrushStyle brushStyle READ brushStyle WRITE setBrushStyle FINAL)
-    Q_PROPERTY(QColor color READ color WRITE setColor FINAL)
+    // Q_PROPERTY(qreal width READ width WRITE setWidth FINAL)
+    // Q_PROPERTY(qreal height READ height WRITE setHeight FINAL)
+    // Q_PROPERTY(QSizeF size READ size WRITE setSize FINAL)
+    // Q_PROPERTY(Qt::BrushStyle brushStyle READ brushStyle WRITE setBrushStyle FINAL)
+    // Q_PROPERTY(QColor color READ color WRITE setColor FINAL)
 
 public:
     AbstractZoneItem(QGraphicsItem *parent = nullptr, bool init = true);
@@ -41,21 +41,25 @@ public:
     // ICustomGraphic interface
     void setSize(const QSizeF &size) override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    QMap<QString, QString> propertyDescription() Q_DECL_OVERRIDE;
+
+    QList<CustomMetadata> metadataList() Q_DECL_OVERRIDE;
+    void setCustomData(const QString &name, const QString &value) Q_DECL_OVERRIDE;
+    QString getCustomData(const QString &name) Q_DECL_OVERRIDE;
+
     using AbstractItem::attribute;
     ZoneProperty *attribute() const;
 
-    qreal width() const;
+    // qreal width() const;
     virtual void setWidth(qreal newWidth);
 
-    qreal height() const;
+    // qreal height() const;
     virtual void setHeight(qreal newHeight);
 
-    QColor color() const;
+    // QColor color() const;
     virtual void setColor(const QColor &newColor);
 
-    Qt::BrushStyle brushStyle() const;
-    void setBrushStyle(Qt::BrushStyle newBrushStyle);
+    // Qt::BrushStyle brushStyle() const;
+    // void setBrushStyle(Qt::BrushStyle newBrushStyle);
 
 protected slots:
     virtual void sizeChanged(QRectF offsetValue);

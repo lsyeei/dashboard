@@ -114,11 +114,11 @@ void AbstractTextItem::setHeight(qreal newHeight)
     textItem->setTransform(trans);
 }
 
-void AbstractTextItem::setColor(const QColor &newColor)
-{
-    textItem->setDefaultTextColor(newColor);
-    updateItem();
-}
+// void AbstractTextItem::setColor(const QColor &newColor)
+// {
+//     textItem->setDefaultTextColor(newColor);
+//     updateItem();
+// }
 
 QPainterPath AbstractTextItem::shapePath() const
 {

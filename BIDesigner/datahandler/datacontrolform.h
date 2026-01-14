@@ -51,6 +51,8 @@ protected Q_SLOTS:
     void addLogic();
     void editLogic();
     void delLogic();
+    void onStateChanged();
+    void onPropertyChanged();
 private:
     Ui::DataControlForm *ui;
     QGraphicsItem *graphic;
@@ -78,6 +80,9 @@ private:
      */
     void collectAndEmit();
     void showControlOption(bool flag);
+    void initStateOption(auto customGraphic);
+    void initPropertyOption(auto customGraphic);
+    void selectStateOption(auto data);
 };
 
 #endif // DATACONTROLFORM_H

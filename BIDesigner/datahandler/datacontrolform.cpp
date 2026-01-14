@@ -17,9 +17,13 @@
  */
 #include "datacontrolform.h"
 #include "datasource/datasourceform.h"
+#include "icustomgraphic.h"
+#include "qjsonarray.h"
 #include "ui_datacontrolform.h"
 
 #include <datahandler/controlaction.h>
+
+#include <QJsonDocument>
 
 #define DATA_ROLE Qt::UserRole + 1
 
@@ -36,10 +40,68 @@ DataControlForm::~DataControlForm()
     delete ui;
 }
 
+void DataControlForm::initStateOption(auto customGraphic)
+{
+    QSignalBlocker stateBlocker(ui->stateOptions);
+    ui->stateOptions->clear();
+    auto stateStr = customGraphic->getCustomData("stateSet");
+    QJsonParseError error;
+    QJsonDocument doc = QJsonDocument::fromJson(stateStr.toUtf8(), &error);
+    if (doc.isArray()) {
+        auto array = doc.array();
+        foreach (auto it, array) {
+            if(!it.isObject()){
+                continue;
+            }
+            auto obj = it.toObject();
+            auto id = obj["id"].toInt();
+            auto name = obj["name"].toString();
+            ui->stateOptions->addItem(name, QVariant::fromValue(QPair{id, name}));
+        }
+        ui->stateOptions->setCurrentIndex(-1);
+    }else{
+        qWarning() << __FUNCTION__ << "get graphic stateSet error:"
+                   << error.errorString();
+    }
+}
+
+void DataControlForm::initPropertyOption(auto customGraphic)
+{
+    QSignalBlocker blocker(ui->propertyOptions);
+    ui->propertyOptions->clear();
+    auto list = customGraphic->metadataList();
+    foreach (auto meta, list) {
+        if (meta.mode== OperateMode::ReadOnly ||
+            meta.name.compare("state") == 0) {
+            continue;
+        }
+        ui->propertyOptions->addItem(meta.alias, QVariant::fromValue(meta));
+    }
+    ui->propertyOptions->setCurrentIndex(-1);
+}
+
+void DataControlForm::selectStateOption(auto data)
+{
+    auto index = ui->stateOptions->count() - 1;
+    for(;index >= 0; --index){
+        auto option = ui->stateOptions->itemData(index).value<QPair<int,QString>>();
+        if (option.first == data.first) {
+            break;
+        }
+    }
+    ui->stateOptions->setCurrentIndex(index);
+    ui->stateWidget->setVisible(true);
+}
+
 void DataControlForm::setGraphicsItem(QGraphicsItem *item)
 {
     graphic = item;
-    // todo：获取图元状态、动画、属性
+    auto customGraphic = dynamic_cast<ICustomGraphic*>(item);
+    // 获取状态选项
+    initStateOption(customGraphic);
+    // 获取属性选项
+    initPropertyOption(customGraphic);
+    // todo：获取图元动画
 }
 
 void DataControlForm::setData(QVariant action)
@@ -113,6 +175,24 @@ void DataControlForm::delLogic()
     collectAndEmit();
 }
 
+void DataControlForm::onStateChanged()
+{
+    dataChanged();
+}
+
+void DataControlForm::onPropertyChanged()
+{
+    if (ui->propertyOptions->currentIndex() < 0) {
+        ui->propertyLabel->setText("");
+        return;
+    }
+    auto meta = ui->propertyOptions->currentData().value<CustomMetadata>();
+    QString text{"数据类型：%1 \r\n例:  %2"};
+    text = text.arg(meta.dataTypeName(), meta.dataExample);
+    ui->propertyLabel->setText(text);
+    dataChanged();
+}
+
 void DataControlForm::editLogic()
 {
     newFlag = false;
@@ -155,9 +235,7 @@ void DataControlForm::editLogic()
     AssignAction assignAction;
     switch (controlType) {
     case ControlType::SWITCH_STATE:
-        index = ui->stateOptions->findData(logic.getAction().toString());
-        ui->stateOptions->setCurrentIndex(index);
-        ui->stateWidget->setVisible(true);
+        selectStateOption(logic.getSwitchStateAction());
         break;
     case ControlType::PLAY_ANIMATION:
         index = ui->animationOptions->findData(logic.getAction().toString());
@@ -165,8 +243,14 @@ void DataControlForm::editLogic()
         ui->animateWidget->setVisible(true);
         break;
     case ControlType::SET_PROPERTY:
-        assignAction = logic.getAction().value<AssignAction>();
-        index = ui->propertyOptions->findData(assignAction.getPropertyName());
+        assignAction = logic.getAction().value<AssignAction>();        
+        auto index = ui->propertyOptions->count() - 1;
+        for (; index >= 0; -- index) {
+            auto meta = ui->propertyOptions->itemData(index).value<CustomMetadata>();
+            if (meta.name.compare(assignAction.getPropertyName()) == 0) {
+                break;
+            }
+        }
         ui->propertyOptions->setCurrentIndex(index);
         ui->propertyValueEdit->setText(assignAction.getDefaultValue());
         ui->propertyWidget->setVisible(true);
@@ -224,9 +308,9 @@ void DataControlForm::initUI()
     connect(ui->animationOptions, &QComboBox::currentIndexChanged,
             this, [&]{dataChanged();});
     connect(ui->stateOptions, &QComboBox::currentIndexChanged,
-            this, [&]{dataChanged();});
+            this, &DataControlForm::onStateChanged);
     connect(ui->propertyOptions, &QComboBox::currentIndexChanged,
-            this, [&]{dataChanged();});
+            this, &DataControlForm::onPropertyChanged);
     connect(ui->propertyValueEdit, &QLineEdit::editingFinished,
             this, [&]{dataChanged();});
     connect(ui->minValueSpin, &QDoubleSpinBox::editingFinished,
@@ -272,14 +356,13 @@ void DataControlForm::addActionTableItem(ControlLogic logic)
 {
     auto row = ui->actionTable->rowCount();
     ui->actionTable->insertRow(row);
-    auto item = new QTableWidgetItem(logic.getSymbolSummary());
+    auto item = new QTableWidgetItem(logic.symbolSummary());
     item->setData(DATA_ROLE, QVariant::fromValue(logic));
     ui->actionTable->setItem(row, 0, item);
 
-    ui->actionTable->setItem(row, 1, new QTableWidgetItem(logic.getControlTypeName()));
+    ui->actionTable->setItem(row, 1, new QTableWidgetItem(logic.controlTypeName()));
 
-    auto act = logic.getAction();
-    ui->actionTable->setItem(row, 2, new QTableWidgetItem(act.toString()));
+    ui->actionTable->setItem(row, 2, new QTableWidgetItem(logic.actionString()));
 }
 
 void DataControlForm::showRangeValue(bool flag)
@@ -321,7 +404,8 @@ void DataControlForm::dataChanged()
         break;
     case ControlType::SET_PROPERTY:
         AssignAction act;
-        act.setPropertyName(ui->propertyOptions->currentData().toString());
+        auto meta = ui->propertyOptions->currentData().value<CustomMetadata>();
+        act.setPropertyName(meta.name);
         act.setPropertyAlias(ui->propertyOptions->currentText());
         act.setDefaultValue(ui->propertyValueEdit->text().trimmed());
         logic.setAction(QVariant::fromValue(act));
@@ -338,12 +422,12 @@ void DataControlForm::dataChanged()
         newFlag = false;
      }else{
          auto item = ui->actionTable->item(row, 0);
-         item->setText(logic.getSymbolSummary());
+         item->setText(logic.symbolSummary());
          item->setData(DATA_ROLE, QVariant::fromValue(logic));
          item = ui->actionTable->item(row, 1);
-         item->setText(logic.getControlTypeName());
+         item->setText(logic.controlTypeName());
          item = ui->actionTable->item(row, 2);
-         item->setText(logic.getAction().toString());
+         item->setText(logic.actionString());
      }
      // 获取全部数据，并触发数据变更信号
      collectAndEmit();

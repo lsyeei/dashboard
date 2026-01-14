@@ -30,10 +30,10 @@ class QTimeLine;
 class AbstractLineItem : public AbstractItem, public ILinePath
 {
     Q_OBJECT
-    Q_PROPERTY(qreal width READ width WRITE setWidth FINAL)
-    Q_PROPERTY(qreal height READ height WRITE setHeight FINAL)
-    Q_PROPERTY(QSizeF size READ size WRITE setSize FINAL)
-    Q_PROPERTY(QColor color READ color WRITE setColor FINAL)
+    // Q_PROPERTY(qreal width READ width WRITE setWidth FINAL)
+    // Q_PROPERTY(qreal height READ height WRITE setHeight FINAL)
+    // Q_PROPERTY(QSizeF size READ size WRITE setSize FINAL)
+    // Q_PROPERTY(QColor color READ color WRITE setColor FINAL)
 public:
     enum LineState{
         // 不可用状态
@@ -64,14 +64,14 @@ public:
     QPainterPath startShape() const Q_DECL_OVERRIDE;
     QPainterPath endShape() const Q_DECL_OVERRIDE;
 
-    qreal width() const;
-    virtual void setWidth(qreal newWidth);
+    // qreal width() const;
+    // virtual void setWidth(qreal newWidth);
 
-    qreal height() const;
-    virtual void setHeight(qreal newHeight);
+    // qreal height() const;
+    // virtual void setHeight(qreal newHeight);
 
-    QColor color() const;
-    virtual void setColor(const QColor &newColor);
+    // QColor color() const;
+    // virtual void setColor(const QColor &newColor);
 
     // ILinePath interface
     QPainterPath previewPath(QList<QPointF> points, QVariant args) const override;

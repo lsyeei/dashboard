@@ -120,11 +120,11 @@ public:
         verticalLayout_3 = new QVBoxLayout(TextPropertyForm);
         verticalLayout_3->setSpacing(0);
         verticalLayout_3->setObjectName("verticalLayout_3");
-        verticalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        verticalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         verticalLayout_3->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setObjectName("horizontalLayout_5");
-        horizontalLayout_5->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_5->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         expandFont = new QToolButton(TextPropertyForm);
         expandFont->setObjectName("expandFont");
         expandFont->setMaximumSize(QSize(16, 16));
@@ -169,11 +169,11 @@ public:
         fontWidget->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(fontWidget);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         verticalLayout->setContentsMargins(0, 9, 0, -1);
         horizontalLayout_12 = new QHBoxLayout();
         horizontalLayout_12->setObjectName("horizontalLayout_12");
-        horizontalLayout_12->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_12->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         fontFamily = new QComboBox(fontWidget);
         fontFamily->setObjectName("fontFamily");
         sizePolicy2.setHeightForWidth(fontFamily->sizePolicy().hasHeightForWidth());
@@ -190,7 +190,7 @@ public:
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName("horizontalLayout");
-        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         label_12 = new QLabel(fontWidget);
         label_12->setObjectName("label_12");
         sizePolicy1.setHeightForWidth(label_12->sizePolicy().hasHeightForWidth());
@@ -235,7 +235,7 @@ public:
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
-        horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         boldBtn = new QToolButton(fontWidget);
         boldBtn->setObjectName("boldBtn");
         boldBtn->setStyleSheet(QString::fromUtf8("font: 9pt \"Microsoft YaHei UI\";\n"
@@ -301,7 +301,7 @@ public:
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName("horizontalLayout_3");
-        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_3->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         label = new QLabel(fontWidget);
         label->setObjectName("label");
         sizePolicy1.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
@@ -354,7 +354,7 @@ public:
 
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setObjectName("horizontalLayout_4");
-        horizontalLayout_4->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_4->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         label_2 = new QLabel(fontWidget);
         label_2->setObjectName("label_2");
         sizePolicy1.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
@@ -399,7 +399,7 @@ public:
 
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setObjectName("horizontalLayout_6");
-        horizontalLayout_6->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_6->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         expandBlock = new QToolButton(TextPropertyForm);
         expandBlock->setObjectName("expandBlock");
         expandBlock->setMaximumSize(QSize(16, 16));
@@ -438,11 +438,11 @@ public:
         blockWidget->setSizePolicy(sizePolicy);
         verticalLayout_2 = new QVBoxLayout(blockWidget);
         verticalLayout_2->setObjectName("verticalLayout_2");
-        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         verticalLayout_2->setContentsMargins(0, -1, 0, -1);
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setObjectName("horizontalLayout_7");
-        horizontalLayout_7->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_7->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         label_11 = new QLabel(blockWidget);
         label_11->setObjectName("label_11");
         sizePolicy1.setHeightForWidth(label_11->sizePolicy().hasHeightForWidth());
@@ -500,7 +500,7 @@ public:
         horizontalLayout_11 = new QHBoxLayout();
         horizontalLayout_11->setSpacing(0);
         horizontalLayout_11->setObjectName("horizontalLayout_11");
-        horizontalLayout_11->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_11->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         label_9 = new QLabel(blockWidget);
         label_9->setObjectName("label_9");
         sizePolicy1.setHeightForWidth(label_9->sizePolicy().hasHeightForWidth());
@@ -525,7 +525,7 @@ public:
 
         horizontalLayout_13 = new QHBoxLayout();
         horizontalLayout_13->setObjectName("horizontalLayout_13");
-        horizontalLayout_13->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_13->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         label_10 = new QLabel(blockWidget);
         label_10->setObjectName("label_10");
         sizePolicy1.setHeightForWidth(label_10->sizePolicy().hasHeightForWidth());
@@ -558,7 +558,7 @@ public:
 
         horizontalLayout_8 = new QHBoxLayout();
         horizontalLayout_8->setObjectName("horizontalLayout_8");
-        horizontalLayout_8->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_8->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         label_6 = new QLabel(blockWidget);
         label_6->setObjectName("label_6");
         sizePolicy1.setHeightForWidth(label_6->sizePolicy().hasHeightForWidth());
@@ -596,7 +596,7 @@ public:
 
         horizontalLayout_10 = new QHBoxLayout();
         horizontalLayout_10->setObjectName("horizontalLayout_10");
-        horizontalLayout_10->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_10->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         label_7 = new QLabel(blockWidget);
         label_7->setObjectName("label_7");
         sizePolicy1.setHeightForWidth(label_7->sizePolicy().hasHeightForWidth());
@@ -623,7 +623,7 @@ public:
 
         horizontalLayout_14 = new QHBoxLayout();
         horizontalLayout_14->setObjectName("horizontalLayout_14");
-        horizontalLayout_14->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_14->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         label_8 = new QLabel(blockWidget);
         label_8->setObjectName("label_8");
         sizePolicy1.setHeightForWidth(label_8->sizePolicy().hasHeightForWidth());
@@ -650,7 +650,7 @@ public:
 
         horizontalLayout_9 = new QHBoxLayout();
         horizontalLayout_9->setObjectName("horizontalLayout_9");
-        horizontalLayout_9->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        horizontalLayout_9->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         label_13 = new QLabel(blockWidget);
         label_13->setObjectName("label_13");
         sizePolicy1.setHeightForWidth(label_13->sizePolicy().hasHeightForWidth());

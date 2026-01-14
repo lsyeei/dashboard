@@ -32,6 +32,9 @@ public:
     QString classId() const override;
     // ICustomGraphic interface
     QString toXml() const override;
+    QList<CustomMetadata> metadataList() override;
+    void setCustomData(const QString &name, const QString &value) override;
+    QString getCustomData(const QString &name) override;
     // AbstractItem interface
     void updateAttribute(BaseProperty *attr) override;
 

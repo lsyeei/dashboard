@@ -47,6 +47,39 @@ QString HtmlItem::toXml() const
     return AbstractZoneItem::toXml();
 }
 
+QList<CustomMetadata> HtmlItem::metadataList()
+{
+    auto list = AbstractTextItem::metadataList();
+    list << CustomMetadata{"html", tr("html 代码"), DataType::STRING,
+                           OperateMode::ReadWrite, "<div>html code</div>"};
+    return list;
+}
+
+void HtmlItem::setCustomData(const QString &name, const QString &value)
+{
+    if (name.isEmpty() || value.isEmpty()) {
+        return;
+    }
+    if (name.compare("html") == 0) {
+        attribute()->setData(value);
+        textItem->setHtml(value);
+    }else{
+        AbstractTextItem::setCustomData(name, value);
+    }
+}
+
+QString HtmlItem::getCustomData(const QString &name)
+{
+    if (name.isEmpty()) {
+        return "";
+    }
+    if(name.compare("html") == 0){
+        return textItem->toHtml();
+    }else{
+        return AbstractTextItem::getCustomData(name);
+    }
+}
+
 void HtmlItem::updateAttribute(BaseProperty *attr)
 {
     AbstractTextItem::updateAttribute(attr);

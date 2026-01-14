@@ -22,7 +22,6 @@
 #include "qwebengineprofile.h"
 #include "qwebenginesettings.h"
 #include "qwebengineview.h"
-
 #include <QJsonDocument>
 
 AbstractGoogleChart::AbstractGoogleChart(QGraphicsItem *parent)
@@ -46,6 +45,49 @@ AbstractGoogleChart::AbstractGoogleChart(const QString &xml, QGraphicsItem *pare
 QString AbstractGoogleChart::classId() const
 {
     return ChartFactory::chartClassId(attribute()->getChartType());
+}
+
+QList<CustomMetadata> AbstractGoogleChart::metadataList()
+{
+    auto list = AbstractZoneItem::metadataList();
+    QString data{""};
+    auto type = attribute()->getChartType();
+    auto charts = ChartFactory::instance()->chartObjects();
+    foreach (auto item, charts) {
+        if(item.type.compare(type) == 0){
+            data = item.defaultData;
+            break;
+        }
+    }
+    list << CustomMetadata{"chartData", tr("图表数据"), DataType::JSON,
+                       OperateMode::ReadWrite, data};
+    return list;
+}
+
+void AbstractGoogleChart::setCustomData(const QString &name, const QString &value)
+{
+    if (name.isEmpty() || value.isEmpty()) {
+        return;
+    }
+    if (name.compare("chartData") == 0){
+        auto attr = attribute();
+        attr->setDataTable(value);
+        refreshChart();
+    }else{
+        AbstractZoneItem::setCustomData(name, value);
+    }
+}
+
+QString AbstractGoogleChart::getCustomData(const QString &name)
+{
+    if (name.isEmpty()) {
+        return "";
+    }
+    if (name.compare("chartData") == 0){
+        return attribute()->getDataTable();
+    }else{
+        return AbstractZoneItem::getCustomData(name);
+    }
 }
 
 ChartProperty *AbstractGoogleChart::attribute() const

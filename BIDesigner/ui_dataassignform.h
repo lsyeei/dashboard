@@ -31,12 +31,14 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_2;
     QLineEdit *defaultValueEdit;
+    QHBoxLayout *horizontalLayout_3;
+    QLabel *propertyLabel;
 
     void setupUi(QWidget *DataAssignForm)
     {
         if (DataAssignForm->objectName().isEmpty())
             DataAssignForm->setObjectName("DataAssignForm");
-        DataAssignForm->resize(219, 92);
+        DataAssignForm->resize(219, 132);
         verticalLayout = new QVBoxLayout(DataAssignForm);
         verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, -1, 0, -1);
@@ -88,6 +90,23 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_2);
 
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName("horizontalLayout_3");
+        propertyLabel = new QLabel(DataAssignForm);
+        propertyLabel->setObjectName("propertyLabel");
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::MinimumExpanding);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(propertyLabel->sizePolicy().hasHeightForWidth());
+        propertyLabel->setSizePolicy(sizePolicy2);
+        propertyLabel->setWordWrap(true);
+        propertyLabel->setMargin(10);
+
+        horizontalLayout_3->addWidget(propertyLabel);
+
+
+        verticalLayout->addLayout(horizontalLayout_3);
+
 
         retranslateUi(DataAssignForm);
 
@@ -100,6 +119,7 @@ public:
         label_3->setText(QCoreApplication::translate("DataAssignForm", "\345\205\263\350\201\224\346\225\260\346\215\256\345\210\260\345\261\236\346\200\247", nullptr));
         label->setText(QCoreApplication::translate("DataAssignForm", "\345\261\236\346\200\247", nullptr));
         label_2->setText(QCoreApplication::translate("DataAssignForm", "\351\273\230\350\256\244\345\200\274", nullptr));
+        propertyLabel->setText(QString());
     } // retranslateUi
 
 };

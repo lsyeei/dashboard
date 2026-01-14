@@ -24,7 +24,7 @@
     <number>0</number>
    </property>
    <property name="sizeConstraint">
-    <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+    <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -41,7 +41,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,0,1">
      <property name="sizeConstraint">
-      <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+      <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
      </property>
      <item>
       <widget class="QToolButton" name="expandFont">
@@ -113,7 +113,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="sizeConstraint">
-       <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+       <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
       </property>
       <property name="leftMargin">
        <number>0</number>
@@ -127,7 +127,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_12">
         <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QComboBox" name="fontFamily">
@@ -156,7 +156,7 @@
          <number>0</number>
         </property>
         <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QLabel" name="label_12">
@@ -254,7 +254,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QToolButton" name="boldBtn">
@@ -421,7 +421,7 @@ text-decoration: line-through;</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QLabel" name="label">
@@ -538,7 +538,7 @@ text-decoration: line-through;</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QLabel" name="label_2">
@@ -626,7 +626,7 @@ text-decoration: line-through;</string>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,0,1">
      <property name="sizeConstraint">
-      <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+      <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
      </property>
      <item>
       <widget class="QToolButton" name="expandBlock">
@@ -698,7 +698,7 @@ text-decoration: line-through;</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="sizeConstraint">
-       <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+       <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
       </property>
       <property name="leftMargin">
        <number>0</number>
@@ -709,7 +709,7 @@ text-decoration: line-through;</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QLabel" name="label_11">
@@ -840,7 +840,7 @@ text-decoration: line-through;</string>
          <number>0</number>
         </property>
         <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QLabel" name="label_9">
@@ -889,7 +889,7 @@ text-decoration: line-through;</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_13">
         <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QLabel" name="label_10">
@@ -953,7 +953,7 @@ text-decoration: line-through;</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QLabel" name="label_6">
@@ -1043,7 +1043,7 @@ text-decoration: line-through;</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_10">
         <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QLabel" name="label_7">
@@ -1101,7 +1101,7 @@ text-decoration: line-through;</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_14">
         <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QLabel" name="label_8">
@@ -1159,7 +1159,7 @@ text-decoration: line-through;</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QLabel" name="label_13">

@@ -63,12 +63,14 @@ public:
     QHBoxLayout *horizontalLayout_6;
     QLabel *label_8;
     QLineEdit *propertyValueEdit;
+    QHBoxLayout *horizontalLayout_8;
+    QLabel *propertyLabel;
 
     void setupUi(QWidget *DataControlForm)
     {
         if (DataControlForm->objectName().isEmpty())
             DataControlForm->setObjectName("DataControlForm");
-        DataControlForm->resize(211, 273);
+        DataControlForm->resize(211, 278);
         QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -288,6 +290,22 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_6);
 
+        horizontalLayout_8 = new QHBoxLayout();
+        horizontalLayout_8->setObjectName("horizontalLayout_8");
+        propertyLabel = new QLabel(propertyWidget);
+        propertyLabel->setObjectName("propertyLabel");
+        QSizePolicy sizePolicy6(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::MinimumExpanding);
+        sizePolicy6.setHorizontalStretch(0);
+        sizePolicy6.setVerticalStretch(0);
+        sizePolicy6.setHeightForWidth(propertyLabel->sizePolicy().hasHeightForWidth());
+        propertyLabel->setSizePolicy(sizePolicy6);
+        propertyLabel->setMargin(10);
+
+        horizontalLayout_8->addWidget(propertyLabel);
+
+
+        verticalLayout->addLayout(horizontalLayout_8);
+
 
         verticalLayout_3->addWidget(propertyWidget);
 
@@ -319,6 +337,7 @@ public:
         label_6->setText(QCoreApplication::translate("DataControlForm", "\346\222\255\346\224\276", nullptr));
         label_7->setText(QCoreApplication::translate("DataControlForm", "\345\233\276\345\205\203\345\261\236\346\200\247", nullptr));
         label_8->setText(QCoreApplication::translate("DataControlForm", "\350\256\276\347\275\256\344\270\272", nullptr));
+        propertyLabel->setText(QString());
     } // retranslateUi
 
 };

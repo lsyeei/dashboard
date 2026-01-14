@@ -33,10 +33,10 @@ class AbstractItem : public QObject, public ICustomGraphic, public UndoObject
 {
     Q_OBJECT
     // Q_INTERFACES(QGraphicsItem)
-    Q_PROPERTY(QPointF center READ center WRITE setCenter STORED false FINAL)
-    Q_PROPERTY(qreal angle READ angle WRITE setAngle STORED false FINAL)
-    Q_PROPERTY(int state READ state WRITE setState STORED false FINAL)
-    Q_PROPERTY(QMap<int, QString> stateSet READ stateSet STORED false)
+    // Q_PROPERTY(QPointF center READ center WRITE setCenter STORED false FINAL)
+    // Q_PROPERTY(qreal angle READ angle WRITE setAngle STORED false FINAL)
+    // Q_PROPERTY(int state READ state WRITE setState STORED false FINAL)
+    // Q_PROPERTY(QMap<int, QString> stateSet READ stateSet STORED false)
 public:
     AbstractItem(QGraphicsItem *parent = nullptr);
     ~AbstractItem();
@@ -86,18 +86,19 @@ public:
     void changeAttribute(int id);
     void setPropertyWidget(QWidget *widget) Q_DECL_OVERRIDE;
 
-    QMap<QString, QString> propertyDescription() Q_DECL_OVERRIDE;
+    QList<CustomMetadata> metadataList() Q_DECL_OVERRIDE;
+    void setCustomData(const QString &name, const QString &value) Q_DECL_OVERRIDE;
+    QString getCustomData(const QString &name) Q_DECL_OVERRIDE;
 
+    // QPointF center() const;
+    // void setCenter(QPointF newCenter);
 
-    QPointF center() const;
-    void setCenter(QPointF newCenter);
-
-    qreal angle() const;
-    void setAngle(qreal newAngle);
+    // qreal angle() const;
+    // void setAngle(qreal newAngle);
 
     int state() const;
     void setState(int index);
-    QMap<int, QString> stateSet();
+    // QMap<int, QString> stateSet();
 
 Q_SIGNALS:
     void stateChanged();

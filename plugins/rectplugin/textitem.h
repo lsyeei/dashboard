@@ -41,8 +41,14 @@ public:
     // QObject interface
     bool eventFilter(QObject *watched, QEvent *event) override;
 
+    // ICustomGraphic interface
+    QList<CustomMetadata> metadataList() override;
+    void setCustomData(const QString &name, const QString &value) override;
+    QString getCustomData(const QString &name) override;
+
     QColor textColor() const;
     void setTextColor(const QColor &newTextColor);
+    void setText(const QString &text);
     // AbstractItem interface
     void updateAttribute(BaseProperty *attr) override;
 
@@ -56,7 +62,6 @@ protected:
     void parseXML(const QString &xml) override;
 private:
     void setTextFormat(const QTextFormat &format);
-
 };
 
 #endif // TEXTITEM_H

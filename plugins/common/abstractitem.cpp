@@ -20,6 +20,8 @@
 #include "baseproperty.h"
 #include "ipropertyform.h"
 
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <QXmlStreamWriter>
 
 AbstractItem::AbstractItem(QGraphicsItem *parent)
@@ -157,39 +159,108 @@ void AbstractItem::setPropertyWidget(QWidget *widget)
     propertyForm->setGraphicItem(this);
 }
 
-QMap<QString, QString> AbstractItem::propertyDescription()
+QList<CustomMetadata> AbstractItem::metadataList()
 {
-    return {{"center", tr("RW|位置")},
-            {"angle", tr("RW|旋转角度")},
-            {"state", tr("RW|状态")},
-            {"stateSet", tr("R|状态集")}};
+    return {{"pos", tr("位置"), DataType::POINT, OperateMode::ReadWrite, "[10.2, 20.5]"},
+            {"angle", tr("旋转角度"), DataType::DOUBLE, OperateMode::ReadWrite, "30"},
+            {"state", tr("状态"), DataType::INT, OperateMode::ReadWrite, "1"},
+            {"stateSet", tr("状态集"), DataType::JSON, OperateMode::ReadOnly,
+            "[{\"id\":\"1\", \"name\":\"state1\"},{\"id\":\"2\", \"name\":\"state2\"}]"}};
 }
 
-QPointF AbstractItem::center() const
+void AbstractItem::setCustomData(const QString &name, const QString &value)
 {
-    return pos();
-}
-
-void AbstractItem::setCenter(QPointF newCenter)
-{
-    setPos(newCenter);
+    if (name.isEmpty() || value.isEmpty()) {
+        return;
+    }
+    bool ok{false};
+    if (name.compare("pos") == 0) {
+        auto values = value.split(",");
+        if (values.count() < 2) {
+            return;
+        }
+        bool xOk{false}, yOk{false};
+        auto xStr = values[0].trimmed().mid(1);
+        auto yStr = values[1].trimmed();
+        yStr = yStr.left(yStr.length() - 1);
+        auto x = xStr.toDouble(&xOk);
+        auto y = yStr.toDouble(&yOk);
+        if (xOk && yOk){
+            setPos(x, y);
+        }
+    }else if(name.compare("angle") == 0){
+        auto angle = value.trimmed().toDouble(&ok);
+        if (ok) {
+            setRotation(angle);
+        }
+    }else if(name.compare("state") == 0){
+        ok = false;
+        auto index = value.trimmed().toInt(&ok);
+        if (ok) {
+            setState(index);
+            return;
+        }
+    }else if(name.compare("stateSet") == 0){
+        return;
+    }else{
+        return;
+    }
     updateGraphic();
     updateSelector();
     updateForm();
 }
 
-qreal AbstractItem::angle() const
+QString AbstractItem::getCustomData(const QString &name)
 {
-    return rotation();
+    if (name.isEmpty()) {
+        return "";
+    }
+    if (name.compare("pos") == 0) {
+        auto p = pos();
+        return QString("[%1,%2]").arg(p.x()).arg(p.y());
+    }else if(name.compare("angle") == 0){
+        return QString("%1").arg(rotation());
+    }else if(name.compare("state") == 0){
+        return QString("%1").arg(attrIndex);
+    }else if(name.compare("stateSet") == 0){
+        QJsonArray array;
+        foreach (auto i, attributes) {
+            QJsonObject obj;
+            obj.insert("id",i->getId());
+            obj.insert("name", i->getName());
+            array << obj;
+        }
+        QJsonDocument doc(array);
+        return doc.toJson();
+    }
+    return "";
 }
 
-void AbstractItem::setAngle(qreal newAngle)
-{
-    setRotation(newAngle);
-    updateGraphic();
-    updateSelector();
-    updateForm();
-}
+// QPointF AbstractItem::center() const
+// {
+//     return pos();
+// }
+
+// void AbstractItem::setCenter(QPointF newCenter)
+// {
+//     setPos(newCenter);
+//     updateGraphic();
+//     updateSelector();
+//     updateForm();
+// }
+
+// qreal AbstractItem::angle() const
+// {
+//     return rotation();
+// }
+
+// void AbstractItem::setAngle(qreal newAngle)
+// {
+//     setRotation(newAngle);
+//     updateGraphic();
+//     updateSelector();
+//     updateForm();
+// }
 
 int AbstractItem::state() const
 {
@@ -209,10 +280,10 @@ void AbstractItem::setState(int index)
     updateForm();
 }
 
-QMap<int, QString> AbstractItem::stateSet()
-{
-    return getAttributes();
-}
+// QMap<int, QString> AbstractItem::stateSet()
+// {
+//     return getAttributes();
+// }
 
 QVariant AbstractItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {

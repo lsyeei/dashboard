@@ -33,6 +33,9 @@ public:
     static QString SHAPE_ID;
     // ICustomGraphic interface
     QString classId() const override;
+    QList<CustomMetadata> metadataList() override;
+    void setCustomData(const QString &name, const QString &value) override;
+    QString getCustomData(const QString &name) override;
     using AbstractItem::attribute;
     ChartProperty *attribute() const;
     // AbstractItem interface

@@ -39,6 +39,7 @@ public:
 Q_SIGNALS:
     void changedEvent(QVariant data);
 protected Q_SLOTS:
+    void onPropertyChanged();
     void dataChanged();
 
 private:
@@ -46,6 +47,7 @@ private:
     QGraphicsItem *graphic;
     AssignAction action;
 
+    void initPropertyOption(auto customGraphic);
 };
 
 #endif // DATAASSIGNFORM_H

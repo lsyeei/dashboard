@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 #include "dataassignform.h"
+#include "icustomgraphic.h"
 #include "ui_dataassignform.h"
 
 #include <datahandler/assignaction.h>
@@ -27,7 +28,7 @@ DataAssignForm::DataAssignForm(QWidget *parent)
     ui->setupUi(this);
     layout()->setAlignment(Qt::AlignTop);
     connect(ui->propertyOptions, &QComboBox::currentIndexChanged,
-            this, &DataAssignForm::dataChanged);
+            this, &DataAssignForm::onPropertyChanged);
     connect(ui->defaultValueEdit, &QLineEdit::editingFinished,
             this, &DataAssignForm::dataChanged);
 }
@@ -37,11 +38,26 @@ DataAssignForm::~DataAssignForm()
     delete ui;
 }
 
+void DataAssignForm::initPropertyOption(auto customGraphic)
+{
+    QSignalBlocker optionBlocker(ui->propertyOptions);
+    ui->propertyOptions->clear();
+    auto list = customGraphic->metadataList();
+    foreach (auto meta, list) {
+        if (meta.mode== OperateMode::ReadOnly ||
+            meta.name.compare("state") == 0) {
+            continue;
+        }
+        ui->propertyOptions->addItem(meta.alias, QVariant::fromValue(meta));
+    }
+    ui->propertyOptions->setCurrentIndex(-1);
+}
+
 void DataAssignForm::setGraphicsItem(QGraphicsItem *item)
 {
     graphic = item;
-    ui->propertyOptions->clear();
-    // todo: 设置图元可用属性
+    auto customGraphic = dynamic_cast<ICustomGraphic*>(item);
+    initPropertyOption(customGraphic);
 }
 
 void DataAssignForm::setData(QVariant data)
@@ -54,17 +70,37 @@ void DataAssignForm::setData(QVariant data)
     }
     action = data.value<AssignAction>();
     auto property = action.getPropertyName();
-    auto index = ui->propertyOptions->findData(property);
+    auto index = ui->propertyOptions->count() - 1;
+    for (; index >= 0; -- index) {
+        auto meta = ui->propertyOptions->itemData(index).value<CustomMetadata>();
+        if (meta.name.compare(property) == 0) {
+            break;
+        }
+    }
     ui->propertyOptions->setCurrentIndex(index);
     ui->defaultValueEdit->setText(action.getDefaultValue());
 }
 
 void DataAssignForm::dataChanged()
 {
-    action.setDefaultValue(ui->defaultValueEdit->text().trimmed());
-    action.setPropertyName(ui->propertyOptions->currentData().toString());
+    action.setDefaultValue(ui->defaultValueEdit->text().trimmed());    
+    auto meta = ui->propertyOptions->currentData().value<CustomMetadata>();
+    action.setPropertyName(meta.name);
     action.setPropertyAlias(ui->propertyOptions->currentText());
     emit changedEvent(QVariant::fromValue(action));
+}
+
+void DataAssignForm::onPropertyChanged()
+{
+    if (ui->propertyOptions->currentIndex() < 0) {
+        ui->propertyLabel->setText("");
+        return;
+    }
+    auto meta = ui->propertyOptions->currentData().value<CustomMetadata>();
+    QString text{"数据类型：%1 \r\n例:  %2"};
+    text = text.arg(meta.dataTypeName(), meta.dataExample);
+    ui->propertyLabel->setText(text);
+    dataChanged();
 }
 
 void DataAssignForm::reset()

@@ -173,6 +173,44 @@ bool TextItem::eventFilter(QObject *watched, QEvent *event)
     return QObject::eventFilter(watched, event);
 }
 
+QList<CustomMetadata> TextItem::metadataList()
+{
+    auto list = AbstractTextItem::metadataList();
+    list << CustomMetadata{"textColor", tr("字体颜色"), DataType::STRING, OperateMode::WriteOnly, "#FF0000"}
+         << CustomMetadata{"text", tr("文本"), DataType::STRING, OperateMode::ReadWrite, "显示文字"};
+    return list;
+}
+
+void TextItem::setCustomData(const QString &name, const QString &value)
+{
+    if (name.isEmpty() || value.isEmpty()) {
+        return;
+    }
+    if (name.compare("textColor") == 0) {
+        QColor color{value};
+        if (!color.isValid()) {
+            return;
+        }
+        setTextColor(color);
+    }else if (name.compare("text") == 0) {
+        setText(value);
+    }else{
+        AbstractTextItem::setCustomData(name, value);
+    }
+}
+
+QString TextItem::getCustomData(const QString &name)
+{
+    if (name.isEmpty()) {
+        return "";
+    }
+    if(name.compare("text") == 0){
+        return textItem->toPlainText();
+    }else{
+        return AbstractTextItem::getCustomData(name);
+    }
+}
+
 QColor TextItem::textColor() const
 {
     QTextCursor cursor = textItem->textCursor();
@@ -192,6 +230,29 @@ void TextItem::setTextColor(const QColor &newTextColor)
     cursor.mergeCharFormat(format);
     cursor.clearSelection();
     updateItem();
+}
+
+void TextItem::setText(const QString &text)
+{
+    bool flag{false};
+    auto doc = textItem->document();
+    QTextCursor cursor(doc);
+    for (QTextBlock block = doc->begin(); block.isValid();) {
+        cursor.setPosition(block.position());
+        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+        cursor.removeSelectedText();
+        if(!flag){
+            cursor.insertText(text);
+            flag = true;
+            block = block.next();
+        }else{
+            block = doc->begin();
+        }
+    }
+    if(!flag){
+        textItem->setPlainText(text);
+    }
+    attribute()->setData(textItem->toHtml());
 }
 
 void TextItem::attributeSwitched(int oldIndex, int newIndex)
