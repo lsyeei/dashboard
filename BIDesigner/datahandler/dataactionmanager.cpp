@@ -49,10 +49,10 @@ DataActionManager *DataActionManager::instance()
 
 void DataActionManager::setGraphicsScene(BIGraphicsScene *scene)
 {
-    if (graphicScene && scene != graphicScene) {
-        disconnect(graphicScene, &BIGraphicsScene::contentChanged,
-                   this, &DataActionManager::onSceneEvent);
-    }
+    // if (graphicScene && scene != graphicScene) {
+    //     disconnect(graphicScene, &BIGraphicsScene::contentChanged,
+    //                this, &DataActionManager::onSceneEvent);
+    // }
     graphicScene = scene;
     // connect(scene, &BIGraphicsScene::contentChanged,
     //         this, &DataActionManager::onSceneEvent);
