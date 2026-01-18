@@ -80,14 +80,22 @@ void AnimationForm::setGraphicItem(ICustomGraphic *item)
     if (id.isEmpty()) {
         return;
     }
-    auto actions = factory->graphicAnimation(id);
-    if (actions.isEmpty()) {
+    auto groupList = factory->graphicAnimation(id);
+    ui->groupCombo->blockSignals(true);
+    ui->groupCombo->clear();
+    if (groupList.isEmpty()) {
+        ui->groupCombo->blockSignals(false);
         return;
     }
-    foreach (auto act, actions) {
-        addAnimateItem(act);
+    // 初始化组数据
+    foreach (auto group, groupList) {
+        ui->groupCombo->addItem(group.getName(), group.getId());
     }
-    ui->animationView->setCurrentItemIndex(-1);
+    ui->groupCombo->blockSignals(false);
+    if (groupList.count() > 0) {
+        ui->groupCombo->setCurrentItem(0);
+        onGroupChanged(0);
+    }
 }
 
 void AnimationForm::onAnimationMenuSelected()
@@ -95,6 +103,16 @@ void AnimationForm::onAnimationMenuSelected()
     auto obj = sender();
     if (obj == nullptr) {
         return;
+    }
+    if (ui->groupCombo->count() <= 0) {
+        // 首次添加动画，自动添加一个分组
+        QSignalBlocker blocker{ui->groupCombo};
+        QString groupName{tr("默认")};
+        auto groupId = AnimationFactory::instance()->addGroup(graphicItem, groupName);
+        if (groupId < 0) {
+            return;
+        }
+        ui->groupCombo->addItem(groupName, groupId);
     }
     graphicItem->setSelected(true);
     auto typeId = obj->property("id").toString();
@@ -115,6 +133,11 @@ void AnimationForm::onRemoveAnimate()
     if (index < 0) {
         return;
     }
+    auto i = ui->groupCombo->currentIndex();
+    if (i < 0) {
+        return;
+    }
+    auto groupId = ui->groupCombo->itemData(i).toInt();
     auto param = ui->animationView->getItem(index).params;
     auto type = AnimationFactory::instance()->getAnimateType(param.getTypeId());
     if (type) {
@@ -122,15 +145,16 @@ void AnimationForm::onRemoveAnimate()
     }
     ui->animationView->removeItem(index);
     // 删除动画数据
-    AnimationFactory::instance()->updateAnimate(graphicItem, ui->animationView->getAllAnimationParams());
+    AnimationFactory::instance()->updateAnimate(graphicItem, groupId,
+                                                ui->animationView->getAllAnimationParams());
     ui->playBtn->setEnabled(ui->animationView->itemCount() > 0);
 }
 
 void AnimationForm::onPlay()
 {
     if (player.isNull()){
-        auto scene = dynamic_cast<BIGraphicsScene*>(graphicItem->scene());
-        player = AnimationFactory::instance()->playGroup(scene->getGroupItems(graphicItem));//play(graphicItem);
+        auto groupId = ui->groupCombo->itemData(ui->groupCombo->currentIndex()).toInt();
+        player = AnimationFactory::instance()->play(graphicItem, groupId);
         if (player == nullptr) {
             qDebug() << "未找到动画配置";
             return;
@@ -164,26 +188,12 @@ void AnimationForm::onAnimateSelectChanged(int oldIndex, int newIndex)
 {
     // 使能移除按钮
     ui->removeBtn->setEnabled(newIndex >= 0);
+    showProperty(nullptr);
     if (newIndex < 0) {
-        if (oldIndex >= 0){
-            // 隐藏原来索引对应的属性
-            auto param = ui->animationView->getItem(oldIndex).params;
-            auto type = AnimationFactory::instance()->getAnimateType(param.getTypeId());
-            if (type){
-                type->paramWidget()->hide();
-            }
-        }
         return;
     }
-    auto param = ui->animationView->getItem(oldIndex).params;
+    auto param = ui->animationView->getItem(newIndex).params;
     auto type = AnimationFactory::instance()->getAnimateType(param.getTypeId());
-    if (type == nullptr || oldIndex != newIndex) {
-        if (type) {
-            type->paramWidget()->hide();
-        }
-        param = ui->animationView->getItem(newIndex).params;
-        type = AnimationFactory::instance()->getAnimateType(param.getTypeId());
-    }
     ui->property->show();
     auto widget = type->paramWidget();
     widget->update(param);
@@ -196,6 +206,11 @@ void AnimationForm::onAnimateParamChanged()
     if (index < 0) {
         return;
     }
+    auto i = ui->groupCombo->currentIndex();
+    if (i < 0) {
+        return;
+    }
+    auto groupId = ui->groupCombo->itemData(i).toInt();
     auto obj = sender();
     auto widget = dynamic_cast<AbstractParamWidget*>(obj);
     if (widget == nullptr) {
@@ -205,16 +220,87 @@ void AnimationForm::onAnimateParamChanged()
 
     if (ui->animationView->setAnimationParam(index, param)){
         // 更新图元动画参数
-        AnimationFactory::instance()->updateAnimate(graphicItem, ui->animationView->getAllAnimationParams());
+        AnimationFactory::instance()->updateAnimate(graphicItem, groupId, ui->animationView->getAllAnimationParams());
     }else{
         // 重新显示原参数
         onAnimateSelectChanged(index, index);
     }
 }
 
+void AnimationForm::onAddGroup(int index)
+{
+    auto groupName = ui->groupCombo->itemText(index).trimmed();
+    if (groupName.isEmpty()) {
+        QMessageBox::information(this, tr("提示"), tr("组名称不能为空！"));
+        ui->groupCombo->setFocus();
+    }
+    auto id = AnimationFactory::instance()->addGroup(graphicItem, groupName);
+    if (id >= 0) {
+        ui->groupCombo->setItemData(index, id);
+        ui->animationView->clear();
+    }else{
+        QMessageBox::information(this, tr("提示"), tr("新建组失败！"));
+        ui->groupCombo->setFocus();
+    }
+}
+
+void AnimationForm::onRemoveGroup(const QString &name, QVariant data)
+{
+    if (!data.isValid() || !data.canConvert<int>()){
+        QMessageBox::information(this, tr("提示"), name + tr("删除失败！"));
+        return;
+    }
+     auto btn = QMessageBox::question(this, tr("提示"),
+                QString(tr("确定要删除[%1]么，该组下的所有动画将同时删除").arg(name)));
+    if (btn == QMessageBox::Cancel) {
+         return;
+    }
+    int groupId = data.toInt();
+    if (AnimationFactory::instance()->removeGroup(graphicItem, groupId)){
+        ui->animationView->clear();
+    }else{
+        QMessageBox::information(this, tr("提示"), name + tr("删除失败！"));
+    }
+}
+
+void AnimationForm::onModifyGroup(int index)
+{
+    if (index < 0){
+        return;
+    }
+    auto groupName = ui->groupCombo->itemText(index).trimmed();
+    auto groupId = ui->groupCombo->itemData(index).toInt();
+    bool flag = ui->enableRadio->isChecked();
+    AnimationFactory::instance()->modifyGroupName(graphicItem, groupId, groupName);
+    AnimationFactory::instance()->enableGroup(graphicItem, groupId, flag);
+}
+
+void AnimationForm::onGroupChanged(int index)
+{
+    if (index < 0){
+        ui->animationView->clear();
+        return;
+    }
+    // 获取组信息
+    auto groupId = ui->groupCombo->itemData(index).toInt();
+    auto group = AnimationFactory::instance()->getGroup(graphicItem, groupId);
+    auto flag = group.getEnable();
+    ui->enableRadio->setChecked(flag);
+    ui->disableRadio->setChecked(!flag);
+    // 显示已配置的动画
+    ui->animationView->clear();
+    auto actions = group.getAnimationList();
+    if (actions.isEmpty()) {
+        return;
+    }
+    foreach (auto act, actions) {
+        addAnimateItem(act);
+    }
+    ui->animationView->setCurrentItemIndex(-1);
+}
+
 void AnimationForm::hideEvent(QHideEvent *event)
 {
-    // qDebug() << __FUNCTION__;
     // 隐藏当前路径
     ui->animationView->setCurrentItemIndex(-1);
     QWidget::hideEvent(event);
@@ -223,6 +309,9 @@ void AnimationForm::hideEvent(QHideEvent *event)
 void AnimationForm::initUI()
 {
     ui->property->hide();
+    // 初始化分组
+    ui->groupCombo->addItem(tr("默认"), 0);
+    ui->groupCombo->setCurrentItem(0);
     // 禁用按钮
     ui->removeBtn->setDisabled(true);
     ui->playBtn->setDisabled(true);
@@ -244,16 +333,33 @@ void AnimationForm::initUI()
 
     // 动画列表
     ui->animationView->clear();
-    connect(ui->animationView, SIGNAL(itemSelectionChanged(int,int)), this, SLOT(onAnimateSelectChanged(int,int)));
+    connect(ui->animationView, SIGNAL(itemSelectionChanged(int,int)),
+            this, SLOT(onAnimateSelectChanged(int,int)));
     // 按钮事件
     connect(ui->removeBtn, SIGNAL(clicked(bool)), this, SLOT(onRemoveAnimate()));
     connect(ui->playBtn, SIGNAL(clicked(bool)), this, SLOT(onPlay()));
-
+    // 分组
+    connect(ui->groupCombo, &BIComboBox::itemAdded,
+            this, &AnimationForm::onAddGroup);
+    connect(ui->groupCombo, &BIComboBox::itemRemoved,
+            this, &AnimationForm::onRemoveAnimate);
+    connect(ui->groupCombo, &BIComboBox::itemModified,
+            this, &AnimationForm::onModifyGroup);
+    connect(ui->groupCombo, &BIComboBox::currentIndexChanged,
+            this, &AnimationForm::onGroupChanged);
+    connect(ui->enableRadio, &QRadioButton::clicked,
+            this, [&]{onModifyGroup(ui->groupCombo->currentIndex());});
+    connect(ui->disableRadio, &QRadioButton::clicked,
+            this, [&]{onModifyGroup(ui->groupCombo->currentIndex());});
 }
-
 
 bool AnimationForm::addAnimateItem(const AnimationParam &param)
 {
+    auto i = ui->groupCombo->currentIndex();
+    if (i < 0) {
+        return false;
+    }
+    auto groupId = ui->groupCombo->itemData(i).toInt();
     // 查找已添加的同类动画，防止时间重叠，自动修改延迟参数
     auto count = ui->animationView->itemCount();
     qreal minDelay = 0;
@@ -276,13 +382,28 @@ bool AnimationForm::addAnimateItem(const AnimationParam &param)
         newParam.setDelay(minDelay);
     }
     // 添加新动画
-    // auto actionItem = actionMap[param.getType()];
     auto type = AnimationFactory::instance()->getAnimateType(param.getTypeId());
     AnimationItem item{type->getIcon(), type->getName(), newParam};
     if (ui->animationView->addItem(item)){
         // 更新图元动画参数
-        AnimationFactory::instance()->updateAnimate(graphicItem, ui->animationView->getAllAnimationParams());
+        AnimationFactory::instance()->updateAnimate(graphicItem, groupId,
+                                                    ui->animationView->getAllAnimationParams());
     }
     ui->playBtn->setEnabled(ui->animationView->itemCount() > 0);
     return true;
+}
+
+void AnimationForm::showProperty(QWidget *widget)
+{
+    auto layout = ui->property->layout();
+    auto count = layout->count();
+    for (int i = 0; i < count; ++i) {
+        auto item = layout->itemAt(i)->widget();
+        if (item) {
+            item->hide();
+        }
+    }
+    if (widget){
+        widget->show();
+    }
 }

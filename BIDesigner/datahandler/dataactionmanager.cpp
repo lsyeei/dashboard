@@ -47,6 +47,17 @@ DataActionManager *DataActionManager::instance()
     return manager;
 }
 
+void DataActionManager::setGraphicsScene(BIGraphicsScene *scene)
+{
+    if (graphicScene && scene != graphicScene) {
+        disconnect(graphicScene, &BIGraphicsScene::contentChanged,
+                   this, &DataActionManager::onSceneEvent);
+    }
+    graphicScene = scene;
+    // connect(scene, &BIGraphicsScene::contentChanged,
+    //         this, &DataActionManager::onSceneEvent);
+}
+
 QString DataActionManager::toXml()
 {
     // 合并数据源及数据信息
@@ -54,71 +65,73 @@ QString DataActionManager::toXml()
     // 生成 XML
     QString data;
     QScopedPointer<QXmlStreamWriter> xml(new QXmlStreamWriter(&data));
-    xml->writeStartElement(XmlTemplate::dataSource);
 
     typedef XmlTemplate::dataSourceTemplate dataSource;
-    xml->writeStartElement(dataSource::source);
-    QByteArray array;
-    QDataStream stream(&array, QIODeviceBase::WriteOnly);
-    stream << dataSourceMap.values();
-    xml->writeCDATA(array.toHex());
+    xml->writeStartElement(dataSource::configList);
+    auto configs = dataSourceMap.values();
+    XmlHelper::writeCDATA(xml.data(), configs);
     xml->writeEndElement();
 
-    xml->writeStartElement(dataSource::data);
-    array.clear();
-    stream << dataMarketMap.values();
-    xml->writeCDATA(array.toHex());
+    xml->writeStartElement(dataSource::dataList);
+    auto dataSets = dataMarketMap.values();
+    XmlHelper::writeCDATA(xml.data(), dataSets);
     xml->writeEndElement();
 
-    xml->writeStartElement(dataSource::action);
+    xml->writeStartElement(dataSource::actionList);
     typedef dataSource::actionTemplate actions;
     typedef actions::graphicActionTemplate actionDetail;
     auto item = actionMap.begin();
     while(item != actionMap.end()){
+        if (graphicScene->getItemById(item.key()) == nullptr){
+            // 已经删除的图元不导出
+            continue;
+        }
         xml->writeStartElement(actions::graphicAction);
         xml->writeTextElement(actionDetail::graphicId,item.key());
         xml->writeStartElement(actionDetail::actions);
-        array.clear();
-        stream << item.value();
-        xml->writeCDATA(array.toHex());
+        auto actions = item.value().values();
+        XmlHelper::writeCDATA(xml.data(), actions);
         xml->writeEndElement();
         xml->writeEndElement();
         item ++;
     }
-    xml->writeEndElement();
     xml->writeEndElement();
     return data;
 }
 
 void DataActionManager::parseXml(const QString &xml)
 {
+    qRegisterMetaType<NamedId>("NamedId");
     typedef XmlTemplate::dataSourceTemplate dataSource;
     typedef dataSource::actionTemplate actions;
     typedef actions::graphicActionTemplate actionDetail;
     QXmlStreamReader reader(xml);
     while(!reader.atEnd()){
-        reader.readNextStartElement();
+        auto flag = reader.readNextStartElement();
         if (reader.hasError()) {
             QMessageBox::information(nullptr, tr("提示"),
                                      QString(tr("解析数据源错误。%1" ))
                                          .arg(reader.errorString()));
             break;
         }
-        if (reader.name().compare(dataSource::source) == 0)
+        if (!flag){
+            continue;
+        }
+        if (reader.name().compare(dataSource::configList) == 0)
         {
             auto sourceList = XmlHelper::CDATA2List<DataSourceDO>(&reader);
-            foreach (auto item, sourceList) {
-                dataSourceMap[item.get_uuid()] = item;
+            for (int i=0; i < sourceList.count(); ++i) {
+                dataSourceMap[sourceList[i].get_uuid()] = sourceList[i];
             }
         }
-        if (reader.name().compare(dataSource::data) == 0)
+        if (reader.name().compare(dataSource::dataList) == 0)
         {
             auto dataList = XmlHelper::CDATA2List<DataMarketDO>(&reader);
-            foreach (auto item, dataList) {
-                dataMarketMap[item.get_uuid()] = item;
+            for (int i=0; i < dataList.count(); ++i) {
+                dataMarketMap[dataList[i].get_uuid()] = dataList[i];
             }
         }
-        if (reader.name().compare(dataSource::action) == 0) {
+        if (reader.name().compare(dataSource::actionList) == 0) {
             while(true){
                 auto type = reader.readNext();
                 if (type != QXmlStreamReader::StartElement ||
@@ -139,9 +152,10 @@ void DataActionManager::parseXml(const QString &xml)
                     }
                     // 完善信息
                     QMap<QString, DataAction> actMap;
-                    foreach (auto item, actionList) {
-                        auto source = dataSourceMap[item.getSourceId()];
-                        auto data = dataMarketMap[item.getDataId()];
+                    for (int i=0; i < actionList.count(); ++i) {
+                        auto& item = actionList[i];
+                        auto& source = dataSourceMap[item.getSourceId()];
+                        auto& data = dataMarketMap[item.getDataId()];
                         data.setDataSource(source);
                         item.setData(data);
                         actMap[item.getDataId()] = item;
@@ -282,16 +296,19 @@ void DataActionManager::onDataQueryEnd(DataAction action, QJsonValue value)
     auto act = action.getAction();
     auto absAction = AbstractAction::fromVariant(&act);
     absAction->triggerAction(value.toVariant(), graphic);
-    // auto type = action.getActionType();
-    // switch (type) {
-    // case ActionType::ASSIGN_PROPERTY:
-    //     act.value<AssignAction>().triggerAction(value.toVariant(), graphic);
-    //     break;
-    // case ActionType::CONTROL_GRAPHIC:
-    //     act.value<ControlAction>().triggerAction(value.toVariant(), graphic);
-    //     break;
-    // }
 }
+
+// 不处理图元删除事件，删除的图元可能通过撤销操作恢复
+// void DataActionManager::onSceneEvent(ItemAction action, QList<QGraphicsItem *> items)
+// {
+//     if (action != ItemAction::REMOVE) {
+//         return;
+//     }
+//     // 只处理删除图元事件
+//     foreach (auto item, items) {
+//         actionMap.remove(graphicScene->getItemId(item));
+//     }
+// }
 
 void DataActionManager::timerEvent(QTimerEvent *event)
 {

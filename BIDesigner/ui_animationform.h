@@ -14,12 +14,15 @@
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QRadioButton>
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include "animation/animationlistview.h"
+#include "bicombobox.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -32,6 +35,12 @@ public:
     QAction *rotateAction;
     QAction *customAction;
     QVBoxLayout *verticalLayout_2;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *label;
+    BIComboBox *groupCombo;
+    QHBoxLayout *horizontalLayout_3;
+    QRadioButton *enableRadio;
+    QRadioButton *disableRadio;
     QHBoxLayout *horizontalLayout;
     QToolButton *addBtn;
     QPushButton *removeBtn;
@@ -75,15 +84,51 @@ public:
         customAction->setMenuRole(QAction::MenuRole::NoRole);
         verticalLayout_2 = new QVBoxLayout(AnimationForm);
         verticalLayout_2->setObjectName("verticalLayout_2");
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName("horizontalLayout_2");
+        label = new QLabel(AnimationForm);
+        label->setObjectName("label");
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy);
+
+        horizontalLayout_2->addWidget(label);
+
+        groupCombo = new BIComboBox(AnimationForm);
+        groupCombo->setObjectName("groupCombo");
+
+        horizontalLayout_2->addWidget(groupCombo);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_2);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName("horizontalLayout_3");
+        enableRadio = new QRadioButton(AnimationForm);
+        enableRadio->setObjectName("enableRadio");
+        enableRadio->setChecked(true);
+
+        horizontalLayout_3->addWidget(enableRadio);
+
+        disableRadio = new QRadioButton(AnimationForm);
+        disableRadio->setObjectName("disableRadio");
+
+        horizontalLayout_3->addWidget(disableRadio);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_3);
+
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
         addBtn = new QToolButton(AnimationForm);
         addBtn->setObjectName("addBtn");
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Minimum);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(addBtn->sizePolicy().hasHeightForWidth());
-        addBtn->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Minimum);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(addBtn->sizePolicy().hasHeightForWidth());
+        addBtn->setSizePolicy(sizePolicy1);
         addBtn->setLayoutDirection(Qt::LayoutDirection::LeftToRight);
         addBtn->setPopupMode(QToolButton::ToolButtonPopupMode::InstantPopup);
         addBtn->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextOnly);
@@ -113,31 +158,31 @@ public:
 
         scrollArea = new QScrollArea(AnimationForm);
         scrollArea->setObjectName("scrollArea");
-        QSizePolicy sizePolicy1(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(scrollArea->sizePolicy().hasHeightForWidth());
-        scrollArea->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(scrollArea->sizePolicy().hasHeightForWidth());
+        scrollArea->setSizePolicy(sizePolicy2);
         scrollArea->setFrameShape(QFrame::Shape::Panel);
         scrollArea->setFrameShadow(QFrame::Shadow::Plain);
         scrollArea->setWidgetResizable(true);
         scrollArea->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 292, 490));
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
-        scrollAreaWidgetContents->setSizePolicy(sizePolicy2);
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 296, 445));
+        QSizePolicy sizePolicy3(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
+        scrollAreaWidgetContents->setSizePolicy(sizePolicy3);
         verticalLayout_3 = new QVBoxLayout(scrollAreaWidgetContents);
         verticalLayout_3->setSpacing(0);
         verticalLayout_3->setObjectName("verticalLayout_3");
         verticalLayout_3->setContentsMargins(2, -1, 2, -1);
         animationView = new AnimationListView(scrollAreaWidgetContents);
         animationView->setObjectName("animationView");
-        sizePolicy2.setHeightForWidth(animationView->sizePolicy().hasHeightForWidth());
-        animationView->setSizePolicy(sizePolicy2);
+        sizePolicy3.setHeightForWidth(animationView->sizePolicy().hasHeightForWidth());
+        animationView->setSizePolicy(sizePolicy3);
 
         verticalLayout_3->addWidget(animationView);
 
@@ -147,8 +192,8 @@ public:
 
         property = new QWidget(AnimationForm);
         property->setObjectName("property");
-        sizePolicy2.setHeightForWidth(property->sizePolicy().hasHeightForWidth());
-        property->setSizePolicy(sizePolicy2);
+        sizePolicy3.setHeightForWidth(property->sizePolicy().hasHeightForWidth());
+        property->setSizePolicy(sizePolicy3);
         verticalLayout = new QVBoxLayout(property);
         verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetNoConstraint);
@@ -185,6 +230,10 @@ public:
 #if QT_CONFIG(tooltip)
         customAction->setToolTip(QCoreApplication::translate("AnimationForm", "\350\207\252\345\256\232\344\271\211\345\212\250\347\224\273", nullptr));
 #endif // QT_CONFIG(tooltip)
+        label->setText(QCoreApplication::translate("AnimationForm", "\345\212\250\347\224\273\347\273\204", nullptr));
+        groupCombo->setDefaultText(QCoreApplication::translate("AnimationForm", "\346\226\260\345\273\272\347\273\204", nullptr));
+        enableRadio->setText(QCoreApplication::translate("AnimationForm", "\345\220\257\347\224\250\347\273\204", nullptr));
+        disableRadio->setText(QCoreApplication::translate("AnimationForm", "\347\246\201\347\224\250\347\273\204", nullptr));
         addBtn->setText(QCoreApplication::translate("AnimationForm", "\346\267\273\345\212\240\345\212\250\347\224\273", nullptr));
         removeBtn->setText(QCoreApplication::translate("AnimationForm", "\347\247\273\351\231\244\345\212\250\347\224\273", nullptr));
         playBtn->setText(QCoreApplication::translate("AnimationForm", "\346\222\255\346\224\276", nullptr));

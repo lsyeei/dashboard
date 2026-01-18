@@ -17,10 +17,9 @@
  */
 #ifndef DATAMARKETDO_H
 #define DATAMARKETDO_H
+
 #include "dbutil/entity.h"
-
 #include "datasourcedo.h"
-
 #include <QDateTime>
 
 class DataMarketDO : public Entity{
@@ -56,8 +55,8 @@ private:
     TABLE_FIELD(dataName, data_name)
     TABLE_FIELD(note, note)
     TABLE_FIELD(requestArgs, request_args)
-    TABLE_FIELD(requestPeriod, request_period)
     TABLE_FIELD(processCode, process_code)
+    TABLE_FIELD(requestPeriod, request_period)
     TABLE_FIELD(createTime, create_time)
     TABLE_FIELD(modifyTime, modify_time)
 };

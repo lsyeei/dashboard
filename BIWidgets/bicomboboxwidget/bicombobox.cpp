@@ -50,6 +50,16 @@ int BIComboBox::currentIndex()
     return ui->comboBox->currentIndex();
 }
 
+int BIComboBox::count()
+{
+    return ui->comboBox->count();
+}
+
+QVariant BIComboBox::currentData(int role)
+{
+    return ui->comboBox->currentData(role);
+}
+
 void BIComboBox::setCurrentItem(int index)
 {
     ui->comboBox->setCurrentIndex(index);
@@ -60,9 +70,14 @@ QString BIComboBox::itemText(int index)
     return ui->comboBox->itemText(index);
 }
 
-QVariant BIComboBox::itemData(int index)
+QVariant BIComboBox::itemData(int index, int role)
 {
-    return ui->comboBox->itemData(index);
+    return ui->comboBox->itemData(index, role);
+}
+
+void BIComboBox::setItemData(int index, QVariant data, int role)
+{
+    ui->comboBox->setItemData(index, data, role);
 }
 
 void BIComboBox::addItem(QString name, QVariant data)
@@ -86,7 +101,7 @@ void BIComboBox::on_comboBox_currentIndexChanged(int index)
 void BIComboBox::on_addBtn_clicked()
 {
     ui->comboBox->blockSignals(true);
-    ui->comboBox->addItem(tr("新项目"));
+    ui->comboBox->addItem(newItemText);
     int index = ui->comboBox->count() - 1;
     ui->comboBox->setCurrentIndex(index);
     ui->comboBox->blockSignals(false);

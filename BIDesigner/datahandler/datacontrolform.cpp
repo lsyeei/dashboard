@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 #include "datacontrolform.h"
+#include "animation/animationfactory.h"
+#include "bigraphicsscene.h"
 #include "datasource/datasourceform.h"
 #include "icustomgraphic.h"
 #include "qjsonarray.h"
@@ -40,7 +42,7 @@ DataControlForm::~DataControlForm()
     delete ui;
 }
 
-void DataControlForm::initStateOption(auto customGraphic)
+void DataControlForm::initStateOption(ICustomGraphic* customGraphic)
 {
     QSignalBlocker stateBlocker(ui->stateOptions);
     ui->stateOptions->clear();
@@ -56,7 +58,7 @@ void DataControlForm::initStateOption(auto customGraphic)
             auto obj = it.toObject();
             auto id = obj["id"].toInt();
             auto name = obj["name"].toString();
-            ui->stateOptions->addItem(name, QVariant::fromValue(QPair{id, name}));
+            ui->stateOptions->addItem(name, QVariant::fromValue(NamedId(id, name)));
         }
         ui->stateOptions->setCurrentIndex(-1);
     }else{
@@ -65,7 +67,7 @@ void DataControlForm::initStateOption(auto customGraphic)
     }
 }
 
-void DataControlForm::initPropertyOption(auto customGraphic)
+void DataControlForm::initPropertyOption(ICustomGraphic* customGraphic)
 {
     QSignalBlocker blocker(ui->propertyOptions);
     ui->propertyOptions->clear();
@@ -80,17 +82,49 @@ void DataControlForm::initPropertyOption(auto customGraphic)
     ui->propertyOptions->setCurrentIndex(-1);
 }
 
-void DataControlForm::selectStateOption(auto data)
+void DataControlForm::initAnimationOption(ICustomGraphic* customGraphic)
+{
+    if (customGraphic == nullptr) {
+        return;
+    }
+    auto scene = customGraphic->scene();
+    auto s = dynamic_cast<BIGraphicsScene*>(scene);
+    if (s == nullptr){
+        return;
+    }
+    auto graophicId = s->getItemId(customGraphic);
+    auto groups = AnimationFactory::instance()->graphicAnimation(graophicId);
+    foreach (auto group, groups) {
+        ui->animationOptions->addItem(group.getName(),
+                QVariant::fromValue(NamedId(group.getId(), group.getName())));
+    }
+    ui->animationOptions->setCurrentIndex(-1);
+}
+
+void DataControlForm::selectStateOption(NamedId data)
 {
     auto index = ui->stateOptions->count() - 1;
     for(;index >= 0; --index){
-        auto option = ui->stateOptions->itemData(index).value<QPair<int,QString>>();
-        if (option.first == data.first) {
+        auto option = ui->stateOptions->itemData(index).value<NamedId>();
+        if (option.getId() == data.getId()) {
             break;
         }
     }
     ui->stateOptions->setCurrentIndex(index);
     ui->stateWidget->setVisible(true);
+}
+
+void DataControlForm::selectAnimationOption(NamedId data)
+{
+    auto index = ui->animationOptions->count() - 1;
+    for(;index >= 0; --index){
+        auto option = ui->animationOptions->itemData(index).value<NamedId>();
+        if (option.getId() == data.getId()) {
+            break;
+        }
+    }
+    ui->animationOptions->setCurrentIndex(index);
+    ui->animateWidget->setVisible(true);
 }
 
 void DataControlForm::setGraphicsItem(QGraphicsItem *item)
@@ -101,7 +135,8 @@ void DataControlForm::setGraphicsItem(QGraphicsItem *item)
     initStateOption(customGraphic);
     // 获取属性选项
     initPropertyOption(customGraphic);
-    // todo：获取图元动画
+    // 获取图元动画
+    initAnimationOption(customGraphic);
 }
 
 void DataControlForm::setData(QVariant action)
@@ -112,7 +147,6 @@ void DataControlForm::setData(QVariant action)
     controlAction = action.value<ControlAction>();
     QSignalBlocker tableBlocker(ui->actionTable);
     reset();
-
     foreach (auto item, controlAction.getLogicList()) {
         addActionTableItem(item);
     }
@@ -235,15 +269,13 @@ void DataControlForm::editLogic()
     AssignAction assignAction;
     switch (controlType) {
     case ControlType::SWITCH_STATE:
-        selectStateOption(logic.getSwitchStateAction());
+        selectStateOption(logic.getSwitchState());
         break;
     case ControlType::PLAY_ANIMATION:
-        index = ui->animationOptions->findData(logic.getAction().toString());
-        ui->animationOptions->setCurrentIndex(index);
-        ui->animateWidget->setVisible(true);
+        selectAnimationOption(logic.getAnimation());
         break;
     case ControlType::SET_PROPERTY:
-        assignAction = logic.getAction().value<AssignAction>();        
+        assignAction = logic.getControlObj().value<AssignAction>();
         auto index = ui->propertyOptions->count() - 1;
         for (; index >= 0; -- index) {
             auto meta = ui->propertyOptions->itemData(index).value<CustomMetadata>();
@@ -362,7 +394,7 @@ void DataControlForm::addActionTableItem(ControlLogic logic)
 
     ui->actionTable->setItem(row, 1, new QTableWidgetItem(logic.controlTypeName()));
 
-    ui->actionTable->setItem(row, 2, new QTableWidgetItem(logic.actionString()));
+    ui->actionTable->setItem(row, 2, new QTableWidgetItem(logic.controlObjName()));
 }
 
 void DataControlForm::showRangeValue(bool flag)
@@ -397,10 +429,10 @@ void DataControlForm::dataChanged()
     logic.setControlType(controlType);
     switch (controlType) {
     case ControlType::SWITCH_STATE:
-        logic.setAction(ui->stateOptions->currentData());
+        logic.setControlObj(ui->stateOptions->currentData());
         break;
     case ControlType::PLAY_ANIMATION:
-        logic.setAction(ui->animationOptions->currentData());
+        logic.setControlObj(ui->animationOptions->currentData());
         break;
     case ControlType::SET_PROPERTY:
         AssignAction act;
@@ -408,7 +440,7 @@ void DataControlForm::dataChanged()
         act.setPropertyName(meta.name);
         act.setPropertyAlias(ui->propertyOptions->currentText());
         act.setDefaultValue(ui->propertyValueEdit->text().trimmed());
-        logic.setAction(QVariant::fromValue(act));
+        logic.setControlObj(QVariant::fromValue(act));
         break;
     }
      if (newFlag) {
@@ -427,7 +459,7 @@ void DataControlForm::dataChanged()
          item = ui->actionTable->item(row, 1);
          item->setText(logic.controlTypeName());
          item = ui->actionTable->item(row, 2);
-         item->setText(logic.actionString());
+         item->setText(logic.controlObjName());
      }
      // 获取全部数据，并触发数据变更信号
      collectAndEmit();

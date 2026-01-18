@@ -73,9 +73,9 @@ public:
     constexpr static char dataSource[] = "dataSource";
     class dataSourceTemplate {
     public:
-        constexpr static char source[] = "sourceList";
-        constexpr static char data[] = "dataList";
-        constexpr static char action[] = "actionList";
+        constexpr static char configList[] = "configList";
+        constexpr static char dataList[] = "dataList";
+        constexpr static char actionList[] = "actionList";
         class actionTemplate {
         public:
             constexpr static char graphicAction[] = "graphicAction";

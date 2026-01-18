@@ -24,11 +24,11 @@
 #ifndef DATAACTIONMANAGER_H
 #define DATAACTIONMANAGER_H
 
+#include "bigraphicsscene.h"
 #include "datasource/datamarketdo.h"
 #include "datasource/datasourcedo.h"
 #include "dataaction.h"
 
-class BIGraphicsScene;
 class DataActionManager : public QObject
 {
     Q_OBJECT
@@ -36,7 +36,7 @@ class DataActionManager : public QObject
 public:
     ~DataActionManager();
     static DataActionManager* instance();
-    void setGraphicsScene(BIGraphicsScene *scene){graphicScene = scene;};
+    void setGraphicsScene(BIGraphicsScene *scene);
     QString toXml();
     void parseXml(const QString &xml);
     /**
@@ -73,6 +73,7 @@ Q_SIGNALS:
     void dataQueryEndEvent(DataAction action, QJsonValue value);
 protected Q_SLOTS:
     void onDataQueryEnd(DataAction action, QJsonValue value);
+    // void onSceneEvent(ItemAction action, QList<QGraphicsItem*> items);
     // QObject interface
 protected:
     void timerEvent(QTimerEvent *event) override;

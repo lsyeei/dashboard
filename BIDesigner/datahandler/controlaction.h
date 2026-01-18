@@ -28,6 +28,21 @@
 enum class LogicSymbol{GREAT, GREATE_EQUAL, RANGE, LESS, LESS_EQUAL, EQUAL, UNEQUAL};
 enum class ControlType{PLAY_ANIMATION, SWITCH_STATE, SET_PROPERTY};
 
+class NamedId : public Serializable{
+    Q_GADGET
+    SERIALIZE(NamedId)
+public:
+    NamedId(){id = -1;}
+    NamedId(int id, const QString &name):id(id), name(name){}
+private:
+    int id;
+    QString name;
+
+    JSONFIELD(id, Id)
+    JSONFIELD(name, Name)
+};
+Q_DECLARE_METATYPE(NamedId)
+
 class ControlLogic : public Serializable
 {
     Q_GADGET
@@ -49,9 +64,11 @@ public:
      * @return true 成功，false 失败
      */
     bool testLogic(QVariant data);
-    void setSwitchStateAction(int id, const QString &name);
-    QPair<int, QString> getSwitchStateAction();
-    QString actionString();
+    void setSwitchState(int id, const QString &name);
+    NamedId getSwitchState();
+    void setAnimation(int id, const QString &name);
+    NamedId getAnimation();
+    QString controlObjName();
 private:
     QString uuid;
     // 逻辑操作符
@@ -62,16 +79,17 @@ private:
     qreal maxValue;
     // 控制类型
     ControlType controlType;
-    // 执行动作
-    QVariant action;
+    // 控制对象
+    QVariant controlObj;
 
     JSONFIELD(uuid, Uuid)
     JSONFIELD(symbol, symbol)
     JSONFIELD(minValue, MinValue)
     JSONFIELD(maxValue, MaxValue)
     JSONFIELD(controlType, ControlType)
-    JSONFIELD(action, Action)
+    JSONFIELD(controlObj, ControlObj)
 };
+Q_DECLARE_METATYPE(ControlLogic)
 
 class ControlAction : public Serializable, public AbstractAction
 {
@@ -98,6 +116,7 @@ private:
 
     JSONFIELD(logicList, LogicList)
 };
+Q_DECLARE_METATYPE(ControlAction)
 
 REGISTER_ACTION(ControlAction)
 
@@ -192,33 +211,49 @@ inline bool ControlLogic::testLogic(QVariant data){
     return trigger;
 }
 
-inline void ControlLogic::setSwitchStateAction(int id, const QString &name)
+inline void ControlLogic::setSwitchState(int id, const QString &name)
 {
     if (controlType != ControlType::SWITCH_STATE) {
         return;
     }
-    action = QVariant::fromValue(QPair{id, name});
+    controlObj = QVariant::fromValue(NamedId(id, name));
 }
 
-inline QPair<int, QString> ControlLogic::getSwitchStateAction()
+inline NamedId ControlLogic::getSwitchState()
 {
     if (controlType != ControlType::SWITCH_STATE) {
-         return QPair<int, QString>{};
+        return NamedId();
     }
-    return action.value<QPair<int, QString>>();
+    return controlObj.value<NamedId>();
 }
 
-inline QString ControlLogic::actionString()
+inline void ControlLogic::setAnimation(int id, const QString &name)
+{
+    if (controlType != ControlType::PLAY_ANIMATION) {
+        return;
+    }
+    controlObj = QVariant::fromValue(NamedId(id, name));
+}
+
+inline NamedId ControlLogic::getAnimation()
+{
+    if (controlType != ControlType::PLAY_ANIMATION) {
+        return NamedId();
+    }
+    return controlObj.value<NamedId>();
+}
+
+inline QString ControlLogic::controlObjName()
 {
     switch (controlType) {
     case ControlType::PLAY_ANIMATION:
-        return action.toString();
+        return getAnimation().getName();
         break;
     case ControlType::SWITCH_STATE:
-        return getSwitchStateAction().second;
+        return getSwitchState().getName();
         break;
     case ControlType::SET_PROPERTY:
-        return action.value<AssignAction>().summary();
+        return controlObj.value<AssignAction>().summary();
         break;
     }
     return "";
@@ -232,7 +267,7 @@ inline void ControlAction::triggerAction(QVariant data, QGraphicsItem *graphic){
             continue;
         }
         auto controlType = logic.getControlType();
-        auto action = logic.getAction();
+        auto action = logic.getControlObj();
         switch (controlType) {
         case ControlType::PLAY_ANIMATION:
             playAnimation(graphic, action.toString());

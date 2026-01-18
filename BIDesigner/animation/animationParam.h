@@ -56,4 +56,28 @@ private:
     JSONFIELD(valueTo, ValueTo)
 };
 
+class AnimationGroup : public Serializable{
+    Q_GADGET
+    SERIALIZE(AnimationGroup)
+public:
+    AnimationGroup(){id = -1; enable = true;}
+    AnimationGroup(int groupId, const QString &groupName, bool enableFlag=true)
+        : id(groupId), name(groupName), enable(enableFlag){}
+    void clearAnimation(){animationList.clear();}
+private:
+    // 组 ID
+    int id;
+    // 组名
+    QString name;
+    // 是否启用，true 启用，可以自动播放；false 禁用， 不会自动播放
+    bool enable;
+    // 组内的动画
+    QList<AnimationParam> animationList;
+
+    JSONFIELD(id, Id)
+    JSONFIELD(name, Name)
+    JSONFIELD(enable, Enable)
+    JSONFIELD(animationList, AnimationList)
+};
+
 #endif // ANIMATIONPARAM_H

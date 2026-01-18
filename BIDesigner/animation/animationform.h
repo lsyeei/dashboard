@@ -47,6 +47,11 @@ protected Q_SLOTS:
     void onPlayEnd();
     void onAnimateSelectChanged(int oldIndex, int newIndex);
     void onAnimateParamChanged();
+    // 响应分组事件
+    void onAddGroup(int index);
+    void onRemoveGroup(const QString &name, QVariant data);
+    void onModifyGroup(int index);
+    void onGroupChanged(int index);
 
     // QWidget interface
 protected:
@@ -69,6 +74,11 @@ private:
      * @return true 成功，false 失败
      */
     bool addAnimateItem(const AnimationParam &param);
+    /**
+     * @brief showProperty 显示属性
+     * @param widget 指定的属性
+     */
+    void showProperty(QWidget *widget);
 };
 
 #endif // ANIMATIONFORM_H

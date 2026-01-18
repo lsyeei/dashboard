@@ -67,6 +67,14 @@ public:
     }
 
     template<class T>
+    static void writeCDATA(QXmlStreamWriter *writer, T &data){
+        QByteArray array;
+        QDataStream stream(&array, QIODeviceBase::WriteOnly);
+        stream << data;
+        writer->writeCDATA(array.toHex());
+    }
+
+    template<class T>
     static QList<T> CDATA2List(QXmlStreamReader *reader){
         QList<T> list;
         auto type = reader->readNext();

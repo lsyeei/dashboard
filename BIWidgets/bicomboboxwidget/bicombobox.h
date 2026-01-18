@@ -32,24 +32,30 @@ class ComboBoxForm;
 class QDESIGNER_WIDGET_EXPORT BIComboBox : public QWidget
 {
     Q_OBJECT
-
+    Q_PROPERTY(QString defaultText READ defaultText WRITE setDefaultText NOTIFY defaultTextChanged FINAL)
 public:
     explicit BIComboBox(QWidget *parent = nullptr);
     ~BIComboBox();
     QComboBox* getComboBox();
     void clear();
     int currentIndex();
+    int count();
+    QVariant currentData(int role = Qt::UserRole);
     void setCurrentItem(int index);
     QString itemText(int index);
-    QVariant itemData(int index);
+    QVariant itemData(int index, int role = Qt::UserRole);
+    void setItemData(int index, QVariant data, int role = Qt::UserRole);
     void addItem(QString name, QVariant data);
     void removeItem(int index);
+    QString defaultText(){return newItemText;}
+    void setDefaultText(const QString &text){newItemText = text;}
 
 Q_SIGNALS:
     void currentIndexChanged(int index);
     void itemRemoved(QString name, QVariant data);
     void itemAdded(int index);
     void itemModified(int index);
+    void defaultTextChanged(const QString &text);
 
 private slots:
     void on_comboBox_currentIndexChanged(int index);
@@ -66,7 +72,7 @@ private:
     Ui::ComboBoxForm *ui;
     bool addFlag{false};
     bool editFlag{false};
-
+    QString newItemText{tr("新建")};
 
     void enableEdit();
 

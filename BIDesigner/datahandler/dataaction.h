@@ -92,12 +92,13 @@ inline void DataAction::copy(const Serializable &from, Serializable &to)
 {
     auto f = const_cast<DataAction*>(dynamic_cast<const DataAction*>(&from));
     auto t = dynamic_cast<DataAction*>(&to);
+    // 先设置data，如果此时data为空页不会影响SourceId和dataid
+    t->setData(f->getData());
     t->setGraphicId(f->getGraphicId());
     t->setSourceId(f->getSourceId());
     t->setDataId(f->getDataId());
     t->setActionType(f->getActionType());
     t->setAction(f->getAction());
-    t->setData(f->getData());
 }
 
 inline void DataAction::copy(const Serializable &from)

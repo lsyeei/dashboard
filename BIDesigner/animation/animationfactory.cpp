@@ -40,6 +40,7 @@
 #include <QTimeLine>
 #include <QPropertyAnimation>
 #include <QGraphicsItem>
+#include <BIGraphicsScene.h>
 
 AnimationFactory* AnimationFactory::factory = nullptr;
 AnimationFactory::AnimationFactory() {
@@ -95,14 +96,14 @@ AnimationFactory *AnimationFactory::instance()
     return factory;
 }
 
-QList<AnimationParam> AnimationFactory::graphicAnimation(const QString &id)
+QList<AnimationGroup> AnimationFactory::graphicAnimation(const QString &id)
 {
     return animations[id];
 }
 
-void AnimationFactory::setGraphicAnimation(const QString &id, QList<AnimationParam> paramList)
+void AnimationFactory::setGraphicAnimation(const QString &id, QList<AnimationGroup> groupList)
 {
-    animations[id] = paramList;
+    animations[id] = groupList;
 }
 
 QString AnimationFactory::toXml()
@@ -112,6 +113,10 @@ QString AnimationFactory::toXml()
     xml->writeStartElement(XmlTemplate::animates);
     auto item = animations.begin();
     while(item != animations.end()){
+        if (scene->getItemById(item.key()) == nullptr){
+            // 已经删除的图元不导出
+            continue;
+        }
         xml->writeStartElement(XmlTemplate::animatesTemplate::animate);
         xml->writeTextElement(XmlTemplate::animatesTemplate::animateTemplate::itemId,
                               item.key());
@@ -151,10 +156,10 @@ void AnimationFactory::parseXml(const QString &xml)
                     auto data = reader.text();
                     QByteArray array =  QByteArray::fromHex(data.toLocal8Bit());
                     QDataStream stream(&array, QIODeviceBase::ReadOnly);
-                    QList<AnimationParam> params;
-                    stream >> params;
+                    QList<AnimationGroup> groups;
+                    stream >> groups;
                     if (!id.isEmpty()) {
-                        animations[id] = params;
+                        animations[id] = groups;
                     }
                 }
             }
@@ -171,13 +176,19 @@ void AnimationFactory::bindScene(IGraphicsScene *scenePtr)
     scene = scenePtr;
 }
 
-QAbstractAnimation *AnimationFactory::play(QGraphicsItem *graphic)
+QAbstractAnimation *AnimationFactory::play(QGraphicsItem *graphic, int groupId)
 {
     auto id = scene->getItemId(graphic);
     if (id.isEmpty()) {
         return nullptr;
     }
-    auto actions = animations[id];
+    AnimationGroup group;
+    if (groupId >= 0){
+        group = getGroup(graphic, groupId);
+    }else{
+        group = getEnableGroup(id);
+    }
+    auto actions = group.getAnimationList();
     if (actions.isEmpty()) {
         return nullptr;
     }
@@ -192,6 +203,30 @@ QAbstractAnimation *AnimationFactory::play(QGraphicsItem *graphic)
                 player->addAnimation(type->createAnimation(graphic, act));
             }
     }
+    // 检查该图元是否是组合图
+    auto s = dynamic_cast<BIGraphicsScene*>(scene);
+    if (s) {
+        auto graphicList= s->getGroupItems(graphic);
+        if (graphicList.count() > 1) {
+            // 同时播放内部图元的动画
+            foreach (auto item, graphicList) {
+                if (graphic == item) {
+                    continue;
+                }
+                group = getEnableGroup(scene->getItemId(item));
+                if (group.getId() < 0){
+                    continue;
+                }
+                actions = group.getAnimationList();
+                foreach (auto act, actions) {
+                    auto type = getAnimateType(act.getTypeId());
+                    if (!type->isEmpty()){
+                        player->addAnimation(type->createAnimation(item, act));
+                    }
+                }
+            }
+        }
+    }
     player->start();
     return player;
 }
@@ -204,7 +239,8 @@ QAbstractAnimation *AnimationFactory::playGroup(QList<QGraphicsItem *> graphicGr
     }
     player = new QParallelAnimationGroup();
     foreach (auto graphic, graphicGroup) {
-        auto actions = animations[scene->getItemId(graphic)];
+        auto group = getEnableGroup(scene->getItemId(graphic));
+        auto actions = group.getAnimationList();
         foreach (auto act, actions) {
             auto type = getAnimateType(act.getTypeId());
             if (!type->isEmpty()){
@@ -230,7 +266,8 @@ QAbstractAnimation *AnimationFactory::playAll()
         if (graphic == nullptr) {
             continue;
         }
-        auto actions = it.value();
+        auto group = getEnableGroup(it.key());
+        auto actions = group.getAnimationList();
         foreach (auto act, actions) {
             auto type = getAnimateType(act.getTypeId());
             if (!type->isEmpty()){
@@ -242,20 +279,110 @@ QAbstractAnimation *AnimationFactory::playAll()
     return player;
 }
 
-void AnimationFactory::updateAnimate(QGraphicsItem *graphic, const QList<AnimationParam> animates)
+AnimationGroup AnimationFactory::getGroup(QGraphicsItem *graphic, int groupId)
 {
-    if (graphic == nullptr){
+    if (graphic == nullptr || groupId < 0) {
+        return AnimationGroup();
+    }
+    auto graphicId = scene->getItemId(graphic);
+    auto& groupList = animations[graphicId];
+    // 查找最大组ID
+    foreach (auto group, groupList) {
+        if (group.getId() == groupId) {
+            return group;
+        }
+    }
+    return AnimationGroup();
+}
+
+int AnimationFactory::addGroup(QGraphicsItem *graphic, const QString &groupName)
+{
+    int groupId = -1;
+    if (graphic == nullptr || groupName.trimmed().isEmpty()) {
+        return groupId;
+    }
+    auto graphicId = scene->getItemId(graphic);
+    auto& groupList = animations[graphicId];
+    // 查找最大组ID
+    foreach (auto group, groupList) {
+        if (group.getId() > groupId) {
+            groupId = group.getId();
+        }
+    }
+    groupId ++;
+    // 新建组
+    groupList << AnimationGroup{groupId, groupName.trimmed()};
+    return groupId;
+
+}
+
+bool AnimationFactory::removeGroup(QGraphicsItem *graphic, int groupId)
+{
+    if (graphic == nullptr || groupId < 0) {
+        return false;
+    }
+    auto graphicId = scene->getItemId(graphic);
+    auto& groupList = animations[graphicId];
+    for (int i=0; i < groupList.count(); ++i) {
+        if (groupList[i].getId() == groupId) {
+            groupList.removeAt(i);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool AnimationFactory::modifyGroupName(QGraphicsItem *graphic, int groupId, const QString &groupName)
+{
+    if (graphic == nullptr || groupId < 0 || groupName.trimmed().isEmpty()) {
+        return false;
+    }
+    auto graphicId = scene->getItemId(graphic);
+    auto& groupList = animations[graphicId];
+    for (int i=0; i < groupList.count(); ++i) {
+        if (groupList[i].getId() == groupId) {
+            groupList[i].setName(groupName.trimmed());
+            return true;
+        }
+    }
+    return false;
+}
+
+void AnimationFactory::enableGroup(QGraphicsItem *graphic, int groupId, bool flag)
+{
+    if (graphic == nullptr || groupId < 0) {
+        return;
+    }
+    auto graphicId = scene->getItemId(graphic);
+    auto& groupList = animations[graphicId];
+    for (int i=0; i < groupList.count(); ++i) {
+        if (groupList[i].getId() == groupId) {
+            groupList[i].setEnable(flag);
+            return;
+        }
+    }
+}
+
+void AnimationFactory::updateAnimate(QGraphicsItem *graphic, int groupId, const QList<AnimationParam> animates)
+{
+    if (graphic == nullptr || groupId < 0){
         return;
     }
     auto id = scene->getItemId(graphic);
     if (id.isEmpty()) {
         return;
     }
-    if (animates.isEmpty()) {
-        animations.remove(id);
-        return;
+    for (int i=0;i< animations[id].count();++i) {
+        auto& group = animations[id][i];
+        if (groupId == group.getId()) {
+            if (animates.isEmpty()) {
+                group.clearAnimation();
+                return;
+            }
+            group.setAnimationList(animates);
+            break;
+        }
     }
-    animations[id] = animates;
 }
 
 QList<AnimateType*> AnimationFactory::animateTypeList()
@@ -275,6 +402,17 @@ AnimateType *AnimationFactory::getAnimateType(const QString &id)
     }else{
         return *type;
     }
+}
+
+AnimationGroup AnimationFactory::getEnableGroup(const QString &graphicId)
+{
+    AnimationGroup group;
+    foreach (auto item, animations[graphicId]) {
+        if (item.getEnable() && !item.getAnimationList().isEmpty()) {
+            return item;
+        }
+    }
+    return group;
 }
 
 QAbstractAnimation *AnimationFactory::scaleAnimation(QGraphicsItem *graphic, const AnimationParam &act)

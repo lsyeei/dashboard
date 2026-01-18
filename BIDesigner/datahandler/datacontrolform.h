@@ -21,6 +21,7 @@
 #include "datahandler/controlaction.h"
 #include <QWidget>
 
+class ICustomGraphic;
 class QGraphicsItem;
 class ControlAction;
 class AbstractAction;
@@ -80,9 +81,11 @@ private:
      */
     void collectAndEmit();
     void showControlOption(bool flag);
-    void initStateOption(auto customGraphic);
-    void initPropertyOption(auto customGraphic);
-    void selectStateOption(auto data);
+    void initStateOption(ICustomGraphic* customGraphic);
+    void initPropertyOption(ICustomGraphic* customGraphic);
+    void initAnimationOption(ICustomGraphic* customGraphic);
+    void selectStateOption(NamedId data);
+    void selectAnimationOption(NamedId data);
 };
 
 #endif // DATACONTROLFORM_H

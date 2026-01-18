@@ -40,14 +40,14 @@ public:
      * @param id 图元ID
      * @return  动画参数列表
      */
-    QList<AnimationParam> graphicAnimation(const QString &id);
+    QList<AnimationGroup> graphicAnimation(const QString &id);
     /**
      * @brief setGraphicAnimation 设置指定图元的动画参数
      * @param id 图元ID
      * @return  动画参数列表
      * @param paramList 动画参数列表
      */
-    void setGraphicAnimation(const QString &id, QList<AnimationParam> paramList);
+    void setGraphicAnimation(const QString &id, QList<AnimationGroup> groupList);
     /**
      * @brief toXml 动画集合转为xml
      * @return  xml文本
@@ -64,11 +64,13 @@ public:
      */
     void bindScene(IGraphicsScene *scenePtr);
     /**
-     * @brief play 播放指定图元的动画
+     * @brief play 播放指定图元的动画，
+     * 默认只播放第一个设置为启动的组的动画，其它组不播放
      * @param graphic 图元对象
+     * @param groupId 指定组ID
      * @return 动画对象
      */
-    QAbstractAnimation *play(QGraphicsItem *graphic);
+    QAbstractAnimation *play(QGraphicsItem *graphic, int groupId = -1);
     /**
      * @brief playGroup 播放一组动画
      * @param graphicGroup 图元集合
@@ -77,15 +79,53 @@ public:
     QAbstractAnimation *playGroup(QList<QGraphicsItem *> graphicGroup);
     /**
      * @brief playAll 播放所有动画
+     * 默认每个图元只播放第一个设置为启动的组的动画，其它组不播放
      * @return 动画对象
      */
     QAbstractAnimation *playAll();
     /**
+     * @brief getGroup 获取一组动画
+     * @param graphic 图元对象
+     * @param groupId 组ID
+     * @return 动画组信息
+     */
+    AnimationGroup getGroup(QGraphicsItem *graphic, int groupId);
+    /**
+     * @brief addGroup 向指定图元添加一个动画组，默认启用该组
+     * @param graphic 图元对象
+     * @param groupName 动画组名称
+     * @return 新分配组ID
+     */
+    int addGroup(QGraphicsItem *graphic, const QString &groupName);
+    /**
+     * @brief removeGroup 删除一组动画
+     * @param graphic 图元对象
+     * @param groupId 组ID
+     * @return true 成功，false 失败
+     */
+    bool removeGroup(QGraphicsItem *graphic, int groupId);
+    /**
+     * @brief modifyGroupName 修改组名称
+     * @param graphic 图元对象
+     * @param groupId 组ID
+     * @param groupName 组名称
+     * @return true 成功，false 失败
+     */
+    bool modifyGroupName(QGraphicsItem *graphic, int groupId, const QString &groupName);
+    /**
+     * @brief enableGroup 启用/禁用组
+     * @param graphic 图元对象
+     * @param groupId 组ID
+     * @param flag true 启用组，false禁用组
+     */
+    void enableGroup(QGraphicsItem *graphic, int groupId, bool flag);
+    /**
      * @brief updateAnimate 更新动画数据
      * @param graphic 图元对象
+     * @param groupId 动画组ID
      * @param animates 动画参数列表
      */
-    void updateAnimate(QGraphicsItem * graphic, const QList<AnimationParam> animates);
+    void updateAnimate(QGraphicsItem * graphic, int groupId, const QList<AnimationParam> animates);
     /**
      * @brief animateTypeList 获取支持的动画类型列表
      * @return 动画类型列表
@@ -105,18 +145,18 @@ private:
     // 动画类型
     QList<AnimateType*> typeList;
     // 动画集合，key 图元ID，value 动画参数
-    QMap<QString, QList<AnimationParam>> animations;
+    // QMap<QString, QList<AnimationParam>> animations;
+    QMap<QString, QList<AnimationGroup>> animations;
     // 用于执行动画的scene
     IGraphicsScene *scene{nullptr};
     // 动画播放（并行播放）
     QPointer<QParallelAnimationGroup> player;
-    // /**
-    //  * @brief createAnimation 创建动画
-    //  * @param graphic 图元对象
-    //  * @param act 动画参数
-    //  * @return 动画对象
-    //  */
-    // QAbstractAnimation *createAnimation(QGraphicsItem *graphic, const AnimationParam &act);
+    /**
+     * @brief getEnableGroup 获取启用的动画组
+     * @param graphicId 图元ID
+     * @return 动画组
+     */
+    AnimationGroup getEnableGroup(const QString &graphicId);
     /**
      * @brief scaleAnimation 缩放动画
      * @param graphic 图元对象
