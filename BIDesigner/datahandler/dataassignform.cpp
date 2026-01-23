@@ -108,3 +108,16 @@ void DataAssignForm::reset()
     ui->defaultValueEdit->setText("");
     ui->propertyOptions->setCurrentIndex(-1);
 }
+
+void DataAssignForm::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    if (graphic == nullptr) {
+        return;
+    }
+    auto customGraphic = dynamic_cast<ICustomGraphic*>(graphic);
+    if (customGraphic == nullptr) {
+        return;
+    }
+    initPropertyOption(customGraphic);
+}

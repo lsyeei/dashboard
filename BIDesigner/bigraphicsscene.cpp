@@ -17,6 +17,7 @@
 */
 
 #include "bigraphicsscene.h"
+#include "datahandler/dataactionmanager.h"
 #include "graphicsitemgroup.h"
 #include "graphicrootwidget.h"
 #include "igraphicplugin.h"
@@ -36,6 +37,7 @@
 #include <QClipboard>
 #include "filetemplate.h"
 #include "snowflake.h"
+#include <animation/animationfactory.h>
 
 int BIGraphicsScene::itemIdIndex = 0;
 int BIGraphicsScene::itemNameIndex = 1;
@@ -637,8 +639,13 @@ QList<QGraphicsItem *> BIGraphicsScene::pastItems(QPointF pos)
     foreach(auto item, newItems){
         // 修改新图元属性
         if (copyFlag) {
-            setItemId(item, idGenerator->nextIdString());
+            auto oldId = item->data(itemIdIndex).toString();
+            auto newId = idGenerator->nextIdString();
+            setItemId(item, newId);
             setItemName(item, item->data(itemNameIndex).toByteArray() + "_copy");
+            // 拷贝动画与数据
+            AnimationFactory::instance()->copyFromGraphic(getItemById(oldId), item);
+            DataActionManager::instance()->copy(oldId, newId);
         }
         item->setPos(item->pos() + offset);
         updateItem(item);

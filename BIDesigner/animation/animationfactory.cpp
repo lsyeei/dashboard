@@ -323,9 +323,9 @@ bool AnimationFactory::removeGroup(QGraphicsItem *graphic, int groupId)
     }
     auto graphicId = scene->getItemId(graphic);
     auto& groupList = animations[graphicId];
-    for (int i=0; i < groupList.count(); ++i) {
-        if (groupList[i].getId() == groupId) {
-            groupList.removeAt(i);
+    for (auto item = groupList.cbegin(); item != groupList.cend(); ++item) {
+        if (item->getId() == groupId) {
+            groupList.erase(item);
             return true;
         }
     }
@@ -402,6 +402,30 @@ AnimateType *AnimationFactory::getAnimateType(const QString &id)
     }else{
         return *type;
     }
+}
+
+bool AnimationFactory::copyFromGraphic(QGraphicsItem *from, QGraphicsItem *to)
+{
+    if (from == nullptr || to == nullptr) {
+        return false;
+    }
+    auto fromId = scene->getItemId(from);
+    auto toId = scene->getItemId(to);
+    if (fromId.isEmpty() || toId.isEmpty()) {
+        return false;
+    }
+    if (!animations.contains(fromId)) {
+        return true;
+    }
+    if (animations.contains(toId)){
+        foreach (auto group, animations[fromId]) {
+            auto id = addGroup(to, group.getName());
+            updateAnimate(to, id, group.getAnimationList());
+        }
+    }else{
+        animations[toId] = animations[fromId];
+    }
+    return true;
 }
 
 AnimationGroup AnimationFactory::getEnableGroup(const QString &graphicId)

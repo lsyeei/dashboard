@@ -266,7 +266,10 @@ inline QString ControlLogic::controlObjName()
 inline void ControlAction::triggerAction(QVariant data, QGraphicsItem *graphic)
 {
     auto json = data.toJsonValue();
-    triggerInfo = QCoreApplication::tr("数据:  ") + JSUtil::instance()->JsonValueToString(json);
+    auto dataStr = JSUtil::instance()->JsonValueToString(json);
+    triggerInfo = "";
+    QString info = "数据:  %1\r\n触发逻辑:  %2 %3\r\n执行:  %4<%5>\r\n结果:  %6";
+    // triggerInfo = QCoreApplication::tr("数据:  ") + dataStr;
     bool execFlag{false};
     foreach (auto logic, logicList) {
         bool flag = logic.testLogic(data);
@@ -275,7 +278,6 @@ inline void ControlAction::triggerAction(QVariant data, QGraphicsItem *graphic)
             continue;
         }
         execFlag = true;
-        triggerInfo += QCoreApplication::tr("\r\n触发逻辑:  ") + logic.symbolSummary();
         auto controlType = logic.getControlType();
         auto controlObj = logic.getControlObj();
         flag = false;
@@ -284,27 +286,28 @@ inline void ControlAction::triggerAction(QVariant data, QGraphicsItem *graphic)
             if (controlObj.canConvert<NamedId>()) {
                 flag = playAnimation(graphic, QString("%1").arg(controlObj.value<NamedId>().getId()));
             }
-            triggerInfo += QString(QCoreApplication::tr("\r\n执行结果:  %1")).arg(flag);
             break;
         case ControlType::SWITCH_STATE:
             if (controlObj.canConvert<NamedId>()) {
                 flag = switchState(graphic, QString("%1").arg(controlObj.value<NamedId>().getId()));
             }
-            triggerInfo += QString(QCoreApplication::tr("\r\n执行结果:  %1")).arg(flag);
             break;
         case ControlType::SET_PROPERTY:
             if (controlObj.canConvert<AssignAction>()) {
                 auto assAct = controlObj.value<AssignAction>();
                 assAct.triggerAction(assAct.getDefaultValue(), graphic);
-                triggerInfo += QCoreApplication::tr("\r\n属性") + assAct.tracerInfo();
+                flag = true;
             }else{
-                triggerInfo += QCoreApplication::tr("\r\n执行结果:  false");
+                flag = false;
             }
             break;
         }
+        triggerInfo += info.arg(dataStr, dataStr, logic.symbolSummary(),
+                        logic.controlTypeName(), logic.controlObjName(),
+                        flag?"成功":"失败");
     }
     if(!execFlag){
-        triggerInfo += QCoreApplication::tr("\r\n数据格式错误，无法解析！");
+        triggerInfo += QCoreApplication::tr("\r\nerror:  数据格式错误，无法解析！");
     }
 }
 

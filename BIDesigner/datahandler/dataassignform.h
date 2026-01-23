@@ -36,6 +36,8 @@ public:
     void setData(QVariant data);
     AssignAction getData(){return action;}
     void reset();
+protected:
+    void showEvent(QShowEvent *event) override;
 Q_SIGNALS:
     void changedEvent(QVariant data);
 protected Q_SLOTS:

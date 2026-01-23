@@ -84,6 +84,8 @@ void DataControlForm::initPropertyOption(ICustomGraphic* customGraphic)
 
 void DataControlForm::initAnimationOption(ICustomGraphic* customGraphic)
 {
+    QSignalBlocker blocker(ui->animationOptions);
+    ui->animationOptions->clear();
     if (customGraphic == nullptr) {
         return;
     }
@@ -381,6 +383,21 @@ void DataControlForm::reset(bool includeTable)
     ui->minValueSpin->setVisible(false);
     ui->valueSpliter->setVisible(false);
     ui->maxValueSpin->setVisible(false);
+}
+
+void DataControlForm::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    if (graphic == nullptr) {
+        return;
+    }
+    auto customGraphic = dynamic_cast<ICustomGraphic*>(graphic);
+    if (customGraphic == nullptr) {
+        return;
+    }
+    initAnimationOption(customGraphic);
+    initStateOption(customGraphic);
+    initPropertyOption(customGraphic);
 }
 
 void DataControlForm::addActionTableItem(ControlLogic logic)

@@ -250,10 +250,12 @@ void AnimationForm::onRemoveGroup(const QString &name, QVariant data)
         QMessageBox::information(this, tr("提示"), name + tr("删除失败！"));
         return;
     }
-     auto btn = QMessageBox::question(this, tr("提示"),
+    auto btn = QMessageBox::question(this, tr("提示"),
                 QString(tr("确定要删除[%1]么，该组下的所有动画将同时删除").arg(name)));
-    if (btn == QMessageBox::Cancel) {
-         return;
+    if (btn == QMessageBox::No) {
+        ui->groupCombo->addItem(name, data);
+        ui->groupCombo->setCurrentItem(ui->groupCombo->count() - 1);
+        return;
     }
     int groupId = data.toInt();
     if (AnimationFactory::instance()->removeGroup(graphicItem, groupId)){
@@ -342,7 +344,7 @@ void AnimationForm::initUI()
     connect(ui->groupCombo, &BIComboBox::itemAdded,
             this, &AnimationForm::onAddGroup);
     connect(ui->groupCombo, &BIComboBox::itemRemoved,
-            this, &AnimationForm::onRemoveAnimate);
+            this, &AnimationForm::onRemoveGroup);
     connect(ui->groupCombo, &BIComboBox::itemModified,
             this, &AnimationForm::onModifyGroup);
     connect(ui->groupCombo, &BIComboBox::currentIndexChanged,

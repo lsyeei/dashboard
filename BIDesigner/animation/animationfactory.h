@@ -137,6 +137,13 @@ public:
      * @return 动画类型
      */
     AnimateType *getAnimateType(const QString &id);
+    /**
+     * @brief copyFromGraphic 拷贝图元动画
+     * @param from 源图元
+     * @param to 目标图元
+     * @return true 成功，false 失败
+     */
+    bool copyFromGraphic(QGraphicsItem *from, QGraphicsItem *to);
 
 protected Q_SLOTS:
 
@@ -144,8 +151,7 @@ private:
     static AnimationFactory *factory;
     // 动画类型
     QList<AnimateType*> typeList;
-    // 动画集合，key 图元ID，value 动画参数
-    // QMap<QString, QList<AnimationParam>> animations;
+    // 动画集合，key 图元ID，value 动画组参数
     QMap<QString, QList<AnimationGroup>> animations;
     // 用于执行动画的scene
     IGraphicsScene *scene{nullptr};

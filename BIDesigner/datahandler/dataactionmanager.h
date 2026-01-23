@@ -75,6 +75,13 @@ public:
      */
     void testDataAction(const DataAction &action);
     void setProjectName(const QString &name){projectName = name;}
+    /**
+     * @brief copy 拷贝数据动作
+     * @param fromGraphicId 源
+     * @param toGraphicId 目标
+     * @return true 成功， false 失败
+     */
+    bool copy(const QString &fromGraphicId, const QString &toGraphicId);
 Q_SIGNALS:
     void dataQueryEndEvent(DataAction action, QJsonValue value);
     void loadProjectData(const QString &projectName, QList<DataMarketDO> dataList);

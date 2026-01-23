@@ -44,6 +44,10 @@ public:
      * @param includeTable true 包含动作表格控件， false 不包括
      */
     void reset(bool includeTable = true);
+
+    // QWidget interface
+protected:
+    void showEvent(QShowEvent *event) override;
 Q_SIGNALS:
     void changedEvent(QVariant action);
 protected Q_SLOTS:

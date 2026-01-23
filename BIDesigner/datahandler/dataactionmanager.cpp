@@ -323,6 +323,26 @@ void DataActionManager::testDataAction(const DataAction &action)
     testWatcher.setFuture(future);
 }
 
+bool DataActionManager::copy(const QString &fromGraphicId, const QString &toGraphicId)
+{
+    if (fromGraphicId.isEmpty() || toGraphicId.isEmpty()){
+        return false;
+    }
+    if (!actionMap.contains(fromGraphicId)){
+        return true;
+    }
+    auto fromActionMap = actionMap[fromGraphicId];
+    auto& toActionMap = actionMap[toGraphicId];
+    foreach (auto act, fromActionMap) {
+        if (toActionMap.contains(act.getDataId())) {
+            continue;
+        }
+        act.setGraphicId(toGraphicId);
+        toActionMap[act.getDataId()] = act;
+    }
+    return true;
+}
+
 void DataActionManager::onDataSourceChanged(DataSourceDO source)
 {
     auto sourceId = source.get_uuid();

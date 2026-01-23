@@ -37,13 +37,13 @@ public:
         if (data.isNull()) {
             data.setValue(defaultValue);
         }
-        triggerInfo += QCoreApplication::tr("\r\n设置属性:  ") + propertyAlias;
+        triggerInfo += QCoreApplication::tr("\r\n目标属性:  ") + propertyAlias;
         auto flag = setProperty(graphic, propertyName, data);
-        triggerInfo += QString(QCoreApplication::tr("\r\n执行结果:  %1")).arg(flag);
+        triggerInfo += QString(QCoreApplication::tr("\r\n结果:  %1")).arg(flag?"成功":"失败");
     }
     QString summary() override
     {
-        return QString(QCoreApplication::tr("给属性[%1]赋值")).arg(propertyAlias);
+        return propertyAlias;//QString(QCoreApplication::tr("给属性[%1]赋值")).arg(propertyAlias);
     }
     QString tracerInfo() override { return triggerInfo;}
 private:
