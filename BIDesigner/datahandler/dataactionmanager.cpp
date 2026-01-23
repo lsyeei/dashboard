@@ -49,13 +49,7 @@ DataActionManager *DataActionManager::instance()
 
 void DataActionManager::setGraphicsScene(BIGraphicsScene *scene)
 {
-    // if (graphicScene && scene != graphicScene) {
-    //     disconnect(graphicScene, &BIGraphicsScene::contentChanged,
-    //                this, &DataActionManager::onSceneEvent);
-    // }
     graphicScene = scene;
-    // connect(scene, &BIGraphicsScene::contentChanged,
-    //         this, &DataActionManager::onSceneEvent);
 }
 
 QString DataActionManager::toXml()
@@ -165,6 +159,8 @@ void DataActionManager::parseXml(const QString &xml)
             }
         }
     }
+    // 将解析的数据整合到本地数据，供数据编辑使用
+    emit loadProjectData(projectName, dataMarketMap.values());
 }
 
 void DataActionManager::run()
@@ -187,6 +183,16 @@ void DataActionManager::run()
             list << action;
         }
     }
+    // 计算数据源中数据的数量
+    foreach (auto item, dataMarketMap) {
+        auto sourceId = item.getDataSource().get_uuid();
+        if (dataCounter.contains(sourceId)) {
+            dataCounter[sourceId] = dataCounter[sourceId] + 1;
+        }else{
+            dataCounter[sourceId] = 1;
+        }
+    }
+
     // 启动定时器
     for (auto it = periodMap.begin(); it != periodMap.end(); ++ it){
         auto timerId = startTimer(std::chrono::seconds(it.key()), Qt::PreciseTimer);
@@ -195,6 +201,18 @@ void DataActionManager::run()
     // 注册事件
     connect(this, &DataActionManager::dataQueryEndEvent,
             this, &DataActionManager::onDataQueryEnd, Qt::QueuedConnection);
+}
+
+void DataActionManager::stop()
+{
+    // 停止所有计数器
+    for (auto item = timerMap.begin(); item != timerMap.end(); ++ item) {
+        killTimer(item.key());
+    }
+    // 停止所有数据连接线程
+    foreach (auto item, threadPoolMap) {
+        item->clear();
+    }
 }
 
 QList<DataAction> DataActionManager::getGraphicDataActions(const QString &graphicId)
@@ -221,6 +239,20 @@ DataAction DataActionManager::getDataAction(const QString &graphicId, const QStr
     return actMap[dataId];
 }
 
+void DataActionManager::saveActionData(DataAction action)
+{
+    auto sourceId = action.getSourceId();
+    if (!sourceId.isEmpty()){
+        if (!dataSourceMap.contains(sourceId)){
+            dataSourceMap[sourceId] = action.getDataSource();
+        }
+        auto dataId = action.getDataId();
+        if (!dataMarketMap.contains(dataId)) {
+            dataMarketMap[dataId] = action.getData();
+        }
+    }
+}
+
 void DataActionManager::addDataAction(DataAction action)
 {
     auto graphicId = action.getGraphicId();
@@ -230,6 +262,7 @@ void DataActionManager::addDataAction(DataAction action)
     auto actMap = actionMap[graphicId];
     actMap[action.getDataId()] = action;
     actionMap[graphicId] = actMap;
+    saveActionData(action);
 }
 
 void DataActionManager::updateDataAction(DataAction action)
@@ -238,9 +271,10 @@ void DataActionManager::updateDataAction(DataAction action)
     if (graphicId.isEmpty() || action.getDataId().isEmpty()) {
         return;
     }
-    auto actMap = actionMap[graphicId];
+    auto& actMap = actionMap[graphicId];
     actMap[action.getDataId()] = action;
-    actionMap[graphicId] = actMap;
+    // actionMap[graphicId] = actMap;
+    saveActionData(action);
 }
 
 void DataActionManager::removeDataAction(DataAction action)
@@ -261,25 +295,51 @@ void DataActionManager::removeDataAction(const QString &graphicId, const QString
     actMap.remove(dataId);
 }
 
-void DataActionManager::testDataAction(DataAction action)
+void DataActionManager::testDataAction(const DataAction &action)
 {
     if (action.getDataId().isEmpty()) {
         return;
     }
-    auto data = action.getData();
+    DataMarketDO data;
+    auto dataId = action.getDataId();
+    if (dataMarketMap.contains(dataId)) {
+        data = dataMarketMap[dataId];
+    }else{
+        data = action.getData();
+    }
     // 异步请求
-    auto future = QtConcurrent::run<QJsonValue>([&](QPromise<QJsonValue> &result){
-        result.addResult(queryData(data));});
-    QFutureWatcher<QJsonValue> watcher;
+    auto future = QtConcurrent::run<QVariantPair>(
+        [&](QPromise<QVariantPair> &result, DataMarketDO dataMarket){
+            if (threadData.hasLocalData()){
+            // 清空存储的连接，防止连接混用
+            threadData.setLocalData(nullptr);
+        }
+        auto value = queryData(dataMarket);
+        result.addResult({QVariant::fromValue(action), QVariant::fromValue(value)});
+    }, data);
     // 等待结果并执行动作
-    connect(&watcher, &QFutureWatcher<QJsonValue>::finished, this, [&]{
-        auto value = watcher.result();
-        onDataQueryEnd(action, value);
-    });
-    watcher.setFuture(future);
+    connect(&testWatcher, &QFutureWatcher<QVariantPair>::finished,
+            this, &DataActionManager::onTestQueryEnd, Qt::SingleShotConnection);
+    testWatcher.setFuture(future);
 }
 
-void DataActionManager::onDataQueryEnd(DataAction action, QJsonValue value)
+void DataActionManager::onDataSourceChanged(DataSourceDO source)
+{
+    auto sourceId = source.get_uuid();
+    if (dataSourceMap.contains(sourceId)){
+        dataSourceMap[sourceId] = source;
+    }
+}
+
+void DataActionManager::onDataChanged(DataMarketDO data)
+{
+    auto dataId = data.get_uuid();
+    if (dataMarketMap.contains(dataId)) {
+        dataMarketMap[dataId] = data;
+    }
+}
+
+void DataActionManager::onDataQueryEnd(const DataAction &action, QJsonValue value)
 {
     // 获取图元
     auto graphicID = action.getGraphicId();
@@ -296,6 +356,15 @@ void DataActionManager::onDataQueryEnd(DataAction action, QJsonValue value)
     auto act = action.getAction();
     auto absAction = AbstractAction::fromVariant(&act);
     absAction->triggerAction(value.toVariant(), graphic);
+    emit actionTestEnd(absAction->tracerInfo());
+}
+
+void DataActionManager::onTestQueryEnd()
+{
+    auto data = testWatcher.result();
+    auto action = data.first.value<DataAction>();
+    auto value = data.second.value<QJsonValue>();
+    onDataQueryEnd(action, value);
 }
 
 // 不处理图元删除事件，删除的图元可能通过撤销操作恢复
@@ -317,7 +386,24 @@ void DataActionManager::timerEvent(QTimerEvent *event)
         return;
     }
     foreach (auto data, dataList) {
-        QThreadPool::globalInstance()->start([&]{
+        auto sourceId = data.getDataSource().get_uuid();
+        // 检查该数据源是否已有连接的线程
+        if (!threadPoolMap.contains(sourceId)) {
+            // 分配数据连接线程池
+            auto pool = new QThreadPool();
+            threadPoolMap[sourceId] = pool;
+            int threadCount{1};
+            auto dataCount = dataCounter[sourceId];
+            auto total = dataMarketMap.count();
+            threadCount = QThread::idealThreadCount() * dataCount / total;
+            if (threadCount < 1) {
+                threadCount = 1;
+            }
+            pool->setMaxThreadCount(threadCount);
+        }
+
+        auto future = QtConcurrent::run(threadPoolMap[sourceId],/*);
+        QThreadPool::globalInstance()->start(*/[&]{
             // 请求数据
             auto value = queryData(data);
             if (value.isNull() || value.isUndefined()){
@@ -335,37 +421,58 @@ void DataActionManager::timerEvent(QTimerEvent *event)
 
 QJsonValue DataActionManager::queryData(DataMarketDO data)
 {
-    auto source = data.getDataSource();
-    // 获取数据源插件
-    auto pluginID = source.get_sourcePluginId();
-    auto plugin = DataSourcePluginManager::instance()->getPluginById(pluginID);
-    // 获取数据源并连接
-    auto dataSource = plugin->dataSource();
-    dataSource->connect(source.get_sourceArgs());
+    QJsonValue jsValue;
+    auto dataId = data.get_uuid();
+    auto localData = dataMarketMap[dataId];
+    IDataSource* dataSource{nullptr};
+    if (threadData.hasLocalData()){
+        dataSource = threadData.localData();
+    }else{
+        auto source = localData.getDataSource();
+        // 获取数据源插件
+        auto pluginID = source.get_sourcePluginId();
+        auto plugin = DataSourcePluginManager::instance()->getPluginById(pluginID);
+        // 获取数据源并连接
+        dataSource = plugin->dataSource();
+        dataSource->connect(source.get_sourceArgs());
+        threadData.setLocalData(dataSource);
+    }
     if (dataSource->isConnected()){
         // 请求数据
-        auto result = dataSource->query(data.get_requestArgs());
+        auto result = dataSource->query(localData.get_requestArgs());
         // 执行处理代码
-        auto code = data.get_processCode();
+        auto code = localData.get_processCode();
         if (!code.isEmpty()) {
             auto value = JSUtil::instance()->jsonDocToJSValue(result);
             auto rtn = JSUtil::instance()->evaluate(code,{value});
-            return JSUtil::instance()->jsValueToJsonValue(rtn);
+            jsValue = JSUtil::instance()->jsValueToJsonValue(rtn);
         }
     }
-    return QJsonValue();
+    return jsValue;
 }
 
 void DataActionManager::mergeDataSource()
 {
-    dataSourceMap.clear();
-    dataMarketMap.clear();
+    QList<QString> sourceIdList;
+    QList<QString> dataIdList;
     foreach (auto item, actionMap) {
-        foreach (auto act, item) {
-            auto data = act.getData();
-            dataMarketMap[data.get_uuid()] = data;
-            auto source = data.getDataSource();
-            dataSourceMap[source.get_uuid()] = source;
+        dataIdList << item.keys();
+    }
+    // 清理不用的data
+    for (auto item = dataMarketMap.begin(); item != dataMarketMap.end();) {
+        if (!dataIdList.contains(item.key())) {
+            item = dataMarketMap.erase(item);
+        }else{
+            sourceIdList.append(item->getDataSource().get_uuid());
+            ++item;
+        }
+    }
+    // 清理不用的source
+    for (auto item = dataSourceMap.begin(); item != dataSourceMap.end(); ) {
+        if (!sourceIdList.contains(item.key())) {
+            item = dataSourceMap.erase(item);
+        }else{
+            ++item;
         }
     }
 }

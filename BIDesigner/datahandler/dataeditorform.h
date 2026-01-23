@@ -54,6 +54,7 @@ protected Q_SLOTS:
     void changeDetailWidget();
     void onSelectData();
     void onActionChanged(QVariant data);
+    void onTestBtnClicked();
 private:
     Ui::DataEditorForm *ui;
     QGraphicsItem *graphic;

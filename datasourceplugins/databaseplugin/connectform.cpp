@@ -115,7 +115,8 @@ void ConnectForm::onTestBtnClicked()
         QMessageBox::information(this, tr("提示"), tr("参数不完整，请检查驱动与数据库配置"));
         return;
     }
-    QSqlDatabase db = QSqlDatabase::addDatabase(driver);
+    auto connectName = "connectTest";
+    QSqlDatabase db = QSqlDatabase::addDatabase(driver, connectName);
     db.setHostName(host);
     db.setDatabaseName(dbName);
     db.setUserName(params.getUserName());
@@ -131,9 +132,10 @@ void ConnectForm::onTestBtnClicked()
     if (!db.open()){
         QMessageBox::information(this, tr("提示"),
                 tr("数据库连接失败，") + db.lastError().text());
-        return;
+    }else{
+        QMessageBox::information(this, tr("提示"), tr("连接成功"));
     }
-    QMessageBox::information(this, tr("提示"), tr("连接成功"));
+    db.removeDatabase(connectName);
 }
 
 void ConnectForm::onDriverChanged(int index)

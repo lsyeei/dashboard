@@ -35,7 +35,7 @@ public:
         dataSource = source;
         dataSourceId = source.get_id();
     }
-    DataSourceDO getDataSource(){return dataSource;}
+    DataSourceDO getDataSource() const {return dataSource;}
 private:
     int id;
     int dataSourceId;

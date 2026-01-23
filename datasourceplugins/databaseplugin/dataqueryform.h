@@ -18,7 +18,6 @@
 #ifndef DATAQUERYFORM_H
 #define DATAQUERYFORM_H
 
-#include "database.h"
 #include "idatasourceplugin.h"
 #include "queryarg.h"
 #include <QModelIndex>
@@ -51,7 +50,7 @@ protected Q_SLOTS:
 private:
     Ui::DataQueryForm *ui;
     QueryArg params;
-    Database db;
+    QString connectArgs;
     QPointer<QStandardItemModel> tableModel, fieldModel;
     QPointer<QSortFilterProxyModel> tableFilter, fieldFilter;
 };

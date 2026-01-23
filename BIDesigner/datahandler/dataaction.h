@@ -50,8 +50,8 @@ public:
                           QCoreApplication::tr("将图元的指定属性的值设置为数据指定值")};
         return types;
     }
-    DataSourceDO getDataSource(){return data.getDataSource();}
-    DataMarketDO getData(){return data;}
+    DataSourceDO getDataSource() const {return data.getDataSource();}
+    DataMarketDO getData() const {return data;}
     void setData(DataMarketDO dataMarket){
         data = dataMarket;
         dataId = dataMarket.get_uuid();

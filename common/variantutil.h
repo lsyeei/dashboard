@@ -203,82 +203,82 @@ inline QString VariantUtil::toString(const QVariant &var)
     return str;
 }
 
-inline void VariantUtil::streamIn(QDataStream &stream, const QVariant &value)
-{
-    if (value.metaType().id() == QMetaType::QVariantList ||
-        value.metaType().id() == QMetaType::QByteArrayList) {
-        auto list = value.toList();
-        int count = list.count();
-        stream << value.metaType().id() << count;
-        foreach (auto item, list) {
-            streamIn(stream, item);
-        }
-    }else if(value.metaType().id() == QMetaType::QVariantMap ||
-             value.metaType().id() == QMetaType::QVariantHash){
-        auto map = value.toMap();
-        int count = map.count();
-        stream << value.metaType().id() << count;
-        for(auto item = map.cbegin(); item != map.cend(); item++) {
-            streamIn(stream, item.key());
-            streamIn(stream, item.value());
-        }
-    }else if(value.metaType().id() == QMetaType::QVariantPair){
-        QVariantPair pair = value.value<QVariantPair>();
-        stream << value.metaType().id();
-        streamIn(stream, pair.first);
-        streamIn(stream, pair.second);
-    }else{
-        stream << value.metaType().id();
-        stream << value;
-    }
-}
+// inline void VariantUtil::streamIn(QDataStream &stream, const QVariant &value)
+// {
+//     if (value.metaType().id() == QMetaType::QVariantList ||
+//         value.metaType().id() == QMetaType::QByteArrayList) {
+//         auto list = value.toList();
+//         int count = list.count();
+//         stream << value.metaType().id() << count;
+//         foreach (auto item, list) {
+//             streamIn(stream, item);
+//         }
+//     }else if(value.metaType().id() == QMetaType::QVariantMap ||
+//              value.metaType().id() == QMetaType::QVariantHash){
+//         auto map = value.toMap();
+//         int count = map.count();
+//         stream << value.metaType().id() << count;
+//         for(auto item = map.cbegin(); item != map.cend(); item++) {
+//             streamIn(stream, item.key());
+//             streamIn(stream, item.value());
+//         }
+//     }else if(value.metaType().id() == QMetaType::QVariantPair){
+//         QVariantPair pair = value.value<QVariantPair>();
+//         stream << value.metaType().id();
+//         streamIn(stream, pair.first);
+//         streamIn(stream, pair.second);
+//     }else{
+//         stream << value.metaType().id();
+//         stream << value;
+//     }
+// }
 
-inline QVariant VariantUtil::streamOut(QDataStream &stream)
-{
-    int typeId = 0;
-    stream >> typeId;
-    if (typeId == QMetaType::QVariantList) {
-        int count{0};
-        stream >> count;
-        QVariantList list;
-        for (int i = 0; i < count; ++i) {
-            list << streamOut(stream);
-        }
-        return list;
-    }else if(typeId == QMetaType::QByteArrayList){
-        int count{0};
-        stream >> count;
-        QByteArrayList list;
-        for (int i = 0; i < count; ++i) {
-            list << streamOut(stream).toByteArray();
-        }
-        return QVariant::fromValue(list);
-    }else if(typeId == QMetaType::QVariantMap){
-        int count{0};
-        stream >> count;
-        QVariantMap map;
-        for (int i = 0; i < count; ++i) {
-            map[streamOut(stream).toString()] = streamOut(stream);
-        }
-        return map;
-    }else if(typeId == QMetaType::QVariantHash){
-        int count{0};
-        stream >> count;
-        QVariantHash hash;
-        for (int i = 0; i < count; ++i) {
-            hash[streamOut(stream).toString()] = streamOut(stream);
-        }
-        return hash;
-    }else if(typeId == QMetaType::QVariantPair){
-        QVariantPair pair;
-        pair.first = streamOut(stream);
-        pair.second = streamOut(stream);
-        return QVariant::fromValue(pair);
-    }
-    auto fieldMeta = QMetaType(typeId);
-    QVariant value(fieldMeta);
-    stream >> value;
-    return value;
-}
+// inline QVariant VariantUtil::streamOut(QDataStream &stream)
+// {
+//     int typeId = 0;
+//     stream >> typeId;
+//     if (typeId == QMetaType::QVariantList) {
+//         int count{0};
+//         stream >> count;
+//         QVariantList list;
+//         for (int i = 0; i < count; ++i) {
+//             list << streamOut(stream);
+//         }
+//         return list;
+//     }else if(typeId == QMetaType::QByteArrayList){
+//         int count{0};
+//         stream >> count;
+//         QByteArrayList list;
+//         for (int i = 0; i < count; ++i) {
+//             list << streamOut(stream).toByteArray();
+//         }
+//         return QVariant::fromValue(list);
+//     }else if(typeId == QMetaType::QVariantMap){
+//         int count{0};
+//         stream >> count;
+//         QVariantMap map;
+//         for (int i = 0; i < count; ++i) {
+//             map[streamOut(stream).toString()] = streamOut(stream);
+//         }
+//         return map;
+//     }else if(typeId == QMetaType::QVariantHash){
+//         int count{0};
+//         stream >> count;
+//         QVariantHash hash;
+//         for (int i = 0; i < count; ++i) {
+//             hash[streamOut(stream).toString()] = streamOut(stream);
+//         }
+//         return hash;
+//     }else if(typeId == QMetaType::QVariantPair){
+//         QVariantPair pair;
+//         pair.first = streamOut(stream);
+//         pair.second = streamOut(stream);
+//         return QVariant::fromValue(pair);
+//     }
+//     auto fieldMeta = QMetaType(typeId);
+//     QVariant value(fieldMeta);
+//     stream >> value;
+//     return value;
+// }
 
 #endif // VARIANTUTIL_H

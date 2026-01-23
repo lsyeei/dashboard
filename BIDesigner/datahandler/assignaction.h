@@ -22,6 +22,8 @@
 #include "serializable.h"
 
 #include <QCoreApplication>
+
+#include <jsutil/jsutil.h>
 class AssignAction : public Serializable,public AbstractAction
 {
     Q_GADGET
@@ -30,15 +32,20 @@ public:
     AssignAction(){}
     // AbstractAction interface
     void triggerAction(QVariant data, QGraphicsItem *graphic) override{
+        auto json = data.toJsonValue();
+        triggerInfo = QCoreApplication::tr("数据:  ") +JSUtil::instance()->JsonValueToString(json);
         if (data.isNull()) {
             data.setValue(defaultValue);
         }
-        setProperty(graphic, propertyName, data);
+        triggerInfo += QCoreApplication::tr("\r\n设置属性:  ") + propertyAlias;
+        auto flag = setProperty(graphic, propertyName, data);
+        triggerInfo += QString(QCoreApplication::tr("\r\n执行结果:  %1")).arg(flag);
     }
     QString summary() override
     {
         return QString(QCoreApplication::tr("给属性[%1]赋值")).arg(propertyAlias);
     }
+    QString tracerInfo() override { return triggerInfo;}
 private:
     // 属性名
     QString propertyName;
@@ -46,12 +53,12 @@ private:
     QString propertyAlias;
     // 默认值
     QString defaultValue;
+    QString triggerInfo;
 
     JSONFIELD(propertyName, PropertyName)
     JSONFIELD(propertyAlias, PropertyAlias)
     JSONFIELD(defaultValue, DefaultValue)
-
 };
-REGISTER_ACTION(AssignAction)
 
+REGISTER_ACTION(AssignAction)
 #endif // ASSIGNACTION_H

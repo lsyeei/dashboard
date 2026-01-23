@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 #include "abstractaction.h"
+#include "animation/animationfactory.h"
+#include "icustomgraphic.h"
 
 QMap<int, AbstractAction* (*)(QVariant*)> AbstractAction::typeMap;
 QMutex AbstractAction::mutex;
@@ -50,15 +52,26 @@ AbstractAction *AbstractAction::fromVariant(QVariant *var) {
 
 bool AbstractAction::switchState(QGraphicsItem *graphic, const QString &stateId)
 {
-    return false;
+    auto obj = dynamic_cast<ICustomGraphic*>(graphic);
+    if (obj == nullptr) {
+        return false;
+    }
+    obj->setCustomData("state", stateId);
+    return true;
 }
 
 bool AbstractAction::playAnimation(QGraphicsItem *graphic, const QString &animationId)
 {
-    return false;
+    AnimationFactory::instance()->play(graphic, animationId.toInt());
+    return true;
 }
 
 bool AbstractAction::setProperty(QGraphicsItem *graphic, const QString &propertyName, QVariant value)
 {
-    return false;
+    auto obj = dynamic_cast<ICustomGraphic*>(graphic);
+    if (obj == nullptr) {
+        return false;
+    }
+    obj->setCustomData(propertyName, value.toString());
+    return true;
 }

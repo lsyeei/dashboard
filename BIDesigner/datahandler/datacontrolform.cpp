@@ -201,7 +201,6 @@ void DataControlForm::delLogic()
     if(row < 0){
         return;
     }
-    auto item = ui->actionTable->item(row,0);    
     ui->actionTable->removeRow(row);
     ui->actionTable->clearSelection();
     ui->configWidget->setVisible(false);

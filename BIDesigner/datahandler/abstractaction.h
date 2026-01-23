@@ -46,6 +46,11 @@ public:
     virtual ~AbstractAction() = default;
     virtual void triggerAction(QVariant data, QGraphicsItem * graphic) = 0;
     virtual QString summary() = 0;
+    /**
+     * @brief tracerInfo 最近一次 trigger 后的执行信息
+     * @return 执行信息
+     */
+    virtual QString tracerInfo() = 0;
 
     // 注册子类：存入类型ID和对应转换函数
     static void registerType(int typeId, CastFunc castFunc);

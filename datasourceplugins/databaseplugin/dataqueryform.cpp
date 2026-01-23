@@ -21,6 +21,7 @@
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QJsonDocument>
+#include "database.h"
 
 DataQueryForm::DataQueryForm(QWidget *parent)
     : IDataQueryWidget(parent)
@@ -78,8 +79,10 @@ void DataQueryForm::setArgs(const QString &args)
 
 void DataQueryForm::setDataSource(const QString &dataSourceArgs)
 {
-    db.connect(dataSourceArgs);
+    connectArgs = dataSourceArgs;
+    Database db(dataSourceArgs);
     auto tableList = db.tables();
+    db.disconnect();
     foreach (auto table, tableList){
         tableModel->appendRow(new QStandardItem(table));
     }
@@ -87,6 +90,7 @@ void DataQueryForm::setDataSource(const QString &dataSourceArgs)
 
 void DataQueryForm::onTestBtnClicked()
 {
+    Database db(connectArgs);
     auto result = db.query(getArgs());
     ui->testResultEdit->clear();
     ui->testResultEdit->setPlainText(result.toJson());
@@ -107,7 +111,9 @@ void DataQueryForm::onTableChanged(QModelIndex proxyIndex)
     }
     fieldModel->clear();
     auto table = item->text();
+    Database db(connectArgs);
     auto fields = db.tableFields(table);
+    db.disconnect();
     foreach (auto field, fields) {
         fieldModel->appendRow(new QStandardItem(field.name()));
     }

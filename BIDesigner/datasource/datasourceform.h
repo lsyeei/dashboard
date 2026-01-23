@@ -23,7 +23,6 @@
 #include "datasourcedo.h"
 #include <QHeaderView>
 #include <QPointer>
-// #include <QTreeWidget>
 
 namespace Ui {
 class DataSourceForm;
@@ -55,6 +54,11 @@ public:
      * @return 数据对象
      */
     DataMarketDO getSelectedData();
+Q_SIGNALS:
+    void dataSourceChanged(DataSourceDO source);
+    void dataChanged(DataMarketDO data);
+public Q_SLOTS:
+    void onLoadProjectData(const QString &projectName, QList<DataMarketDO> dataList);
 protected Q_SLOTS:
     void onAddCategory(bool flag);
     void onDelCategory(bool flag);

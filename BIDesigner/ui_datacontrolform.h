@@ -70,7 +70,7 @@ public:
     {
         if (DataControlForm->objectName().isEmpty())
             DataControlForm->setObjectName("DataControlForm");
-        DataControlForm->resize(211, 278);
+        DataControlForm->resize(211, 298);
         QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);

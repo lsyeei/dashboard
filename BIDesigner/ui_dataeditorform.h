@@ -14,7 +14,9 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -34,12 +36,16 @@ public:
     QLabel *label_3;
     QRadioButton *controlRadio;
     QRadioButton *assignmentRadio;
+    QHBoxLayout *testLayout;
+    QSpacerItem *horizontalSpacer;
+    QPushButton *testBtn;
+    QLabel *testInfo;
 
     void setupUi(QWidget *DataEditorForm)
     {
         if (DataEditorForm->objectName().isEmpty())
             DataEditorForm->setObjectName("DataEditorForm");
-        DataEditorForm->resize(225, 54);
+        DataEditorForm->resize(225, 117);
         QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -102,6 +108,30 @@ public:
 
         verticalLayout_2->addWidget(controlTypeWidget);
 
+        testLayout = new QHBoxLayout();
+        testLayout->setObjectName("testLayout");
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        testLayout->addItem(horizontalSpacer);
+
+        testBtn = new QPushButton(DataEditorForm);
+        testBtn->setObjectName("testBtn");
+
+        testLayout->addWidget(testBtn);
+
+
+        verticalLayout_2->addLayout(testLayout);
+
+        testInfo = new QLabel(DataEditorForm);
+        testInfo->setObjectName("testInfo");
+        testInfo->setTextFormat(Qt::TextFormat::AutoText);
+        testInfo->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop);
+        testInfo->setWordWrap(true);
+        testInfo->setMargin(8);
+        testInfo->setIndent(2);
+
+        verticalLayout_2->addWidget(testInfo);
+
 
         retranslateUi(DataEditorForm);
 
@@ -116,6 +146,8 @@ public:
         label_3->setText(QCoreApplication::translate("DataEditorForm", "\350\241\214\344\270\272", nullptr));
         controlRadio->setText(QCoreApplication::translate("DataEditorForm", "\346\216\247\345\210\266\345\233\276\345\205\203", nullptr));
         assignmentRadio->setText(QCoreApplication::translate("DataEditorForm", "\345\261\236\346\200\247\350\265\213\345\200\274", nullptr));
+        testBtn->setText(QCoreApplication::translate("DataEditorForm", "\346\265\213\350\257\225", nullptr));
+        testInfo->setText(QString());
     } // retranslateUi
 
 };

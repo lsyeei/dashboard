@@ -127,6 +127,10 @@ void DataDialog::onTestProcessCode()
     }
     auto queryData = dataSource->query(data.get_requestArgs());
 
+    dataSource->disconnect();
+    delete dataSource;
+    dataSource = nullptr;
+
     // 设置js参数
     auto jsutil = JSUtil::instance();
     QJSValueList args;

@@ -19,6 +19,7 @@
 #include "dataeditorform.h"
 #include "dataassignform.h"
 #include "datasource/datasourceform.h"
+#include "dataactionmanager.h"
 #include "ui_dataeditorform.h"
 
 #include <QPushButton>
@@ -152,6 +153,23 @@ void DataEditorForm::onActionChanged(QVariant data)
     emit changedEvent(action);
 }
 
+void DataEditorForm::onTestBtnClicked()
+{
+    ui->testInfo->setText("");
+    if (graphic == nullptr ||
+        action.getDataId().isEmpty() ||
+        action.getSourceId().isEmpty() ||
+        action.getAction().isNull()) {
+        return;
+    }
+    auto actManager = DataActionManager::instance();
+    connect(actManager, &DataActionManager::actionTestEnd,
+            this, [&](const QString &info){
+        ui->testInfo->setText(info);
+    }, Qt::SingleShotConnection);
+    actManager->testDataAction(action);
+}
+
 void DataEditorForm::initUI()
 {
     layout()->setAlignment(Qt::AlignTop);
@@ -159,8 +177,10 @@ void DataEditorForm::initUI()
     ui->controlRadio->setChecked(true);
     controlForm = new DataControlForm(this);
     assignForm = new DataAssignForm(this);
-    layout()->addWidget(controlForm);
-    layout()->addWidget(assignForm);
+    auto vBox = dynamic_cast<QVBoxLayout*>(layout());
+    auto index = vBox->indexOf(ui->testLayout);
+    vBox->insertWidget(index, controlForm);
+    vBox->insertWidget(index, assignForm);
     controlForm->setVisible(false);
     assignForm->setVisible(false);
 
@@ -174,6 +194,9 @@ void DataEditorForm::initUI()
             this, &DataEditorForm::onActionChanged);
     connect(assignForm, &DataAssignForm::changedEvent,
             this, &DataEditorForm::onActionChanged);
+
+    connect(ui->testBtn, &QPushButton::clicked,
+            this, &DataEditorForm::onTestBtnClicked);
 }
 
 void DataEditorForm::updateDataEdit(DataMarketDO data)

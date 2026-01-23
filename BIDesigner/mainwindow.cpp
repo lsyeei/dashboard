@@ -824,6 +824,10 @@ void MainWindow::doOpen()
             }
         }
     }
+    auto projectName = projectProperty.getName();
+    if (!projectName.isEmpty()) {
+        DataActionManager::instance()->setProjectName(projectName);
+    }
     file.close();
 }
 
@@ -1041,6 +1045,13 @@ void MainWindow::showDataSource(bool flag)
         dataSource = new DataSourceForm(this);
         dataSource->setWindowFlag(Qt::Dialog);
         dataSource->setWindowModality(Qt::WindowModality::ApplicationModal);
+        auto daManager = DataActionManager::instance();
+        connect(dataSource, &DataSourceForm::dataSourceChanged,
+                daManager, &DataActionManager::onDataSourceChanged);
+        connect(dataSource, &DataSourceForm::dataChanged,
+                daManager, &DataActionManager::onDataChanged);
+        connect(daManager, &DataActionManager::loadProjectData,
+                dataSource, &DataSourceForm::onLoadProjectData);
     }
     dataSource->setVisible(!dataSource->isVisible());
 }

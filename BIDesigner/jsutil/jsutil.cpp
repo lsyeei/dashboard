@@ -117,6 +117,7 @@ QJSValue JSUtil::jsonArrayToJSValue(const QJsonArray &jsonArray)
 QJsonValue JSUtil::jsValueToJsonValue(const QJSValue &jsValue)
 {
     return engine->fromScriptValue<QJsonValue>(jsValue);
+
 //     if (jsValue.isObject()) {
 //         // 如果是对象，递归转换
 //         return jsValueToJsonObject(jsValue);
@@ -151,7 +152,7 @@ QJsonObject JSUtil::jsValueToJsonObject(const QJSValue &jsonValue)
     QJsonObject obj;
     QJSValueIterator it(jsonValue);
     while (it.hasNext()) {
-        it.next();qDebug() << __FUNCTION__ << it.name();
+        it.next();
         obj[it.name()] = jsValueToJsonValue(it.value());
     }
     return obj;
@@ -187,4 +188,9 @@ QString JSUtil::JSValueToString(const QJSValue &jsValue)
         return "undefined";
     }
     return doc.toJson();
+}
+
+QString JSUtil::JsonValueToString(const QJsonValue &jsonValue)
+{
+    return JSValueToString(jsonValueToJSValue(jsonValue));
 }

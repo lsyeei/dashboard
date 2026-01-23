@@ -40,6 +40,7 @@ public:
     QJsonArray jsValueToJsonArray(const QJSValue &jsValue);
 
     QString JSValueToString(const QJSValue &jsValue);
+    QString JsonValueToString(const QJsonValue &jsonValue);
 private:
     QPointer<QJSEngine> engine;
 };

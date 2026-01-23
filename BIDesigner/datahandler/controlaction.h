@@ -24,6 +24,8 @@
 #include "serializable.h"
 #include <QPair>
 #include <enuminfo.h>
+#include <QJsonDocument>
+#include <jsutil/jsutil.h>
 
 enum class LogicSymbol{GREAT, GREATE_EQUAL, RANGE, LESS, LESS_EQUAL, EQUAL, UNEQUAL};
 enum class ControlType{PLAY_ANIMATION, SWITCH_STATE, SET_PROPERTY};
@@ -110,9 +112,11 @@ public:
     // AbstractAction interface
     void triggerAction(QVariant data, QGraphicsItem *graphic) override;
     QString summary() override;
+    QString tracerInfo() override {return triggerInfo;}
 private:
     // 数据
     QList<ControlLogic> logicList;
+    QString triggerInfo;
 
     JSONFIELD(logicList, LogicList)
 };
@@ -259,26 +263,48 @@ inline QString ControlLogic::controlObjName()
     return "";
 }
 
-inline void ControlAction::triggerAction(QVariant data, QGraphicsItem *graphic){
+inline void ControlAction::triggerAction(QVariant data, QGraphicsItem *graphic)
+{
+    auto json = data.toJsonValue();
+    triggerInfo = QCoreApplication::tr("数据:  ") + JSUtil::instance()->JsonValueToString(json);
+    bool execFlag{false};
     foreach (auto logic, logicList) {
         bool flag = logic.testLogic(data);
 
         if (!flag) {
             continue;
         }
+        execFlag = true;
+        triggerInfo += QCoreApplication::tr("\r\n触发逻辑:  ") + logic.symbolSummary();
         auto controlType = logic.getControlType();
-        auto action = logic.getControlObj();
+        auto controlObj = logic.getControlObj();
+        flag = false;
         switch (controlType) {
         case ControlType::PLAY_ANIMATION:
-            playAnimation(graphic, action.toString());
+            if (controlObj.canConvert<NamedId>()) {
+                flag = playAnimation(graphic, QString("%1").arg(controlObj.value<NamedId>().getId()));
+            }
+            triggerInfo += QString(QCoreApplication::tr("\r\n执行结果:  %1")).arg(flag);
             break;
         case ControlType::SWITCH_STATE:
-            switchState(graphic, action.toString());
+            if (controlObj.canConvert<NamedId>()) {
+                flag = switchState(graphic, QString("%1").arg(controlObj.value<NamedId>().getId()));
+            }
+            triggerInfo += QString(QCoreApplication::tr("\r\n执行结果:  %1")).arg(flag);
             break;
         case ControlType::SET_PROPERTY:
-            action.value<AssignAction>().triggerAction(data, graphic);
+            if (controlObj.canConvert<AssignAction>()) {
+                auto assAct = controlObj.value<AssignAction>();
+                assAct.triggerAction(assAct.getDefaultValue(), graphic);
+                triggerInfo += QCoreApplication::tr("\r\n属性") + assAct.tracerInfo();
+            }else{
+                triggerInfo += QCoreApplication::tr("\r\n执行结果:  false");
+            }
             break;
         }
+    }
+    if(!execFlag){
+        triggerInfo += QCoreApplication::tr("\r\n数据格式错误，无法解析！");
     }
 }
 

@@ -93,6 +93,65 @@ DataMarketDO DataSourceForm::getSelectedData()
     return data;
 }
 
+void DataSourceForm::onLoadProjectData(const QString &projectName, QList<DataMarketDO> dataList)
+{
+    DataDirDO dir;
+    if (projectName.isEmpty()) {
+        dir.set_name(tr("当前项目"));
+    }else{
+        dir.set_name(projectName);
+    }
+    dir.set_parentId(-1);
+    if (!dataDirService->save(&dir)) {
+        qWarning() << __FUNCTION__ << projectName << "save failed!";
+        return;
+    }
+    for (int i=0; i< dataList.count(); ++i) {
+        auto& item = dataList[i];
+        // 存储数据源
+        auto source = item.getDataSource();
+        auto uuid = source.get_uuid();
+        auto oldSource = dataSourceService->list(QString("uuid='%1'").arg(uuid));
+        if (oldSource.count() <= 0) {
+            // 不存在此数据源
+            source.set_dataDirId(dir.get_id());
+            if (!dataSourceService->save(&source)){
+                qWarning() << __FUNCTION__ << projectName
+                           << "save data source failed:"
+                           << source.getSourceName();
+                continue;
+            }
+        }else{
+            // 此数据源已经存在
+            if (source.get_id() != oldSource[0].get_id()){
+                // 使用已有的 id
+                source.set_id(oldSource[0].get_id());
+            }
+        }
+        // 存储数据
+        item.set_dataSourceId(source.get_id());
+        uuid = item.get_uuid();
+        auto oldData = dataMarketService->list(QString("uuid='%1'").arg(uuid));
+        if (oldData.count() <= 0) {
+            // 不存在此数据
+            if (!dataMarketService->save(&item)){
+                qWarning() << __FUNCTION__ << projectName
+                           << "save data failed:"
+                           << item.get_dataName();
+                continue;
+            }
+        }else{
+            // 存在此数据
+        }
+    }
+    // 判断新建的 dir下面是否有数据，如果没有，删除该dir
+    auto childs = dataSourceService->list(QString("data_dir_id=%1").arg(dir.get_id()));
+    if (childs.count() <= 0) {
+        // 删除该dir
+        dataDirService->deleteById(dir);
+    }
+}
+
 void DataSourceForm::onAddCategory(bool flag)
 {
     Q_UNUSED(flag)
@@ -225,6 +284,11 @@ void DataSourceForm::onEditCategory(bool flag)
                     parentItem->removeChild(treeItem);
                     ui->dataDir->addTopLevelItem(treeItem);
                 }
+                // 通知数据源改动
+                if(!source.isEmpty()){
+                    source.setSourceName(dataDir.get_name());
+                    emit dataSourceChanged(source);
+                }
             }
         }else{
             if (!trans.rollback()){
@@ -295,6 +359,7 @@ void DataSourceForm::onEditData(bool flag)
         // 保存数据
         if(dataMarketService->updateById(dataMarket)){
             updateDataTableItem(row, dataMarket);
+            emit dataChanged(dataMarket);
         }
     }
 }

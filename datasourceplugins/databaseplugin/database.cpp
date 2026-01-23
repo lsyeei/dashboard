@@ -19,11 +19,10 @@
 #include "database.h"
 #include "queryarg.h"
 #include "QtSql/qsqlerror.h"
-
 #include <QtSql/qsqldatabase.h>
 #include <QtSql/qsqlquery.h>
 #include <QtSql/QSqlRecord>
-
+#include <QCryptographicHash>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <variantutil.h>
@@ -69,6 +68,10 @@ QJsonDocument Database::query(const QString &args)
     }
     QString sql = queryArg.getSQL();
     auto db = QSqlDatabase::database(connectionName, true);
+    if (!db.isValid() || !db.isOpen()) {
+        qWarning() << __FUNCTION__ << "database not open";
+        return result;
+    }
     QSqlQuery query{db};
     if (query.exec(sql)){
         auto record = query.record();
@@ -89,6 +92,7 @@ QJsonDocument Database::query(const QString &args)
     }else{
         qWarning() << __FUNCTION__ << "error happend:" << query.lastError().text();
     }
+    query.clear();
     return result;
 }
 
@@ -114,6 +118,7 @@ bool Database::update(const QString &args, QJsonDocument data)
     if (!result){
         qWarning() << __FUNCTION__ << "error happend:" << query.lastError().text();
     }
+    query.clear();
     return result;
 }
 
@@ -137,6 +142,7 @@ QList<QSqlField> Database::tableFields(const QString &tableName)
     for (int i = 0; i < count; ++i) {
         fields << record.field(i);
     }
+    record.clear();
     return fields;
 }
 
@@ -152,7 +158,12 @@ bool Database::doConnect(const QString &args)
     if (driver.isEmpty() || dbName.isEmpty()) {
         return false;
     }
-    QSqlDatabase db = QSqlDatabase::addDatabase(driver);
+    auto md5 = QCryptographicHash::hash(args.toUtf8(), QCryptographicHash::Md5).toHex();
+    if (QSqlDatabase::contains(md5)) {
+        connectionName = md5;
+        return true;
+    }
+    QSqlDatabase db = QSqlDatabase::addDatabase(driver, md5);
     db.setHostName(host);
     db.setDatabaseName(dbName);
     db.setUserName(connectArg.getUserName());
@@ -175,11 +186,13 @@ bool Database::doConnect(const QString &args)
 
 void Database::doDisconnect()
 {
-    auto db = QSqlDatabase::database(connectionName);
-    if (db.isValid()) {
-        db.close();
-        QSqlDatabase::removeDatabase(connectionName);
+    {
+        auto db = QSqlDatabase::database(connectionName);
+        if (db.isValid()) {
+            db.close();
+        }
     }
+    QSqlDatabase::removeDatabase(connectionName);
 }
 
 
