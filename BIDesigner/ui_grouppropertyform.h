@@ -113,7 +113,7 @@ public:
         posProperty->setObjectName("posProperty");
         sizePolicy.setHeightForWidth(posProperty->sizePolicy().hasHeightForWidth());
         posProperty->setSizePolicy(sizePolicy);
-        posProperty->setMinimumSize(QSize(0, 0));
+        posProperty->setMinimumSize(QSize(118, 110));
         posProperty->setAspectRatio(true);
 
         verticalLayout->addWidget(posProperty);
@@ -131,7 +131,7 @@ public:
         lineProperty->setObjectName("lineProperty");
         sizePolicy.setHeightForWidth(lineProperty->sizePolicy().hasHeightForWidth());
         lineProperty->setSizePolicy(sizePolicy);
-        lineProperty->setMinimumSize(QSize(0, 0));
+        lineProperty->setMinimumSize(QSize(40, 18));
         lineProperty->setMaximumSize(QSize(16777215, 16777215));
         lineProperty->setShowLine(false);
 
@@ -151,7 +151,7 @@ public:
         fillProperty->setObjectName("fillProperty");
         sizePolicy.setHeightForWidth(fillProperty->sizePolicy().hasHeightForWidth());
         fillProperty->setSizePolicy(sizePolicy);
-        fillProperty->setMinimumSize(QSize(0, 0));
+        fillProperty->setMinimumSize(QSize(155, 74));
         fillProperty->setMaximumSize(QSize(16777215, 16777215));
         fillProperty->setProperty("fill", QVariant(true));
 
@@ -245,7 +245,7 @@ public:
         sizePolicy3.setHeightForWidth(unit->sizePolicy().hasHeightForWidth());
         unit->setSizePolicy(sizePolicy3);
         QIcon icon;
-        icon.addFile(QString::fromUtf8("icons/shapes_unite.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        icon.addFile(QString::fromUtf8(":/icons/icons/shapes_unite.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
         unit->setIcon(icon);
         unit->setCheckable(true);
         unit->setAutoExclusive(true);
@@ -258,7 +258,7 @@ public:
         sizePolicy3.setHeightForWidth(intersect->sizePolicy().hasHeightForWidth());
         intersect->setSizePolicy(sizePolicy3);
         QIcon icon1;
-        icon1.addFile(QString::fromUtf8("icons/shapes_intersect.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        icon1.addFile(QString::fromUtf8(":/icons/icons/shapes_intersect.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
         intersect->setIcon(icon1);
         intersect->setCheckable(true);
         intersect->setAutoExclusive(true);
@@ -271,7 +271,7 @@ public:
         sizePolicy3.setHeightForWidth(subtract->sizePolicy().hasHeightForWidth());
         subtract->setSizePolicy(sizePolicy3);
         QIcon icon2;
-        icon2.addFile(QString::fromUtf8("icons/shapes_minus_back.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        icon2.addFile(QString::fromUtf8(":/icons/icons/shapes_minus_back.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
         subtract->setIcon(icon2);
         subtract->setCheckable(true);
         subtract->setAutoExclusive(true);
@@ -284,7 +284,7 @@ public:
         sizePolicy3.setHeightForWidth(exclude->sizePolicy().hasHeightForWidth());
         exclude->setSizePolicy(sizePolicy3);
         QIcon icon3;
-        icon3.addFile(QString::fromUtf8("icons/shapes_exclude.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        icon3.addFile(QString::fromUtf8(":/icons/icons/shapes_exclude.svg"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
         exclude->setIcon(icon3);
         exclude->setCheckable(true);
         exclude->setAutoExclusive(true);

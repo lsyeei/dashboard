@@ -45,13 +45,13 @@ void DataSourcePluginManager::loadDataSource()
     if (isLoaded) {
         return;
     }
-    QFuture<IDataSourcePlugin*> future = QtConcurrent::run(
+    auto future = QtConcurrent::run(
         [&](QPromise<IDataSourcePlugin*> &promise){
             promise.addResults(loadPlugins());
         });
     watcher = new QFutureWatcher<IDataSourcePlugin*>();
     connect(watcher, &QFutureWatcher<IDataSourcePlugin*>::finished,
-            this, &DataSourcePluginManager::onPluginLoadEnd);
+            this, &DataSourcePluginManager::onPluginLoadEnd, Qt::SingleShotConnection);
     watcher->setFuture(future);
 }
 
@@ -91,16 +91,16 @@ QList<IDataSourcePlugin *> DataSourcePluginManager::loadPlugins()
     QList<IDataSourcePlugin *> result;
     QDir pluginsDir(QCoreApplication::applicationDirPath());
     pluginsDir.setNameFilters({"*.dll", "*.so"});
-#if defined(Q_OS_WIN)
-    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-        pluginsDir.cdUp();
-#elif defined(Q_OS_MAC)
-    if (pluginsDir.dirName() == "MacOS") {
-        pluginsDir.cdUp();
-        pluginsDir.cdUp();
-        pluginsDir.cdUp();
-    }
-#endif
+// #if defined(Q_OS_WIN)
+//     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+//         pluginsDir.cdUp();
+// #elif defined(Q_OS_MAC)
+//     if (pluginsDir.dirName() == "MacOS") {
+//         pluginsDir.cdUp();
+//         pluginsDir.cdUp();
+//         pluginsDir.cdUp();
+//     }
+// #endif
     if (!pluginsDir.cd("dataplugins")){
         QMessageBox::information(nullptr, tr("提示"), tr("未找到数据插件目录"));
         return result;

@@ -8,7 +8,7 @@ DEFINES += QT_DEBUG_DRAW
 
 CONFIG += c++17 plugin
 
- QMAKE_CXXFLAGS += /MP
+QMAKE_CXXFLAGS += /MP
 
 TARGET = $$qtLibraryTarget(lineplugin)
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -96,7 +96,9 @@ unix {
 }
 !isEmpty(target.path): INSTALLS += target
 
-DESTDIR = $$PWD/../../BIDesigner/plugins
+win32:CONFIG(release, debug|release): DESTDIR = $$PWD/../../BIDesigner/release/plugins
+else:win32:CONFIG(debug, debug|release): DESTDIR = $$PWD/../../BIDesigner/debug/plugins
+else:unix:DESTDIR = $$PWD/../../BIDesigner/plugins
 
 FORMS += \
     linepropertyform.ui

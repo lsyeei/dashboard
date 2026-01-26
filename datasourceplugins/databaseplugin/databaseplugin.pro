@@ -55,7 +55,9 @@ else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PW
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../common/debug/common.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../../common/libcommon.a
 
-DESTDIR = $$PWD/../../BIDesigner/dataplugins
+win32:CONFIG(release, debug|release): DESTDIR = $$PWD/../../BIDesigner/release/dataplugins
+else:win32:CONFIG(debug, debug|release): DESTDIR = $$PWD/../../BIDesigner/debug/dataplugins
+else:unix: DESTDIR = $$PWD/../../BIDesigner/dataplugins
 
 RESOURCES += \
     editor.qrc

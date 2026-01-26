@@ -677,7 +677,7 @@ void MainWindow::on_action_animate_triggered()
     QTransform trans;
     angle += 30;
     angle = fmodf(angle, 360);
-    trans.rotate(angle, Qt::YAxis);//qDebug() << angle << items.first()->transform();
+    trans.rotate(angle, Qt::YAxis);
     items.first()->setTransform(trans, false);
     // qDebug() << "属性： " << item->property(attr.toLocal8Bit());
     //          << "state=" << item->property("state")

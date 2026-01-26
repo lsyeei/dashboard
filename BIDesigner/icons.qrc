@@ -45,6 +45,10 @@
         <file>icons/tree_add.svg</file>
         <file>icons/tree_delete.svg</file>
         <file>icons/tree_edit.svg</file>
+        <file>icons/shapes_exclude.svg</file>
+        <file>icons/shapes_intersect.svg</file>
+        <file>icons/shapes_minus_back.svg</file>
+        <file>icons/shapes_unite.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>animation/path/icons/curvedLine.svg</file>

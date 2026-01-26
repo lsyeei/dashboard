@@ -261,16 +261,16 @@ QList<IGraphicPlugin *> GraphicsManager::loadPredefGraphics()
     QList<IGraphicPlugin*> result;
     QDir pluginsDir(QCoreApplication::applicationDirPath());
     pluginsDir.setNameFilters({"*.dll", "*.so"});
-#if defined(Q_OS_WIN)
-    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-        pluginsDir.cdUp();
-#elif defined(Q_OS_MAC)
-    if (pluginsDir.dirName() == "MacOS") {
-        pluginsDir.cdUp();
-        pluginsDir.cdUp();
-        pluginsDir.cdUp();
-    }
-#endif
+// #if defined(Q_OS_WIN)
+//     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+//         pluginsDir.cdUp();
+// #elif defined(Q_OS_MAC)
+//     if (pluginsDir.dirName() == "MacOS") {
+//         pluginsDir.cdUp();
+//         pluginsDir.cdUp();
+//         pluginsDir.cdUp();
+//     }
+// #endif
     if (!pluginsDir.cd("plugins")){
         QMessageBox::information(nullptr, tr("提示"), tr("未找到插件目录"));
         return result;
@@ -282,7 +282,7 @@ QList<IGraphicPlugin *> GraphicsManager::loadPredefGraphics()
         sync.addFuture(QtConcurrent::run([=](QPromise<IGraphicPlugin*> &promise){
             QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
             if (!pluginLoader.load()){
-                qDebug() << "库加载失败：" << fileName << "; 错误提示：" << pluginLoader.errorString();
+                qWarning() << "库加载失败：" << fileName << "; 错误提示：" << pluginLoader.errorString();
                 return;
             }
             QObject *plugin = pluginLoader.instance();

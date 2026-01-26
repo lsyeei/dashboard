@@ -12,4 +12,5 @@ BIDesigner/dataplugins/*.*
 **/Makefile
 **/Makefile.*
 msvc_make.bat
-XML存储格式.txt
+deploy/
+saveformat.txt

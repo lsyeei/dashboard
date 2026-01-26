@@ -88,8 +88,8 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>0</width>
-       <height>0</height>
+       <width>118</width>
+       <height>110</height>
       </size>
      </property>
      <property name="aspectRatio">
@@ -120,8 +120,8 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>0</width>
-       <height>0</height>
+       <width>40</width>
+       <height>18</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -164,8 +164,8 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>0</width>
-       <height>0</height>
+       <width>155</width>
+       <height>74</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -366,8 +366,8 @@
          <string>合并</string>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>icons/shapes_unite.svg</normaloff>icons/shapes_unite.svg</iconset>
+         <iconset resource="icons.qrc">
+          <normaloff>:/icons/icons/shapes_unite.svg</normaloff>:/icons/icons/shapes_unite.svg</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -395,8 +395,8 @@
          <string>交集</string>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>icons/shapes_intersect.svg</normaloff>icons/shapes_intersect.svg</iconset>
+         <iconset resource="icons.qrc">
+          <normaloff>:/icons/icons/shapes_intersect.svg</normaloff>:/icons/icons/shapes_intersect.svg</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -424,8 +424,8 @@
          <string>差集</string>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>icons/shapes_minus_back.svg</normaloff>icons/shapes_minus_back.svg</iconset>
+         <iconset resource="icons.qrc">
+          <normaloff>:/icons/icons/shapes_minus_back.svg</normaloff>:/icons/icons/shapes_minus_back.svg</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -453,8 +453,8 @@
          <string>排除</string>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>icons/shapes_exclude.svg</normaloff>icons/shapes_exclude.svg</iconset>
+         <iconset resource="icons.qrc">
+          <normaloff>:/icons/icons/shapes_exclude.svg</normaloff>:/icons/icons/shapes_exclude.svg</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -494,6 +494,8 @@
    <header>bicombobox.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -87,7 +87,9 @@ unix {
 }
 !isEmpty(target.path): INSTALLS += target
 
-DESTDIR = $$PWD/../../BIDesigner/plugins
+win32:CONFIG(release, debug|release): DESTDIR = $$PWD/../../BIDesigner/release/plugins
+else:win32:CONFIG(debug, debug|release): DESTDIR = $$PWD/../../BIDesigner/debug/plugins
+else:unix:DESTDIR = $$PWD/../../BIDesigner/plugins
 
 RESOURCES += \
     googleicons.qrc
