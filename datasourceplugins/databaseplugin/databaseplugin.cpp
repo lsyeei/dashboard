@@ -24,6 +24,10 @@
 const QString DatabasePlugin::PLUGIN_ID{"DATABASE_DEFAULT"};
 DatabasePlugin::DatabasePlugin() {}
 
+DatabasePlugin::~DatabasePlugin()
+{
+}
+
 QString DatabasePlugin::id() const
 {
     return PLUGIN_ID;
@@ -41,12 +45,18 @@ QString DatabasePlugin::toolTip() const
 
 IDataSourceWidget *DatabasePlugin::connectWidget()
 {
-    return new ConnectForm();
+    if (!sourceWidget) {
+        sourceWidget = new ConnectForm();
+    }
+    return sourceWidget;
 }
 
 IDataQueryWidget *DatabasePlugin::dataWidget()
 {
-    return new DataQueryForm();
+    if(!queryWidget){
+        queryWidget = new DataQueryForm();
+    }
+    return queryWidget;
 }
 
 IDataSource *DatabasePlugin::dataSource()

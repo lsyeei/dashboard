@@ -74,24 +74,26 @@ void DataDirDialog::setData(DataDirDO dataDir)
         ui->dataSourceCheckBox->setChecked(false);
     }else{
         ui->dataSourceCheckBox->setChecked(true);
+        hideDataSourceForms();
         // 查找数据源
         auto pluginId = dataSource.get_sourcePluginId();
         auto index = ui->dataSourceComboBox->findData(pluginId);
+        // 选中数据源
+        ui->dataSourceComboBox->setCurrentIndex(index);
         if (index < 0) {
             return;
         }
-        // 选中数据源
-        ui->dataSourceComboBox->setCurrentIndex(index);
-        auto plugin = DataSourcePluginManager::instance()->getPluginById(pluginId);
-        auto widget = plugin->connectWidget();
-        // 显示数据源参数
-        widget->setArgs(dataSource.get_sourceArgs());
-        if (!connectWidget.isNull()) {
-            ui->dataSourceWidget->layout()->removeWidget(connectWidget);
-            connectWidget.clear();
+        // 显示配置 UI
+        if (dataSourceForms.contains(index)) {
+            dataSourceForms[index]->show();
+        }else{
+            auto plugin = DataSourcePluginManager::instance()->getPluginById(pluginId);
+            auto widget = plugin->connectWidget();
+            dataSourceForms[index] = widget;
+            // 显示数据源参数
+            widget->setArgs(dataSource.get_sourceArgs());
+            ui->dataSourceWidget->layout()->addWidget(widget);
         }
-        connectWidget = widget;
-        ui->dataSourceWidget->layout()->addWidget(connectWidget);
     }
 }
 
@@ -104,9 +106,10 @@ DataDirDO DataDirDialog::getData()
     }
     if (ui->dataSourceCheckBox->isChecked()) {
         auto source = data.getDataSource();
+        auto index = ui->dataSourceComboBox->currentIndex();
         auto pluginId = ui->dataSourceComboBox->currentData().toString();
-        if(!connectWidget.isNull()){
-            auto args = connectWidget->getArgs();
+        if(dataSourceForms.contains(index)){
+            auto args = dataSourceForms[index]->getArgs();
             // 设置数据源参数
             source.set_sourcePluginId(pluginId);
             source.set_sourceArgs(args);
@@ -130,27 +133,32 @@ void DataDirDialog::onCheckDataSource(Qt::CheckState state)
     }
 }
 
-void DataDirDialog::onDataSourceChanged(int index)
-{
-    // 获取选中数据源信息
-    auto pluginId = ui->dataSourceComboBox->currentData().toString();
-    if (pluginId.isEmpty()) {
-        return;
+void DataDirDialog::hideDataSourceForms() {
+    foreach (auto form, dataSourceForms) {
+        form->hide();
     }
-    auto plugin = DataSourcePluginManager::instance()->getPluginById(pluginId);
-    if (plugin == nullptr) {
-        return;
+}
+void DataDirDialog::onDataSourceChanged(int index) {
+    hideDataSourceForms();
+    if (dataSourceForms.contains(index)) {
+        dataSourceForms[index]->show();
+    } else {
+        // 获取选中数据源信息
+        auto pluginId = ui->dataSourceComboBox->currentData().toString();
+        if (pluginId.isEmpty()) {
+            return;
+        }
+        auto plugin = DataSourcePluginManager::instance()->getPluginById(pluginId);
+        if (plugin == nullptr) {
+            return;
+        }
+        auto widget = plugin->connectWidget();
+        widget->setArgs(data.getDataSource().get_sourceArgs());
+        dataSourceForms[index] = widget;
+        // 显示选中的数据源配置页面
+        ui->dataSourceWidget->layout()->addWidget(widget);
+        ui->dataSourceWidget->setVisible(true);
     }
-    auto widget = plugin->connectWidget();
-    widget->setArgs(data.getDataSource().get_sourceArgs());
-    // 显示选中的数据源配置页面
-    if (!connectWidget.isNull()) {
-        ui->dataSourceWidget->layout()->removeWidget(connectWidget);
-        connectWidget.clear();
-    }
-    connectWidget = widget;
-    ui->dataSourceWidget->layout()->addWidget(connectWidget);
-    ui->dataSourceWidget->setVisible(true);
 }
 
 void DataDirDialog::onTopChecked()

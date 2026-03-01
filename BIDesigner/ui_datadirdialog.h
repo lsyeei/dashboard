@@ -61,7 +61,7 @@ public:
         DataDirDialog->setAutoFillBackground(true);
         verticalLayout = new QVBoxLayout(DataDirDialog);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
+        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetFixedSize);
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setObjectName("horizontalLayout_4");
         topRadio = new QRadioButton(DataDirDialog);
@@ -138,6 +138,7 @@ public:
         verticalLayout_2 = new QVBoxLayout(dataSourceWidget);
         verticalLayout_2->setObjectName("verticalLayout_2");
         verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
 
         verticalLayout->addWidget(dataSourceWidget);
 

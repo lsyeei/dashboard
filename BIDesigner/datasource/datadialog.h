@@ -41,7 +41,9 @@ private:
     Ui::DataDialog *ui;
     DataMarketDO data;
     QPointer<IDataQueryWidget> queryWidget;
+    QMap<QString, IDataQueryWidget*> widgetMap;
 
+    void hideSubWidgets();
     void updateData();
     bool validate();
 };

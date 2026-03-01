@@ -61,8 +61,8 @@ void Serializable::copy(const Serializable &from, Serializable &to)
         for(int i=0; i< count; i++){
             auto property = fromMeta->property(i);
             auto name = property.name();
-            QVariant value = const_cast<Serializable&>(from).getValue(name);
-            to.setValue(name, value);
+            QVariant value = const_cast<Serializable&>(from).get(name);
+            to.set(name, value);
         }
         fromMeta = fromMeta->superClass();
     }while(fromMeta != nullptr);
@@ -82,8 +82,8 @@ void Serializable::copy(const Serializable &from){
         for(int i=0; i< count; i++){
             auto property = fromMeta->property(i);
             auto name = property.name();
-            QVariant value = const_cast<Serializable&>(from).getValue(name);
-            setValue(name, value);
+            QVariant value = const_cast<Serializable&>(from).get(name);
+            set(name, value);
         }
         fromMeta = fromMeta->superClass();
     }while(fromMeta != nullptr);
@@ -125,7 +125,7 @@ QString Serializable::toString()
         for(int i=0; i< count; i++){
             auto property = metaInfo->property(i);
             auto name = property.name();
-            QVariant value =getValue(name);
+            QVariant value =get(name);
             bool isObject = Serializable::isSubClass(value.metaType());
             QString str;
             if (isObject) {
@@ -148,7 +148,7 @@ QString Serializable::toString()
     return fieldStr;
 }
 
-void Serializable::setValue(QString fieldName, QVariant value)
+void Serializable::set(QString fieldName, QVariant value)
 {
     const QMetaObject *metaInfo = getMetaInfo();
     int index = metaInfo->indexOfProperty(fieldName.toLocal8Bit());
@@ -159,7 +159,7 @@ void Serializable::setValue(QString fieldName, QVariant value)
     field.writeOnGadget(this, value);
 }
 
-QVariant Serializable::getValue(QString fieldName)
+QVariant Serializable::get(QString fieldName)
 {
     const QMetaObject *metaInfo = getMetaInfo();
     int index = metaInfo->indexOfProperty(fieldName.toLocal8Bit().constData());
@@ -178,7 +178,7 @@ QDataStream &operator<<(QDataStream &stream, const Serializable &data){
         for(int i=0; i< count; i++){
             auto property = metaInfo->property(i);
             auto name = property.name();
-            QVariant value = dataPtr->getValue(name);
+            QVariant value = dataPtr->get(name);
             stream << value;
         }
         metaInfo = metaInfo->superClass();
@@ -196,7 +196,7 @@ QDataStream &operator>>(QDataStream &stream, Serializable &data){
             auto name = property.name();
             QVariant value(property.metaType());
             stream >> value;
-            dataPtr->setValue(name, value);
+            dataPtr->set(name, value);
         }
         metaInfo = metaInfo->superClass();
     }while(metaInfo != nullptr);
@@ -212,7 +212,7 @@ QDebug operator<<(QDebug dbg, const Serializable &data){
         for(int i=0; i< count; i++){
             auto property = metaInfo->property(i);
             auto name = property.name();
-            QVariant value =dataPtr->getValue(name);
+            QVariant value =dataPtr->get(name);
             QString str{""};
             if (value.canConvert(QMetaType::fromType<QString>())) {
                 value.convert(QMetaType::fromType<QString>());

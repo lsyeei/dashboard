@@ -49,7 +49,7 @@ QJsonObject EasyJsonImpl::toJson(const Serializable &obj)
                 QMap<QString, QString> jsonInfo;
                 jsonInfo = objPtr->invokeMethod<QMap<QString, QString>>(metaInfo, i);
                 QString alias = jsonInfo["alias"];
-                QVariant value = objPtr->getValue(jsonInfo["name"]);
+                QVariant value = objPtr->get(jsonInfo["name"]);
                 QMetaType type = value.metaType();
                 // 对 Serializable 子类递归转换
                 if (Serializable::isSubClass(type)) {
@@ -93,12 +93,12 @@ QVariant EasyJsonImpl::parseObject(QJsonObject json, QMetaType typeName)
                 auto type = fieldType.metaType();
                 // 对 Serializable 子类递归解析
                 if (Serializable::isSubClass(type)) {
-                    obj->setValue(fieldName,
+                    obj->set(fieldName,
                                      parseObject(jsonValue.toObject(), fieldType.metaType()));
                     continue;
                 }
                 // 设置字段值
-                obj->setValue(fieldName,
+                obj->set(fieldName,
                               VariantUtil::fromJsonValue(jsonValue, fieldType.metaType()));
             }
         }

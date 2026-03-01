@@ -89,9 +89,9 @@ public:
     void setValueByColName(const QString &colName, const QVariant &value);
     QString getColPropery(const QString &colName);
     template<typename T>
-    T getValue(const QString &field) const;
+    T get(const QString &field) const;
     template<typename T>
-    void setValue(const QString &field, const T &value);
+    void set(const QString &field, const T &value);
     // void setValue(const QString &field, const QVariant &value);
 
 protected:
@@ -223,7 +223,7 @@ inline QMetaMethod Entity::getMethod(const QString &methodName) const
 }
 
 template<typename T>
-inline T Entity::getValue(const QString &field) const
+inline T Entity::get(const QString &field) const
 {
     auto method = getMethod("get_" + field + "()");
     T result;
@@ -232,7 +232,7 @@ inline T Entity::getValue(const QString &field) const
 }
 
 template<typename T>
-inline void Entity::setValue(const QString &field, const T &value)
+inline void Entity::set(const QString &field, const T &value)
 {
     auto method = getMethod("set_" + field + "(__type_" + field + ")");
     method.invokeOnGadget(this, value);

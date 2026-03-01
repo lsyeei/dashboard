@@ -40,9 +40,7 @@ public:
     QHBoxLayout *horizontalLayout_3;
     QLabel *label_3;
     QLineEdit *noteEdit;
-    QWidget *dataWidget;
-    QVBoxLayout *verticalLayout;
-    QHBoxLayout *horizontalLayout_6;
+    QHBoxLayout *processLayout;
     QCheckBox *processCheck;
     QSpacerItem *horizontalSpacer_4;
     QPushButton *codeTestBtn;
@@ -66,10 +64,11 @@ public:
     {
         if (DataDialog->objectName().isEmpty())
             DataDialog->setObjectName("DataDialog");
-        DataDialog->resize(356, 216);
+        DataDialog->resize(356, 202);
+        DataDialog->setAutoFillBackground(true);
         verticalLayout_2 = new QVBoxLayout(DataDialog);
         verticalLayout_2->setObjectName("verticalLayout_2");
-        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
+        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetFixedSize);
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
         label = new QLabel(DataDialog);
@@ -121,38 +120,24 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_3);
 
-        dataWidget = new QWidget(DataDialog);
-        dataWidget->setObjectName("dataWidget");
-        QSizePolicy sizePolicy1(QSizePolicy::Policy::MinimumExpanding, QSizePolicy::Policy::Preferred);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(dataWidget->sizePolicy().hasHeightForWidth());
-        dataWidget->setSizePolicy(sizePolicy1);
-        verticalLayout = new QVBoxLayout(dataWidget);
-        verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
-        verticalLayout->setContentsMargins(0, 0, 0, 0);
-
-        verticalLayout_2->addWidget(dataWidget);
-
-        horizontalLayout_6 = new QHBoxLayout();
-        horizontalLayout_6->setObjectName("horizontalLayout_6");
+        processLayout = new QHBoxLayout();
+        processLayout->setObjectName("processLayout");
         processCheck = new QCheckBox(DataDialog);
         processCheck->setObjectName("processCheck");
 
-        horizontalLayout_6->addWidget(processCheck);
+        processLayout->addWidget(processCheck);
 
         horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
-        horizontalLayout_6->addItem(horizontalSpacer_4);
+        processLayout->addItem(horizontalSpacer_4);
 
         codeTestBtn = new QPushButton(DataDialog);
         codeTestBtn->setObjectName("codeTestBtn");
 
-        horizontalLayout_6->addWidget(codeTestBtn);
+        processLayout->addWidget(codeTestBtn);
 
 
-        verticalLayout_2->addLayout(horizontalLayout_6);
+        verticalLayout_2->addLayout(processLayout);
 
         processWidget = new QWidget(DataDialog);
         processWidget->setObjectName("processWidget");
@@ -175,11 +160,11 @@ public:
 
         processCodeEdit = new QTextEdit(layoutWidget);
         processCodeEdit->setObjectName("processCodeEdit");
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(processCodeEdit->sizePolicy().hasHeightForWidth());
-        processCodeEdit->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(processCodeEdit->sizePolicy().hasHeightForWidth());
+        processCodeEdit->setSizePolicy(sizePolicy1);
         processCodeEdit->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContentsOnFirstShow);
 
         verticalLayout_3->addWidget(processCodeEdit);
@@ -198,8 +183,8 @@ public:
 
         codeTestEdit = new QPlainTextEdit(verticalLayoutWidget_2);
         codeTestEdit->setObjectName("codeTestEdit");
-        sizePolicy2.setHeightForWidth(codeTestEdit->sizePolicy().hasHeightForWidth());
-        codeTestEdit->setSizePolicy(sizePolicy2);
+        sizePolicy1.setHeightForWidth(codeTestEdit->sizePolicy().hasHeightForWidth());
+        codeTestEdit->setSizePolicy(sizePolicy1);
         codeTestEdit->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContentsOnFirstShow);
         codeTestEdit->setReadOnly(true);
 

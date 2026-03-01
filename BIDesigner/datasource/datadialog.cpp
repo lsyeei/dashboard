@@ -62,23 +62,28 @@ void DataDialog::setData(DataMarketDO dataObj)
 {
     data = dataObj;
     auto dataSource = data.getDataSource();
+    hideSubWidgets();
     // 显示插件窗口
     auto pluginId = dataSource.get_sourcePluginId();
     if (pluginId.isEmpty()) {
         return;
     }
-    auto plugin = DataSourcePluginManager::instance()->getPluginById(pluginId);
-    if (plugin == nullptr) {
-        return;
+    if (widgetMap.contains(pluginId)) {
+        queryWidget = widgetMap[pluginId];
+    }else{
+        auto plugin = DataSourcePluginManager::instance()->getPluginById(pluginId);
+        if (plugin == nullptr) {
+            return;
+        }
+        queryWidget = plugin->dataWidget();
+        widgetMap[pluginId] = queryWidget;
+        auto vLayout = dynamic_cast<QVBoxLayout*>(layout());
+        auto index = vLayout->indexOf(ui->processLayout);
+        vLayout->insertWidget(index, queryWidget);
     }
-    if (!queryWidget.isNull()) {
-        ui->dataWidget->layout()->removeWidget(queryWidget);
-        queryWidget.clear();
-    }
-    queryWidget = plugin->dataWidget();
+    queryWidget->show();
     queryWidget->setDataSource(dataSource.get_sourceArgs());
     queryWidget->setArgs(data.get_requestArgs());
-    ui->dataWidget->layout()->addWidget(queryWidget);
     // 显示其它内容
     ui->dataNameEdit->setText(data.get_dataName());
     ui->periodSpin->setValue(data.get_requestPeriod());
@@ -139,6 +144,13 @@ void DataDialog::onTestProcessCode()
     // 执行js代码
     auto result = jsutil->evaluate(code, args);
     ui->codeTestEdit->setPlainText(jsutil->JSValueToString(result));
+}
+
+void DataDialog::hideSubWidgets()
+{
+    foreach (auto widget, widgetMap) {
+        widget->hide();
+    }
 }
 
 void DataDialog::updateData()

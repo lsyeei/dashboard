@@ -28,6 +28,7 @@ class DatabasePlugin:public QObject, public IDataSourcePlugin
     Q_INTERFACES(IDataSourcePlugin)
 public:
     DatabasePlugin();
+    ~DatabasePlugin();
     const static QString PLUGIN_ID;
     // IDataSourcePlugin interface
     QString id() const override;
@@ -36,6 +37,9 @@ public:
     IDataSourceWidget *connectWidget() override;
     IDataQueryWidget *dataWidget() override;
     IDataSource *dataSource() override;
+private:
+    IDataSourceWidget *sourceWidget{nullptr};
+    IDataQueryWidget *queryWidget{nullptr};
 };
 
 #endif // DATABASEPLUGIN_H

@@ -112,9 +112,9 @@ bool EntityTableModel<T>::setData(const QModelIndex &index, const QVariant &valu
         return false;
     }
     if (checkFlag) {
-        obj->setValue(headNameMap[index.column()-1].first,value);
+        obj->set(headNameMap[index.column()-1].first,value);
     } else{
-        obj->setValue(headNameMap[index.column()].first,value);
+        obj->set(headNameMap[index.column()].first,value);
     }
     event->triggerUpdate(QVariant::fromValue(*data));
     return true;

@@ -36,6 +36,7 @@ AbstractTextItem::AbstractTextItem(QGraphicsItem *parent)
     // 计算边框大小
     textItem->setTextWidth(100);
     setSize(textItem->boundingRect().size());
+    textItem->setPos(logicRect.topLeft());
     // 监控文本框大小改变信号
     auto doc = textItem->document();
     doc->setIndentWidth(12);

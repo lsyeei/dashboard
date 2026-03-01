@@ -46,7 +46,7 @@ protected Q_SLOTS:
 private:
     Ui::DataDirDialog *ui;
     DataDirDO data;
-    QPointer<IDataSourceWidget> connectWidget;
+    QMap<int, IDataSourceWidget*> dataSourceForms;
     /**
      * @brief initDataSourceOption 舒适化数据源选项
      */
@@ -60,6 +60,7 @@ private:
      * @return true 校验成功， false 校验失败
      */
     bool validation();
+    void hideDataSourceForms();
 
 };
 

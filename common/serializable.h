@@ -87,13 +87,13 @@ inline const QMetaObject* getMetaInfo() const override{ \
 #ifdef CHAIN
 #define SETTER(field, alias) \
 inline auto set##alias(const __type_##field &value) { \
-    field = value; \
+    this->field = value; \
 return this; \
 }
 #else
 #define SETTER(field, alias) \
 inline void set##alias(const __type_##field &value) { \
-    field = const_cast<__type_##field>(value); \
+    this->field = const_cast<__type_##field>(value); \
 }
 #endif
 
@@ -110,7 +110,7 @@ Q_PROPERTY(__type_##field field READ get##alias WRITE set##alias) \
     } \
     inline __type_##field get##alias() const { return field; } \
     inline void set##alias(const __type_##field &value) { \
-            field = value; \
+            this->field = value; \
     }
 
 class Serializable
@@ -136,8 +136,8 @@ public:
         delete voidPtr;
         return result;
     }
-    virtual QVariant getValue(QString fieldName);
-    virtual void setValue(QString fieldName, QVariant value);
+    virtual QVariant get(QString fieldName);
+    virtual void set(QString fieldName, QVariant value);
 
     friend QDataStream &operator<<(QDataStream &stream, const Serializable &data);
     friend QDataStream &operator>>(QDataStream &stream, Serializable &data);

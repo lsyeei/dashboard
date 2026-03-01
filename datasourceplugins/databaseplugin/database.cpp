@@ -26,7 +26,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <variantutil.h>
-
+#include <QThread>
 
 Database::Database() {}
 
@@ -159,11 +159,12 @@ bool Database::doConnect(const QString &args)
         return false;
     }
     auto md5 = QCryptographicHash::hash(args.toUtf8(), QCryptographicHash::Md5).toHex();
-    if (QSqlDatabase::contains(md5)) {
-        connectionName = md5;
+    auto id = QString{"%1-%2"}.arg((quintptr)QThread::currentThreadId()).arg(md5);
+    if (QSqlDatabase::contains(id)) {
+        connectionName = id;
         return true;
     }
-    QSqlDatabase db = QSqlDatabase::addDatabase(driver, md5);
+    QSqlDatabase db = QSqlDatabase::addDatabase(driver, id);
     db.setHostName(host);
     db.setDatabaseName(dbName);
     db.setUserName(connectArg.getUserName());
