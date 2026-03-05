@@ -128,9 +128,13 @@ void DataActionManager::parseXml(const QString &xml)
         if (reader.name().compare(dataSource::actionList) == 0) {
             while(true){
                 auto type = reader.readNext();
+                if (type == QXmlStreamReader::EndElement &&
+                    reader.name().compare(dataSource::actionList) == 0){
+                    break;
+                }
                 if (type != QXmlStreamReader::StartElement ||
                     reader.name().compare(actions::graphicAction) != 0){
-                    break;
+                    continue;
                 }
                 QString id = "";
                 type = reader.readNext();
@@ -363,6 +367,10 @@ void DataActionManager::onDataQueryEnd(const DataAction &action, QJsonValue valu
 {
     // 获取图元
     auto graphicID = action.getGraphicId();
+    if (graphicID.isEmpty()) {
+        qWarning() << __FUNCTION__ << "graphic id is empty!";
+        return;
+    }
     // 查找图元
     if (graphicScene == nullptr) {
         return;

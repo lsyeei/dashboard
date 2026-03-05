@@ -145,6 +145,59 @@ void AbstractLineItem::setSize(const QSizeF &size)
     updateSelector();
 }
 
+QList<CustomMetadata> AbstractLineItem::metadataList()
+{
+    auto list = AbstractItem::metadataList();
+    list << CustomMetadata{"flow", tr("流动控制"), DataType::ENUM,
+                           OperateMode::ReadWrite, "",
+                           {{0, tr("启动")}, {1, tr("暂停")}, {2, tr("停止")}}};
+    return list;
+}
+
+void AbstractLineItem::setCustomData(const QString &name, const QString &value)
+{
+    if (name.isEmpty() || value.isEmpty()) {
+        return;
+    }
+    if (name.compare("flow") == 0) {
+        auto attr = attribute();
+        if (value.compare("0") == 0) {
+            // 启动动画
+            attr->setFlowAnimation(true);
+            attr->setFlowPlay(true);
+        }else if(value.compare("1") == 0){
+            attr->setFlowAnimation(true);
+            attr->setFlowPlay(false);
+        }else{
+            attr->setFlowAnimation(false);
+            attr->setFlowPlay(false);
+        }
+        updateGraphic();
+        updateForm();
+    }else{
+        AbstractItem::setCustomData(name,value);
+    }
+}
+
+QString AbstractLineItem::getCustomData(const QString &name)
+{
+    if (name.isEmpty()) {
+        return "";
+    }
+    if (name.compare("flow") == 0) {
+        auto attr = attribute();
+        auto isAnimate = attr->getFlowAnimation();
+        if (!isAnimate) {
+            return "2";
+        }else{
+            auto control = attr->getFlowPlay();
+            return control?"0":"1";
+        }
+    }else {
+        return AbstractItem::getCustomData(name);
+    }
+}
+
 QPainterPath AbstractLineItem::linePath(QList<QPointF> points) const
 {
     QPainterPath path;
@@ -374,8 +427,14 @@ void AbstractLineItem::updateGraphic()
         timeLine->setDirection(attr->getBackward()?QTimeLine::Backward:QTimeLine::Forward);
         timeLine->setDuration(attr->getDuration());
         timeLine->setEasingCurve(QEasingCurve::BezierSpline);
-        if(timeLine->state() != QTimeLine::Running){
-            timeLine->start();
+        if (attr->getFlowPlay()) {
+            if(timeLine->state() != QTimeLine::Running){
+                timeLine->state() == QTimeLine::Paused?timeLine->resume():timeLine->start();
+            }
+        }else{
+            if(timeLine->state() == QTimeLine::Running){
+                timeLine->stop();
+            }
         }
     } else {
         if (timeLine && timeLine->state() == QTimeLine::Running) {

@@ -31,7 +31,6 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_2;
     QLineEdit *defaultValueEdit;
-    QHBoxLayout *horizontalLayout_3;
     QLabel *propertyLabel;
 
     void setupUi(QWidget *DataAssignForm)
@@ -90,22 +89,19 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_2);
 
-        horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName("horizontalLayout_3");
         propertyLabel = new QLabel(DataAssignForm);
         propertyLabel->setObjectName("propertyLabel");
-        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::MinimumExpanding);
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(propertyLabel->sizePolicy().hasHeightForWidth());
         propertyLabel->setSizePolicy(sizePolicy2);
+        propertyLabel->setTextFormat(Qt::TextFormat::RichText);
+        propertyLabel->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop);
         propertyLabel->setWordWrap(true);
         propertyLabel->setMargin(10);
 
-        horizontalLayout_3->addWidget(propertyLabel);
-
-
-        verticalLayout->addLayout(horizontalLayout_3);
+        verticalLayout->addWidget(propertyLabel);
 
 
         retranslateUi(DataAssignForm);

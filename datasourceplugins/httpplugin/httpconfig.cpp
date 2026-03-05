@@ -19,12 +19,54 @@
 #define EASY_JSON_DEFAULT
 #include "easyjson.h"
 
+#include <QJsonArray>
+#include <QJsonDocument>
+
 HttpConfig HttpConfig::fromJson(const QString &json)
 {
-    return EASYJSON->parseObject<HttpConfig>(json);
+    HttpConfig config;
+    QJsonParseError error;
+    auto doc = QJsonDocument::fromJson(json.toUtf8(), &error);
+    if (error.error != QJsonParseError::NoError) {
+        qWarning() << "json parse error:" << error.errorString()
+        << "。json string：" << json;
+        return config;
+    }
+    auto obj = doc.object();
+    config.setURL(obj["URL"].toString());
+    config.setAuthConfig(EASYJSON->parseObject<AuthConfig>(obj["AuthConfig"].toObject()));
+    QList<KeyValue> cookies;
+    auto cookieArray = obj["Cookies"].toArray();
+    foreach (auto item, cookieArray) {
+        cookies << EASYJSON->parseObject<KeyValue>(item.toObject());
+    }
+    config.setCookies(cookies);
+    QList<HttpHeaderItem> headers;
+    auto headArray = obj["Headers"].toArray();
+    foreach (auto item, headArray) {
+        headers << EASYJSON->parseObject<HttpHeaderItem>(item.toObject());
+    }
+    config.setheaders(headers);
+    config.setSetting(EASYJSON->parseObject<HttpSetting>(obj["Setting"].toObject()));
+    return config;
 }
 
 QString HttpConfig::toJson()
 {
-    return EASYJSON->toJsonString(*this);
+    QJsonObject obj;
+    obj["URL"] = url;
+    obj["AuthConfig"] = EASYJSON->toJson(authConfig);
+    QJsonArray cookieArray;
+    foreach (auto item, cookies) {
+        cookieArray.append(EASYJSON->toJson(item));
+    }
+    obj["Cookies"] = cookieArray;
+    QJsonArray headArray;
+    foreach (auto item, headers) {
+        headArray.append(EASYJSON->toJson(item));
+    }
+    obj["Headers"] = headArray;
+    obj["Setting"] = EASYJSON->toJson(setting);
+    QJsonDocument doc(obj);
+    return doc.toJson(QJsonDocument::Compact);
 }

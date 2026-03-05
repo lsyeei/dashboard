@@ -20,12 +20,57 @@
 #define EASY_JSON_DEFAULT
 #include "easyjson.h"
 
+#include <QJsonArray>
+#include <QJsonDocument>
+
 QueryConfig QueryConfig::fromJson(const QString &json)
 {
-    return EASYJSON->parseObject<QueryConfig>(json);
+    QueryConfig config;
+    if (json.isEmpty()) {
+        return config;
+    }
+    QJsonParseError error;
+    auto doc = QJsonDocument::fromJson(json.toUtf8(), &error);
+    if (error.error != QJsonParseError::NoError) {
+        qWarning() << "json parse error:" << error.errorString()
+                   << "。json string：" << json;
+        return config;
+    }
+    auto obj = doc.object();
+    config.setMethod(QueryMethod(obj["Method"].toInt(0)));
+    config.setUrl(obj["URL"].toString());
+    QList<KeyValue> queryParam;
+    auto queryArray = obj["QueryParams"].toArray();
+    foreach (auto item, queryArray) {
+        queryParam << EASYJSON->parseObject<KeyValue>(item.toObject());
+    }
+    config.setQueryParams(queryParam);
+    QList<HttpHeaderItem> headers;
+    auto headArray = obj["Headers"].toArray();
+    foreach (auto item, headArray) {
+        headers << EASYJSON->parseObject<HttpHeaderItem>(item.toObject());
+    }
+    config.setHeaders(headers);
+    config.setBody(EASYJSON->parseObject<HttpBody>(obj["Body"].toObject()));
+    return config;
 }
 
 QString QueryConfig::toJson()
 {
-    return EASYJSON->toJsonString(*this);
+    QJsonObject obj;
+    obj.insert("Method", int(method));
+    obj.insert("URL", url);
+    QJsonArray paramArray;
+    foreach (auto item, queryParams) {
+        paramArray.append(EASYJSON->toJson(item));
+    }
+    obj.insert("QueryParams", paramArray);
+    QJsonArray headArray;
+    foreach (auto item, headers) {
+        headArray.append(EASYJSON->toJson(item));
+    }
+    obj.insert("Headers", headArray);
+    obj.insert("Body", EASYJSON->toJson(body));
+    QJsonDocument doc(obj);
+    return doc.toJson(QJsonDocument::Compact);
 }

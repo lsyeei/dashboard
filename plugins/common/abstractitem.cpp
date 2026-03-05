@@ -161,10 +161,10 @@ void AbstractItem::setPropertyWidget(QWidget *widget)
 
 QList<CustomMetadata> AbstractItem::metadataList()
 {
-    return {{"pos", tr("位置"), DataType::POINT, OperateMode::ReadWrite, "[10.2, 20.5]"},
-            {"angle", tr("旋转角度"), DataType::DOUBLE, OperateMode::ReadWrite, "30"},
-            {"state", tr("状态"), DataType::INT, OperateMode::ReadWrite, "1"},
-            {"stateSet", tr("状态集"), DataType::JSON, OperateMode::ReadOnly,
+    return {CustomMetadata{"pos", tr("位置"), DataType::POINT, OperateMode::ReadWrite, "[10.2, 20.5]"},
+            CustomMetadata{"angle", tr("旋转角度"), DataType::DOUBLE, OperateMode::ReadWrite, "30"},
+            CustomMetadata{"state", tr("状态"), DataType::INT, OperateMode::ReadWrite, "1"},
+            CustomMetadata{"stateSet", tr("状态集"), DataType::JSON, OperateMode::ReadOnly,
             "[{\"id\":\"1\", \"name\":\"state1\"},{\"id\":\"2\", \"name\":\"state2\"}]"}};
 }
 

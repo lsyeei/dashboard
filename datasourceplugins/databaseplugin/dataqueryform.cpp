@@ -49,8 +49,6 @@ DataQueryForm::DataQueryForm(QWidget *parent)
 
     SyntaxFactory::instance()->highlightDocument(ui->sqlEdit->document(), "sql");
 
-    connect(ui->testButton, &QPushButton::clicked,
-            this, &DataQueryForm::onTestBtnClicked);
     connect(ui->tableList, &QListView::clicked,
             this, &DataQueryForm::onTableChanged);
     connect(ui->tableEdit, &QLineEdit::textChanged,
@@ -75,6 +73,7 @@ void DataQueryForm::setArgs(const QString &args)
 {
     params = QueryArg::fromJson(args);
     ui->sqlEdit->setPlainText(params.getSQL());
+    ui->testResultEdit->clear();
 }
 
 void DataQueryForm::setDataSource(const QString &dataSourceArgs)
@@ -88,12 +87,13 @@ void DataQueryForm::setDataSource(const QString &dataSourceArgs)
     }
 }
 
-void DataQueryForm::onTestBtnClicked()
+QJsonDocument DataQueryForm::doTest()
 {
     Database db(connectArgs);
     auto result = db.query(getArgs());
     ui->testResultEdit->clear();
     ui->testResultEdit->setPlainText(result.toJson());
+    return result;
 }
 
 void DataQueryForm::onTableChanged(QModelIndex proxyIndex)

@@ -25,6 +25,9 @@ class HttpBody : public Serializable
     SERIALIZE(HttpBody)
 public:
     HttpBody(){}
+    bool isEmpty() {
+        return contentType.isEmpty() || content.isEmpty();
+    }
     static QList<QPair<QString,QString>> contentTypeList(){
         return {{"none", ""},
                 {"form data", "multipart/form-data"},

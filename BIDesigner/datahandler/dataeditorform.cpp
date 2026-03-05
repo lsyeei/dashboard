@@ -22,6 +22,7 @@
 #include "dataactionmanager.h"
 #include "ui_dataeditorform.h"
 
+#include <QGraphicsItem>
 #include <QPushButton>
 
 DataEditorForm::DataEditorForm(QWidget *parent)
@@ -46,13 +47,29 @@ void DataEditorForm::reset()
     controlForm->setVisible(false);
     assignForm->setVisible(false);
     action = DataAction();
+    setGraphicId();
 }
 
 void DataEditorForm::setGraphicsItem(QGraphicsItem *item)
 {
     graphic = item;
+    ui->testInfo->clear();
+    setGraphicId();
     controlForm->setGraphicsItem(item);
     assignForm->setGraphicsItem(item);
+}
+
+void DataEditorForm::setGraphicId()
+{
+    if (graphic == nullptr) {
+        return;
+    }
+    auto scene = graphic->scene();
+    if (scene) {
+        auto s = dynamic_cast<BIGraphicsScene*>(scene);
+        auto id = s->getItemId(graphic);
+        action.setGraphicId(id);
+    }
 }
 
 void DataEditorForm::setData(DataAction data)
@@ -61,6 +78,7 @@ void DataEditorForm::setData(DataAction data)
     if (data.getDataId().isEmpty()) {
         return;
     }
+    setGraphicId();
     QSignalBlocker dataBlocker(ui->dataEdit);
     auto dataMarketDo = data.getData();
     auto source = dataMarketDo.getDataSource();
@@ -124,6 +142,7 @@ void DataEditorForm::onSelectData()
         dlgLayout->addWidget(dataSource);
         dlgLayout->addWidget(btnBox);
     }
+    selectorDlg->adjustSize();
     if (selectorDlg->exec() == QDialog::Rejected){
         return;
     }

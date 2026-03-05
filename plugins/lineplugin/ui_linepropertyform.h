@@ -16,6 +16,7 @@
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QVBoxLayout>
@@ -71,6 +72,9 @@ public:
     QLabel *label_7;
     QDoubleSpinBox *dashRatio;
     QSpacerItem *horizontalSpacer_5;
+    QHBoxLayout *horizontalLayout_3;
+    QSpacerItem *horizontalSpacer_3;
+    QPushButton *playBtn;
 
     void setupUi(QWidget *LinePropertyForm)
     {
@@ -189,7 +193,7 @@ public:
         linePen->setObjectName("linePen");
         sizePolicy.setHeightForWidth(linePen->sizePolicy().hasHeightForWidth());
         linePen->setSizePolicy(sizePolicy);
-        linePen->setMinimumSize(QSize(0, 52));
+        linePen->setMinimumSize(QSize(90, 49));
         linePen->setMaximumSize(QSize(16777215, 52));
         linePen->setShowLine(true);
 
@@ -415,6 +419,20 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_6);
 
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName("horizontalLayout_3");
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_3->addItem(horizontalSpacer_3);
+
+        playBtn = new QPushButton(animationParam);
+        playBtn->setObjectName("playBtn");
+
+        horizontalLayout_3->addWidget(playBtn);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_3);
+
 
         verticalLayout->addWidget(animationParam);
 
@@ -450,6 +468,7 @@ public:
         label_6->setText(QCoreApplication::translate("LinePropertyForm", "\347\272\277\351\225\277", nullptr));
         dashLen->setSuffix(QCoreApplication::translate("LinePropertyForm", " px", nullptr));
         label_7->setText(QCoreApplication::translate("LinePropertyForm", "\345\215\240\347\251\272\346\257\224", nullptr));
+        playBtn->setText(QCoreApplication::translate("LinePropertyForm", "\346\232\202\345\201\234", nullptr));
     } // retranslateUi
 
 };

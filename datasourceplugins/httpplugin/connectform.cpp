@@ -31,7 +31,7 @@ ConnectForm::ConnectForm(IDataSourceWidget *parent)
     connect(ui->headerRadio, &QRadioButton::clicked, this, &ConnectForm::onTabChanged);
     connect(ui->cookieRadio, &QRadioButton::clicked, this, &ConnectForm::onTabChanged);
     connect(ui->settingRadio, &QRadioButton::clicked, this, &ConnectForm::onTabChanged);
-    connect(ui->urlEdit, &QLineEdit::editingFinished, this, &ConnectForm::onDataChanged);
+    connect(ui->urlEdit, &QPlainTextEdit::textChanged, this, &ConnectForm::onDataChanged);
 }
 
 ConnectForm::~ConnectForm()
@@ -112,7 +112,7 @@ void ConnectForm::onDataChanged()
 {
     auto obj = sender();
     if (obj == ui->urlEdit){
-        httpConfig.setURL(ui->urlEdit->text().trimmed());
+        httpConfig.setURL(ui->urlEdit->toPlainText().trimmed());
     }else if(obj == authForm){
         httpConfig.setAuthConfig(authForm->getData().value<AuthConfig>());
     }else if(cookieForm){
@@ -122,7 +122,6 @@ void ConnectForm::onDataChanged()
     }else if(settingForm){
         httpConfig.setSetting(settingForm->getData().value<HttpSetting>());
     }
-
 }
 
 QString ConnectForm::getArgs()
@@ -139,7 +138,7 @@ void ConnectForm::setArgs(const QString &args)
 
 void ConnectForm::updateParam()
 {
-    httpConfig.setURL(ui->urlEdit->text().trimmed());
+    httpConfig.setURL(ui->urlEdit->toPlainText().trimmed());
     if (authForm){
         httpConfig.setAuthConfig(authForm->getData().value<AuthConfig>());
     }
@@ -156,7 +155,7 @@ void ConnectForm::updateParam()
 
 void ConnectForm::updateUI()
 {
-    ui->urlEdit->setText(httpConfig.getURL());
+    ui->urlEdit->setPlainText(httpConfig.getURL());
     if (authForm.isNull()){
         initAuthForm();
     }

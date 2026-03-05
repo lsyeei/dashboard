@@ -42,8 +42,8 @@ public:
     void setArgs(const QString &args) override;
     // IDataQueryWidget interface
     void setDataSource(const QString &dataSourceArgs) override;
+    QJsonDocument doTest() override;
 protected Q_SLOTS:
-    void onTestBtnClicked();
     void onTableChanged(QModelIndex proxyIndex);
     void onFindTable(const QString &text);
     void onFindField(const QString &text);

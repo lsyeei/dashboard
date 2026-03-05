@@ -124,7 +124,7 @@ void AbstractZoneItem::setCustomData(const QString &name, const QString &value)
             setSize({x, y});
         }
     }else if (name.compare("color") == 0) {
-        QColor color{value};
+        auto color = QColor::fromString(value);
         if (!color.isValid()) {
             return;
         }
@@ -197,6 +197,9 @@ void AbstractZoneItem::setColor(const QColor &newColor)
     auto attr = attribute();
     auto brush = attr->getBrush();
     brush.setColor(newColor);
+    if (brush.getStyle() == Qt::NoBrush) {
+        brush.setStyle(Qt::SolidPattern);
+    }
     attr->setBrush(brush);
     updateItem();
 }

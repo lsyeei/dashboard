@@ -20,6 +20,7 @@
 
 #include "bodyform.h"
 #include "headerform.h"
+#include "httpclient.h"
 #include "idatasourceplugin.h"
 #include "keyvalueform.h"
 #include "queryconfig.h"
@@ -44,18 +45,20 @@ public:
 
     // IDataQueryWidget interface
     void setDataSource(const QString &dataSourceArgs) override;
+    QJsonDocument doTest() override;
 
 private Q_SLOTS:
     void onTabChanged();
     void onDataChanged();
-    void onTestBtnClicked();
 private:
     Ui::QueryForm *ui;
 
+    QString connectArgs;
     QueryConfig config;
     QPointer<HeaderForm> headerForm;
     QPointer<BodyForm> bodyForm;
     QPointer<KeyValueForm> paramForm;
+    HttpClient *client{nullptr};
 
     void updateParam();
     void updateUI();

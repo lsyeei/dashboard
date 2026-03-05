@@ -30,7 +30,6 @@ public:
     QHBoxLayout *horizontalLayout;
     QComboBox *queryMethodCombo;
     QLineEdit *queryUrlEdit;
-    QToolButton *testBtn;
     QLabel *label;
     QWidget *paramWidget;
     QHBoxLayout *horizontalLayout_3;
@@ -64,11 +63,6 @@ public:
         queryUrlEdit->setObjectName("queryUrlEdit");
 
         horizontalLayout->addWidget(queryUrlEdit);
-
-        testBtn = new QToolButton(QueryForm);
-        testBtn->setObjectName("testBtn");
-
-        horizontalLayout->addWidget(testBtn);
 
 
         verticalLayout_2->addLayout(horizontalLayout);
@@ -174,6 +168,7 @@ public:
         sizePolicy.setHeightForWidth(replyEdit->sizePolicy().hasHeightForWidth());
         replyEdit->setSizePolicy(sizePolicy);
         replyEdit->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
+        replyEdit->setReadOnly(true);
 
         verticalLayout->addWidget(replyEdit);
 
@@ -189,7 +184,6 @@ public:
     void retranslateUi(QWidget *QueryForm)
     {
         QueryForm->setWindowTitle(QCoreApplication::translate("QueryForm", "Form", nullptr));
-        testBtn->setText(QCoreApplication::translate("QueryForm", "\346\265\213\350\257\225", nullptr));
         label->setText(QCoreApplication::translate("QueryForm", "\350\257\267\346\261\202\345\217\202\346\225\260", nullptr));
         paramRadio->setText(QCoreApplication::translate("QueryForm", "Params", nullptr));
         bodyRadio->setText(QCoreApplication::translate("QueryForm", "Body", nullptr));

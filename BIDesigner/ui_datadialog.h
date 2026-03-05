@@ -43,7 +43,6 @@ public:
     QHBoxLayout *processLayout;
     QCheckBox *processCheck;
     QSpacerItem *horizontalSpacer_4;
-    QPushButton *codeTestBtn;
     QWidget *processWidget;
     QHBoxLayout *horizontalLayout_5;
     QSplitter *processSplitter;
@@ -57,6 +56,7 @@ public:
     QPlainTextEdit *codeTestEdit;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer;
+    QPushButton *codeTestBtn;
     QPushButton *okBtn;
     QPushButton *cancelBtn;
 
@@ -66,6 +66,8 @@ public:
             DataDialog->setObjectName("DataDialog");
         DataDialog->resize(356, 202);
         DataDialog->setAutoFillBackground(true);
+        DataDialog->setSizeGripEnabled(true);
+        DataDialog->setModal(false);
         verticalLayout_2 = new QVBoxLayout(DataDialog);
         verticalLayout_2->setObjectName("verticalLayout_2");
         verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetFixedSize);
@@ -130,11 +132,6 @@ public:
         horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         processLayout->addItem(horizontalSpacer_4);
-
-        codeTestBtn = new QPushButton(DataDialog);
-        codeTestBtn->setObjectName("codeTestBtn");
-
-        processLayout->addWidget(codeTestBtn);
 
 
         verticalLayout_2->addLayout(processLayout);
@@ -203,6 +200,11 @@ public:
 
         horizontalLayout_2->addItem(horizontalSpacer);
 
+        codeTestBtn = new QPushButton(DataDialog);
+        codeTestBtn->setObjectName("codeTestBtn");
+
+        horizontalLayout_2->addWidget(codeTestBtn);
+
         okBtn = new QPushButton(DataDialog);
         okBtn->setObjectName("okBtn");
 
@@ -230,9 +232,9 @@ public:
         periodSpin->setSuffix(QCoreApplication::translate("DataDialog", "\347\247\222", nullptr));
         label_3->setText(QCoreApplication::translate("DataDialog", "\346\263\250\351\207\212", nullptr));
         processCheck->setText(QCoreApplication::translate("DataDialog", "\346\225\260\346\215\256\345\244\204\347\220\206", nullptr));
-        codeTestBtn->setText(QCoreApplication::translate("DataDialog", "\346\265\213\350\257\225", nullptr));
         label_4->setText(QCoreApplication::translate("DataDialog", "\350\276\223\345\205\245\345\244\204\347\220\206\346\225\260\346\215\256\347\232\204JS\344\273\243\347\240\201", nullptr));
-        label_5->setText(QCoreApplication::translate("DataDialog", "\346\265\213\350\257\225\347\273\223\346\236\234", nullptr));
+        label_5->setText(QCoreApplication::translate("DataDialog", "\346\225\260\346\215\256\345\244\204\347\220\206\347\273\223\346\236\234", nullptr));
+        codeTestBtn->setText(QCoreApplication::translate("DataDialog", "\346\265\213\350\257\225", nullptr));
         okBtn->setText(QCoreApplication::translate("DataDialog", "\347\241\256\345\256\232", nullptr));
         cancelBtn->setText(QCoreApplication::translate("DataDialog", "\345\217\226\346\266\210", nullptr));
     } // retranslateUi

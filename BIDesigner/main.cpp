@@ -51,15 +51,16 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
         log.flush();
         log.close();
     }
-    if (originalHandler)
+    if (originalHandler){
         originalHandler(type, context, msg);
+    }
 }
 
 int main(int argc, char *argv[])
 {
     qSetMessagePattern("[%{time yy-MM-dd hh:mm:ss.sss}] [%{type}] [ %{file}: %{line}] %{message}");
     // 自定义日志文件
-    qInstallMessageHandler(customMessageHandler);
+    originalHandler = qInstallMessageHandler(customMessageHandler);
 
     // 启用 ANGLE
     // QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);

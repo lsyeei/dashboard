@@ -13,7 +13,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -24,9 +24,8 @@ class Ui_ConnectForm
 {
 public:
     QVBoxLayout *verticalLayout;
-    QHBoxLayout *horizontalLayout_2;
     QLabel *label_2;
-    QLineEdit *urlEdit;
+    QPlainTextEdit *urlEdit;
     QWidget *paramWidget;
     QHBoxLayout *horizontalLayout_3;
     QRadioButton *authRadio;
@@ -38,33 +37,35 @@ public:
     {
         if (ConnectForm->objectName().isEmpty())
             ConnectForm->setObjectName("ConnectForm");
-        ConnectForm->resize(250, 55);
+        ConnectForm->resize(250, 105);
         verticalLayout = new QVBoxLayout(ConnectForm);
         verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         verticalLayout->setContentsMargins(0, 0, 0, 0);
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName("horizontalLayout_2");
         label_2 = new QLabel(ConnectForm);
         label_2->setObjectName("label_2");
 
-        horizontalLayout_2->addWidget(label_2);
+        verticalLayout->addWidget(label_2);
 
-        urlEdit = new QLineEdit(ConnectForm);
+        urlEdit = new QPlainTextEdit(ConnectForm);
         urlEdit->setObjectName("urlEdit");
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(urlEdit->sizePolicy().hasHeightForWidth());
+        urlEdit->setSizePolicy(sizePolicy);
+        urlEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
+        urlEdit->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
 
-        horizontalLayout_2->addWidget(urlEdit);
-
-
-        verticalLayout->addLayout(horizontalLayout_2);
+        verticalLayout->addWidget(urlEdit);
 
         paramWidget = new QWidget(ConnectForm);
         paramWidget->setObjectName("paramWidget");
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(paramWidget->sizePolicy().hasHeightForWidth());
-        paramWidget->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Minimum);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(paramWidget->sizePolicy().hasHeightForWidth());
+        paramWidget->setSizePolicy(sizePolicy1);
         paramWidget->setMinimumSize(QSize(0, 26));
         paramWidget->setAutoFillBackground(false);
         paramWidget->setStyleSheet(QString::fromUtf8("QRadioButton::indicator{\n"
@@ -92,8 +93,8 @@ public:
         horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
         authRadio = new QRadioButton(paramWidget);
         authRadio->setObjectName("authRadio");
-        sizePolicy.setHeightForWidth(authRadio->sizePolicy().hasHeightForWidth());
-        authRadio->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(authRadio->sizePolicy().hasHeightForWidth());
+        authRadio->setSizePolicy(sizePolicy1);
         authRadio->setMinimumSize(QSize(0, 26));
         authRadio->setAutoFillBackground(false);
         authRadio->setChecked(true);
@@ -102,8 +103,8 @@ public:
 
         headerRadio = new QRadioButton(paramWidget);
         headerRadio->setObjectName("headerRadio");
-        sizePolicy.setHeightForWidth(headerRadio->sizePolicy().hasHeightForWidth());
-        headerRadio->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(headerRadio->sizePolicy().hasHeightForWidth());
+        headerRadio->setSizePolicy(sizePolicy1);
         headerRadio->setMinimumSize(QSize(0, 26));
         headerRadio->setAutoFillBackground(false);
 
@@ -111,16 +112,16 @@ public:
 
         cookieRadio = new QRadioButton(paramWidget);
         cookieRadio->setObjectName("cookieRadio");
-        sizePolicy.setHeightForWidth(cookieRadio->sizePolicy().hasHeightForWidth());
-        cookieRadio->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(cookieRadio->sizePolicy().hasHeightForWidth());
+        cookieRadio->setSizePolicy(sizePolicy1);
         cookieRadio->setMinimumSize(QSize(0, 26));
 
         horizontalLayout_3->addWidget(cookieRadio);
 
         settingRadio = new QRadioButton(paramWidget);
         settingRadio->setObjectName("settingRadio");
-        sizePolicy.setHeightForWidth(settingRadio->sizePolicy().hasHeightForWidth());
-        settingRadio->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(settingRadio->sizePolicy().hasHeightForWidth());
+        settingRadio->setSizePolicy(sizePolicy1);
         settingRadio->setMinimumSize(QSize(0, 26));
 
         horizontalLayout_3->addWidget(settingRadio);

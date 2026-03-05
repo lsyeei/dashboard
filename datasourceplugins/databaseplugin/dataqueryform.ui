@@ -169,22 +169,9 @@
            <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
           </property>
           <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>10</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="testButton">
+           <widget class="QLabel" name="label">
             <property name="text">
-             <string>测试</string>
+             <string>SQL 执行结果</string>
             </property>
            </widget>
           </item>

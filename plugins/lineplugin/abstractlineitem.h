@@ -58,6 +58,9 @@ public:
     QSizeF size();
     // ICustomGraphic interface
     void setSize(const QSizeF &size) override;
+    QList<CustomMetadata> metadataList() Q_DECL_OVERRIDE;
+    void setCustomData(const QString &name, const QString &value) Q_DECL_OVERRIDE;
+    QString getCustomData(const QString &name) Q_DECL_OVERRIDE;
 
     // ILinePath interface
     virtual QPainterPath linePath(QList<QPointF> points) const Q_DECL_OVERRIDE;

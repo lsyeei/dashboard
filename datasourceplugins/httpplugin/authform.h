@@ -47,6 +47,7 @@ private:
      */
     QMap<AuthMethod, AbstractSubForm*> subFormMap;
     void hideSubForm();
+    void createFormByMethod(AuthMethod method);
 };
 
 #endif // AUTHFORM_H

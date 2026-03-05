@@ -205,6 +205,8 @@ INCLUDEPATH += \
     $$PWD/../plugins/common \
     $$PWD/../datasourceplugins/interface \    
 
+RC_ICONS = app.ico
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

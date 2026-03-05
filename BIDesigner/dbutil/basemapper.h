@@ -165,22 +165,24 @@ inline bool BaseMapper<T>::updateById(const T &data)
         }
         switch (value.typeId()) {
         case QMetaType::QString:
-            if (value.toString().isEmpty()) {
-                break;
-            }
             values += (values.isEmpty()?"":",") + item.value() + "=";
-            values += "'" + value.toString() + "'";
+            if (value.toString().isEmpty()) {
+                values += "NULL";
+            }else{
+                values += "'" + value.toString() + "'";
+            }
             break;            
         case QMetaType::QByteArray:            
             values += (values.isEmpty()?"":",") + item.value() + "=";
             values += "X'" + QString(value.toByteArray().toHex(0)) + "'";
             break;
         default:
-            if (value.toString().isEmpty()) {
-                break;
-            }
             values += (values.isEmpty()?"":",") + item.value() + "=";
-            values += value.toString();
+            if (value.toString().isEmpty()) {
+                values += "NULL";
+            } else {
+                values += value.toString();
+            }
             break;
         }
     }

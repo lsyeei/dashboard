@@ -147,7 +147,7 @@ inline QVariant Entity::getValueByColName(const QString &colName) const
     auto property = const_cast<Entity*>(this)->getColPropery(colName);
     QString methodName{"get_%1()"};
     if (!property.isEmpty() && property.compare("ENCRYPT")==0) {
-        methodName = "get_encrypt_%1()";qDebug() << __FUNCTION__ << field << methodName;
+        methodName = "get_encrypt_%1()";
     }
     auto method = getMethod(methodName.arg(field));
     auto rtnType = method.returnMetaType();

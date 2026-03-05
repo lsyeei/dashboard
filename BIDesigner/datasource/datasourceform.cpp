@@ -165,6 +165,7 @@ void DataSourceForm::onAddCategory(bool flag)
     }
     dataDirDlg->setWindowTitle(tr("添加分类"));
     dataDirDlg->setData(dataDir);
+    dataDirDlg->adjustSize();
     if (dataDirDlg->exec() == QDialog::Accepted) {
         dataDir = dataDirDlg->getData();
         // 存储数据目录
@@ -224,7 +225,7 @@ void DataSourceForm::onDelCategory(bool flag)
     }
     // 删除节点
     auto parent = treeItem->parent();
-    if (parent) {qDebug()<<"has parent...";
+    if (parent) {
         parent->takeChild(parent->indexOfChild(treeItem));
     }else{
         ui->dataDir->takeTopLevelItem(ui->dataDir->indexOfTopLevelItem(treeItem));
@@ -247,6 +248,7 @@ void DataSourceForm::onEditCategory(bool flag)
     dataDir.setDataSource(sourceMap[dataDir.get_id()]);
     dataDirDlg->setWindowTitle(tr("编辑分类"));
     dataDirDlg->setData(dataDir);
+    dataDirDlg->adjustSize();
     if (dataDirDlg->exec() == QDialog::Accepted){
         // 获取更新并存储
         dataDir = dataDirDlg->getData();
@@ -287,6 +289,9 @@ void DataSourceForm::onEditCategory(bool flag)
                 // 通知数据源改动
                 if(!source.isEmpty()){
                     source.setSourceName(dataDir.get_name());
+                    // 刷新数据视图
+                    onTreeSelectionChanged();
+                    // 发出消息
                     emit dataSourceChanged(source);
                 }
             }
@@ -314,6 +319,7 @@ void DataSourceForm::onAddData(bool flag)
     DataMarketDO dataMarket;
     dataMarket.setDataSource(source);
     dataDlg->setData(dataMarket);
+    dataDlg->adjustSize();
     if (dataDlg->exec() == QDialog::Accepted) {
         dataMarket = dataDlg->getData();
         // 保存数据
@@ -354,6 +360,8 @@ void DataSourceForm::onEditData(bool flag)
     auto dataMarket = item->data(DATA_ROLE).value<DataMarketDO>();
     dataDlg->setWindowTitle(tr("编辑数据"));
     dataDlg->setData(dataMarket);
+    dataDlg->setWindowModality(Qt::ApplicationModal);
+    dataDlg->adjustSize();
     if (dataDlg->exec() == QDialog::Accepted) {
         dataMarket = dataDlg->getData();
         // 保存数据

@@ -21,6 +21,8 @@
 #include "abstractsubform.h"
 #include "auth2config.h"
 
+
+class OAuth2Client;
 namespace Ui {
 class OAuth2Form;
 }
@@ -37,14 +39,19 @@ public:
     void setData(const QVariant &data) override;
     QVariant getData() const override;
 
+private Q_SLOTS:
+    void onTestBtnClicked();
+
 private:
     Ui::OAuth2Form *ui;
     Auth2Config config;
+    OAuth2Client *oauth2Client{nullptr};
 
     void initLocation();
     void initTokenType();
     void initAuthModel();
     void initEvent();
+    void updateUIByAuthModel();
 };
 
 #endif // OAUTH2FORM_H

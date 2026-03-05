@@ -54,4 +54,6 @@ private:
     JSONFIELD(note, Note)
 };
 typedef QList<HttpHeaderItem> HttpHeader;
+
+Q_DECLARE_METATYPE(HttpHeaderItem)
 #endif // HTTPHEADER_H

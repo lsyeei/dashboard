@@ -1,4 +1,4 @@
-﻿/**
+/**
 * This file is part of the dashboard library
 * 
 * Copyright 2025 lishiying  lsyeei@163.com
@@ -1004,10 +1004,12 @@ void MainWindow::onAnimatePlay(bool flag)
 void MainWindow::showAbout()
 {
     QMessageBox msg{QMessageBox::Information, "关于",
-                    "Compelling Data Designer V0.1 \r\n\r\n"
+                    "Visual Data Studio V0.1 \r\n\r\n"
                     "项目地址：https://github.com/lsyeei/dashboard/ \r\n\r\n"
                     "作者：李世颖\r\n\r\n"
                     "Email：lsyeei@163.com\r\n\r\n"};
+    auto icon = QPixmap::fromImage(QImage(":/icons/icons/app.png"));
+    msg.setIconPixmap(icon);
     msg.setWindowModality(Qt::ApplicationModal);
     msg.exec();
 }

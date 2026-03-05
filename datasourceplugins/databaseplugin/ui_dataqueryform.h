@@ -16,8 +16,6 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListView>
 #include <QtWidgets/QPlainTextEdit>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -47,8 +45,7 @@ public:
     QLabel *label_3;
     QPlainTextEdit *sqlEdit;
     QHBoxLayout *horizontalLayout_2;
-    QSpacerItem *horizontalSpacer;
-    QPushButton *testButton;
+    QLabel *label;
     QPlainTextEdit *testResultEdit;
 
     void setupUi(QWidget *DataQueryForm)
@@ -164,14 +161,10 @@ public:
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
         horizontalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
-        horizontalSpacer = new QSpacerItem(10, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        label = new QLabel(layoutWidget1);
+        label->setObjectName("label");
 
-        horizontalLayout_2->addItem(horizontalSpacer);
-
-        testButton = new QPushButton(layoutWidget1);
-        testButton->setObjectName("testButton");
-
-        horizontalLayout_2->addWidget(testButton);
+        horizontalLayout_2->addWidget(label);
 
 
         verticalLayout_3->addLayout(horizontalLayout_2);
@@ -200,7 +193,7 @@ public:
         label_4->setText(QCoreApplication::translate("DataQueryForm", "\350\241\250", nullptr));
         label_2->setText(QCoreApplication::translate("DataQueryForm", "\345\255\227\346\256\265", nullptr));
         label_3->setText(QCoreApplication::translate("DataQueryForm", "SQL \350\257\255\345\217\245", nullptr));
-        testButton->setText(QCoreApplication::translate("DataQueryForm", "\346\265\213\350\257\225", nullptr));
+        label->setText(QCoreApplication::translate("DataQueryForm", "SQL \346\211\247\350\241\214\347\273\223\346\236\234", nullptr));
     } // retranslateUi
 
 };

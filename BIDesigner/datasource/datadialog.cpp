@@ -19,7 +19,6 @@
 #include "datasourcepluginmanager.h"
 #include "idatasourceplugin.h"
 #include "jsutil/jsutil.h"
-#include "qjsonarray.h"
 #include "qjsondocument.h"
 #include "ui_datadialog.h"
 #include <QJSEngine>
@@ -32,7 +31,6 @@ DataDialog::DataDialog(QWidget *parent)
     ui->setupUi(this);
     ui->processWidget->setVisible(false);
     ui->processCheck->setChecked(false);
-    ui->codeTestBtn->setVisible(false);
     ui->processSplitter->setStretchFactor(0,3);
     ui->processSplitter->setStretchFactor(1,1);
     SyntaxFactory::instance()->highlightDocument(ui->processCodeEdit->document(), "javascript");
@@ -48,7 +46,6 @@ DataDialog::DataDialog(QWidget *parent)
     connect(ui->processCheck, &QCheckBox::checkStateChanged,
             this,[&]{
         ui->processWidget->setVisible(ui->processCheck->isChecked());
-        ui->codeTestBtn->setVisible(ui->processCheck->isChecked());
     });
     connect(ui->codeTestBtn, &QPushButton::clicked, this, &DataDialog::onTestProcessCode);
 }
@@ -93,12 +90,11 @@ void DataDialog::setData(DataMarketDO dataObj)
         ui->processCheck->setChecked(true);
         ui->processCodeEdit->setPlainText(code);
         ui->processWidget->setVisible(true);
-        ui->codeTestBtn->setVisible(true);
     }else{
         ui->processWidget->setVisible(false);
         ui->processCheck->setChecked(false);
-        ui->codeTestBtn->setVisible(false);
     }
+    ui->codeTestEdit->clear();
 }
 
 DataMarketDO DataDialog::getData()
@@ -109,32 +105,13 @@ DataMarketDO DataDialog::getData()
 
 void DataDialog::onTestProcessCode()
 {
+    updateData();
+    auto queryData = queryWidget->doTest();
+
     auto code = ui->processCodeEdit->toPlainText().trimmed();
     if (code.isEmpty()){
         return;
     }
-    updateData();
-    // 获取数据源内容
-    auto source = data.getDataSource();
-    auto plugin = DataSourcePluginManager::instance()->getPluginById(source.get_sourcePluginId());
-    if (plugin == nullptr) {
-        ui->codeTestEdit->setPlainText("data source not found");
-        return;
-    }
-    auto dataSource = plugin->dataSource();
-    if (dataSource == nullptr) {
-        ui->codeTestEdit->setPlainText("data source is null");
-        return;
-    }
-    if(!dataSource->connect(source.get_sourceArgs())){
-        ui->codeTestEdit->setPlainText("data source connect falied");
-        return;
-    }
-    auto queryData = dataSource->query(data.get_requestArgs());
-
-    dataSource->disconnect();
-    delete dataSource;
-    dataSource = nullptr;
 
     // 设置js参数
     auto jsutil = JSUtil::instance();
@@ -159,7 +136,11 @@ void DataDialog::updateData()
     data.set_requestPeriod(ui->periodSpin->value());
     data.set_note(ui->noteEdit->text().trimmed());
     data.set_requestArgs(queryWidget->getArgs());
-    data.set_processCode(ui->processCodeEdit->toPlainText());
+    if (ui->processCheck->isChecked()) {
+        data.set_processCode(ui->processCodeEdit->toPlainText());
+    } else {
+        data.set_processCode("");
+    }
 }
 
 bool DataDialog::validate()

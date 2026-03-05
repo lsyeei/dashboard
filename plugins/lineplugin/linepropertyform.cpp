@@ -113,6 +113,7 @@ void LinePropertyForm::updateData()
         ui->stateBox->setCurrentItem(index);
     }
     ui->stateBox->blockSignals(false);
+    switchPlayBtnText(!attr.getFlowPlay());
 }
 
 ICustomGraphic *LinePropertyForm::getGraphicItem()
@@ -252,6 +253,12 @@ void LinePropertyForm::initEvent()
     connect(ui->stateBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onStateIndexChanged(int)));
     connect(ui->centerX, SIGNAL(valueChanged(int)), this, SLOT(onPosChanged(int)));
     connect(ui->centerY, SIGNAL(valueChanged(int)), this, SLOT(onPosChanged(int)));
+    connect(ui->playBtn, &QPushButton::clicked, this, [&](){
+        auto play = attr.getFlowPlay();
+        switchPlayBtnText(play);
+        attr.setFlowPlay(!play);
+        graphicItem->updateAttribute(&attr);
+    });
 }
 
 void LinePropertyForm::initArrowType()
@@ -270,6 +277,11 @@ void LinePropertyForm::initArrowType()
             ui->endTypeOptions->addItem(type.value(), "", type.key());
         }
     }
+}
+
+void LinePropertyForm::switchPlayBtnText(bool flag)
+{
+    ui->playBtn->setText(flag?tr("启动"):tr("暂停"));
 }
 
 void LinePropertyForm::onStateAdded(int index)

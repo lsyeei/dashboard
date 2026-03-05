@@ -50,6 +50,9 @@ void AuthForm::setData(const QVariant &data)
     ui->authMethodCombo->setCurrentIndex(index);
     // 显示对应的配置UI，并设置数据
     hideSubForm();
+    if (!subFormMap.contains(method)) {
+        createFormByMethod(method);
+    }
     if (subFormMap[method] == nullptr) {
         return;
     }
@@ -62,23 +65,32 @@ QVariant AuthForm::getData() const
     return QVariant::fromValue(authConfig);
 }
 
+void AuthForm::createFormByMethod(AuthMethod method)
+{
+    if (method == AuthMethod::NoAuth) {
+        return;
+    }
+    AbstractSubForm *form{nullptr};
+    foreach (auto item, AuthDef::list) {
+        if (item.method == method) {
+            form = item.form();
+            break;
+        }
+    }
+    layout()->addWidget(form);
+    connect(form, &AbstractSubForm::dataChangedEvent,
+            this, &AuthForm::onAuthDataChanged);
+    subFormMap[method] = form;
+}
+
 void AuthForm::onSelectedAuthChanged(int index)
 {
     hideSubForm();
     auto method = ui->authMethodCombo->currentData().value<AuthMethod>();
-    if (!subFormMap.contains(method)) {
-        AbstractSubForm *form{nullptr};
-        foreach (auto item, AuthDef::list) {
-            if (item.method == method) {
-                form = item.form();
-                break;
-            }
+    if (method != AuthMethod::NoAuth) {
+        if (!subFormMap.contains(method)) {
+            createFormByMethod(method);
         }
-        layout()->addWidget(form);
-        connect(form, &AbstractSubForm::dataChangedEvent,
-                this, &AuthForm::onAuthDataChanged);
-        subFormMap[method] = form;
-    }else{
         if (subFormMap[method]) {
             subFormMap[method]->show();
         }
@@ -91,7 +103,7 @@ void AuthForm::onAuthDataChanged(const QVariant &data)
 {    
     auto method = ui->authMethodCombo->currentData().value<AuthMethod>();
     authConfig.setMethod(method);
-    if (!subFormMap.contains(method)) {
+    if (subFormMap.contains(method)) {
         authConfig.setConfig(data);
     }else{
         authConfig.setConfig(QVariant());

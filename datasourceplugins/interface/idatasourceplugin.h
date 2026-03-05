@@ -34,6 +34,7 @@ class IDataQueryWidget : public IDataSourceWidget
 public:
     IDataQueryWidget(QWidget *parent = nullptr) : IDataSourceWidget(parent){}
     virtual void setDataSource(const QString &dataSourceArgs) = 0;
+    virtual QJsonDocument doTest() = 0;
 };
 
 class IDataSourcePlugin{

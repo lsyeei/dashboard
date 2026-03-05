@@ -49,6 +49,12 @@ public:
     QHBoxLayout *horizontalLayout;
     QLabel *label_8;
     QLineEdit *clientSecretEdit;
+    QHBoxLayout *horizontalLayout_7;
+    QLabel *label_9;
+    QLineEdit *userNameEdit;
+    QHBoxLayout *horizontalLayout_10;
+    QLabel *label_10;
+    QLineEdit *passwordEdit;
     QHBoxLayout *horizontalLayout_9;
     QSpacerItem *horizontalSpacer;
     QPushButton *testBtn;
@@ -57,7 +63,7 @@ public:
     {
         if (OAuth2Form->objectName().isEmpty())
             OAuth2Form->setObjectName("OAuth2Form");
-        OAuth2Form->resize(250, 225);
+        OAuth2Form->resize(250, 290);
         verticalLayout = new QVBoxLayout(OAuth2Form);
         verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, 0, 0, 0);
@@ -195,6 +201,41 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
+        horizontalLayout_7 = new QHBoxLayout();
+        horizontalLayout_7->setObjectName("horizontalLayout_7");
+        label_9 = new QLabel(OAuth2Form);
+        label_9->setObjectName("label_9");
+        sizePolicy.setHeightForWidth(label_9->sizePolicy().hasHeightForWidth());
+        label_9->setSizePolicy(sizePolicy);
+
+        horizontalLayout_7->addWidget(label_9);
+
+        userNameEdit = new QLineEdit(OAuth2Form);
+        userNameEdit->setObjectName("userNameEdit");
+
+        horizontalLayout_7->addWidget(userNameEdit);
+
+
+        verticalLayout->addLayout(horizontalLayout_7);
+
+        horizontalLayout_10 = new QHBoxLayout();
+        horizontalLayout_10->setObjectName("horizontalLayout_10");
+        label_10 = new QLabel(OAuth2Form);
+        label_10->setObjectName("label_10");
+        sizePolicy.setHeightForWidth(label_10->sizePolicy().hasHeightForWidth());
+        label_10->setSizePolicy(sizePolicy);
+
+        horizontalLayout_10->addWidget(label_10);
+
+        passwordEdit = new QLineEdit(OAuth2Form);
+        passwordEdit->setObjectName("passwordEdit");
+        passwordEdit->setEchoMode(QLineEdit::Password);
+
+        horizontalLayout_10->addWidget(passwordEdit);
+
+
+        verticalLayout->addLayout(horizontalLayout_10);
+
         horizontalLayout_9 = new QHBoxLayout();
         horizontalLayout_9->setObjectName("horizontalLayout_9");
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
@@ -226,6 +267,8 @@ public:
         label_6->setText(QCoreApplication::translate("OAuth2Form", "callback URL", nullptr));
         label_7->setText(QCoreApplication::translate("OAuth2Form", "Client ID", nullptr));
         label_8->setText(QCoreApplication::translate("OAuth2Form", "Client Secret", nullptr));
+        label_9->setText(QCoreApplication::translate("OAuth2Form", "\347\224\250\346\210\267\345\220\215", nullptr));
+        label_10->setText(QCoreApplication::translate("OAuth2Form", "\345\257\206\347\240\201", nullptr));
         testBtn->setText(QCoreApplication::translate("OAuth2Form", "\350\216\267\345\217\226token", nullptr));
     } // retranslateUi
 

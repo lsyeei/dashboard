@@ -237,8 +237,8 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>0</width>
-       <height>52</height>
+       <width>90</width>
+       <height>49</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -727,6 +727,30 @@
            </size>
           </property>
          </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="playBtn">
+          <property name="text">
+           <string>暂停</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

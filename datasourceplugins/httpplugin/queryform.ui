@@ -37,13 +37,6 @@
      <item>
       <widget class="QLineEdit" name="queryUrlEdit"/>
      </item>
-     <item>
-      <widget class="QToolButton" name="testBtn">
-       <property name="text">
-        <string>测试</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
@@ -242,6 +235,9 @@ QRadioButton:checked {
         </property>
         <property name="sizeAdjustPolicy">
          <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

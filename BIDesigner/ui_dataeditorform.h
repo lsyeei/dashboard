@@ -54,6 +54,7 @@ public:
         DataEditorForm->setAutoFillBackground(true);
         verticalLayout_2 = new QVBoxLayout(DataEditorForm);
         verticalLayout_2->setObjectName("verticalLayout_2");
+        verticalLayout_2->setSizeConstraint(QLayout::SizeConstraint::SetDefaultConstraint);
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
@@ -124,7 +125,12 @@ public:
 
         testInfo = new QLabel(DataEditorForm);
         testInfo->setObjectName("testInfo");
-        testInfo->setTextFormat(Qt::TextFormat::AutoText);
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(testInfo->sizePolicy().hasHeightForWidth());
+        testInfo->setSizePolicy(sizePolicy2);
+        testInfo->setTextFormat(Qt::TextFormat::RichText);
         testInfo->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop);
         testInfo->setWordWrap(true);
         testInfo->setMargin(8);

@@ -28,7 +28,11 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Compelling Data Designer</string>
+   <string>Visual Data Studio</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="icons.qrc">
+    <normaloff>:/icons/app.ico</normaloff>:/icons/app.ico</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -259,8 +263,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>234</width>
-              <height>475</height>
+              <width>206</width>
+              <height>485</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -381,7 +385,7 @@
      <x>0</x>
      <y>0</y>
      <width>1038</width>
-     <height>21</height>
+     <height>18</height>
     </rect>
    </property>
    <property name="sizePolicy">

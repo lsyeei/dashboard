@@ -57,7 +57,7 @@ protected Q_SLOTS:
     void onTestBtnClicked();
 private:
     Ui::DataEditorForm *ui;
-    QGraphicsItem *graphic;
+    QGraphicsItem *graphic{nullptr};
     DataControlForm *controlForm{nullptr};
     DataAssignForm *assignForm{nullptr};
     QDialog *selectorDlg{nullptr};
@@ -71,6 +71,7 @@ private:
      * @param data 数据
      */
     void updateDataEdit(DataMarketDO data);
+    void setGraphicId();
 };
 
 #endif // DATAEDITORFORM_H

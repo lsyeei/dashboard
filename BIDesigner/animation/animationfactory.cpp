@@ -110,11 +110,11 @@ QString AnimationFactory::toXml()
 {
     QString data;
     QScopedPointer<QXmlStreamWriter> xml(new QXmlStreamWriter(&data));
-    xml->writeStartElement(XmlTemplate::animates);
     auto item = animations.begin();
     while(item != animations.end()){
         if (scene->getItemById(item.key()) == nullptr){
             // 已经删除的图元不导出
+            item ++;
             continue;
         }
         xml->writeStartElement(XmlTemplate::animatesTemplate::animate);
@@ -129,7 +129,6 @@ QString AnimationFactory::toXml()
         xml->writeEndElement();
         item ++;
     }
-    xml->writeEndElement();
     return data;
 }
 

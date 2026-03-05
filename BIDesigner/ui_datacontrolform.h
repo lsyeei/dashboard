@@ -63,7 +63,6 @@ public:
     QHBoxLayout *horizontalLayout_6;
     QLabel *label_8;
     QLineEdit *propertyValueEdit;
-    QHBoxLayout *horizontalLayout_8;
     QLabel *propertyLabel;
 
     void setupUi(QWidget *DataControlForm)
@@ -290,8 +289,6 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_6);
 
-        horizontalLayout_8 = new QHBoxLayout();
-        horizontalLayout_8->setObjectName("horizontalLayout_8");
         propertyLabel = new QLabel(propertyWidget);
         propertyLabel->setObjectName("propertyLabel");
         QSizePolicy sizePolicy6(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::MinimumExpanding);
@@ -299,12 +296,12 @@ public:
         sizePolicy6.setVerticalStretch(0);
         sizePolicy6.setHeightForWidth(propertyLabel->sizePolicy().hasHeightForWidth());
         propertyLabel->setSizePolicy(sizePolicy6);
+        propertyLabel->setTextFormat(Qt::TextFormat::AutoText);
+        propertyLabel->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop);
+        propertyLabel->setWordWrap(true);
         propertyLabel->setMargin(10);
 
-        horizontalLayout_8->addWidget(propertyLabel);
-
-
-        verticalLayout->addLayout(horizontalLayout_8);
+        verticalLayout->addWidget(propertyLabel);
 
 
         verticalLayout_3->addWidget(propertyWidget);

@@ -16,6 +16,12 @@
   <property name="autoFillBackground">
    <bool>true</bool>
   </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="sizeConstraint">
     <enum>QLayout::SizeConstraint::SetFixedSize</enum>
@@ -109,13 +115,6 @@
        </property>
       </spacer>
      </item>
-     <item>
-      <widget class="QPushButton" name="codeTestBtn">
-       <property name="text">
-        <string>测试</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
@@ -173,7 +172,7 @@
           <item>
            <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>测试结果</string>
+             <string>数据处理结果</string>
             </property>
            </widget>
           </item>
@@ -214,6 +213,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="codeTestBtn">
+       <property name="text">
+        <string>测试</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="okBtn">

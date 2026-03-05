@@ -39,7 +39,11 @@ void BodyForm::setData(const QVariant &data)
     QSignalBlocker blocker2(ui->contentEdit);
     auto index = ui->contentTypeCombo->findData(body.getContentType());
     ui->contentTypeCombo->setCurrentIndex(index);
-    ui->contentEdit->setPlainText(body.getContent());
+    if (index > 0) {
+        ui->contentEdit->setPlainText(body.getContent());
+        ui->tipLabel->show();
+        ui->contentEdit->show();
+    }
 }
 
 QVariant BodyForm::getData() const

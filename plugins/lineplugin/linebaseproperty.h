@@ -87,6 +87,8 @@ private:
     int maxId{0};
     // 流动动画
     bool flowAnimation{false};
+    // 动画控制，true 播放，false 暂停
+    bool flowPlay{false};
     // 动画速度
     qreal duration{1000};
     // 动画方向，true 反向， true 正向
@@ -112,6 +114,7 @@ private:
     JSONFIELD(pointList, PointList)
     JSONFIELD(maxId, MaxId)
     JSONFIELD(flowAnimation, FlowAnimation)
+    JSONFIELD(flowPlay, FlowPlay)
     JSONFIELD(duration, Duration)
     JSONFIELD(backward, Backward)
     JSONFIELD(dashLen, DashLen)

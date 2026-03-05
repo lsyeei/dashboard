@@ -195,6 +195,7 @@ void DataControlForm::addLogic()
     auto count = ui->controlOptions->count();
     int index = count>0?0:-1;
     ui->controlOptions->setCurrentIndex(index);
+    ui->propertyValueEdit->clear();
 }
 
 void DataControlForm::delLogic()
@@ -368,6 +369,7 @@ void DataControlForm::reset(bool includeTable)
     QSignalBlocker propertyBlocker(ui->propertyOptions);
     QSignalBlocker minValueBlocker(ui->minValueSpin);
     QSignalBlocker maxValueBlocker(ui->maxValueSpin);
+    QSignalBlocker editorBlocker(ui->propertyValueEdit);
 
     ui->animateWidget->setVisible(false);
     ui->stateWidget->setVisible(false);
@@ -380,6 +382,7 @@ void DataControlForm::reset(bool includeTable)
     ui->symbolOptions->setCurrentIndex(-1);
     ui->animationOptions->setCurrentIndex(-1);
     ui->propertyOptions->setCurrentIndex(-1);
+    ui->propertyValueEdit->clear();
     ui->minValueSpin->setVisible(false);
     ui->valueSpliter->setVisible(false);
     ui->maxValueSpin->setVisible(false);

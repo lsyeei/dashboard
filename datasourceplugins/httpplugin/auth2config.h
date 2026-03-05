@@ -19,7 +19,7 @@
 #define AUTH2CONFIG_H
 
 #include "serializable.h"
-enum class AuthLocation{ Header, Query};
+#include "authlocation.h"
 enum class TokenType{ID, Access};
 enum class AuthModel{Code, Code_PKCE, Implicit,
                        Credentials_Password, Credentials_Client};
@@ -32,9 +32,6 @@ public:
         location = AuthLocation::Header;
         tokenType=TokenType::ID;
         authModel=AuthModel::Code;
-    }
-    static QList<QPair<QString, AuthLocation>> locationList(){
-        return {{"Header", AuthLocation::Header}, {"Query Param", AuthLocation::Query}};
     }
     static QList<QPair<QString, TokenType>> tokenTypeList(){
         return {{"ID token", TokenType::ID}, {"Access token", TokenType::Access}};
@@ -55,6 +52,8 @@ private:
     QString callbackUrl;
     QString clientId;
     QString clientSecret;
+    QString userName;
+    QString password;
 
     JSONFIELD(location, Location)
     JSONFIELD(tokenType, TokenType)
@@ -64,6 +63,8 @@ private:
     JSONFIELD(callbackUrl, CallbackUrl)
     JSONFIELD(clientId, ClientId)
     JSONFIELD(clientSecret, ClientSecret)
+    JSONFIELD(userName, UserName)
+    JSONFIELD(password, Password)
 };
 
 #endif // AUTH2CONFIG_H

@@ -43,7 +43,6 @@ QueryForm::QueryForm(IDataQueryWidget *parent)
             this, &QueryForm::onDataChanged);
     connect(ui->queryMethodCombo, &QComboBox::currentIndexChanged,
             this, &QueryForm::onDataChanged);
-    connect(ui->testBtn, &QToolButton::clicked, this, &QueryForm::onTestBtnClicked);
     connect(ui->switchBtn, &QToolButton::clicked, this, [&]{
         auto flag = ui->replyEdit->isVisible();
         ui->switchBtn->setArrowType(flag?Qt::RightArrow:Qt::DownArrow);
@@ -54,6 +53,10 @@ QueryForm::QueryForm(IDataQueryWidget *parent)
 QueryForm::~QueryForm()
 {
     delete ui;
+    if (client) {
+        delete client;
+        client = nullptr;
+    }
 }
 
 QString QueryForm::getArgs()
@@ -70,6 +73,20 @@ void QueryForm::setArgs(const QString &args)
 
 void QueryForm::setDataSource(const QString &dataSourceArgs)
 {
+    connectArgs = dataSourceArgs;
+}
+
+QJsonDocument QueryForm::doTest()
+{
+    updateParam();
+    if (client == nullptr) {
+        client = new HttpClient();
+    }
+    client->connect(connectArgs);
+    auto result = client->query(config.toJson());
+    ui->replyEdit->setPlainText(result.toJson());
+    ui->replyWidget->show();
+    return result;
 }
 
 void QueryForm::initParamForm()
@@ -137,31 +154,26 @@ void QueryForm::onDataChanged()
         config.setUrl(ui->queryUrlEdit->text().trimmed());
     }else if(obj == ui->queryMethodCombo){
         config.setMethod(ui->queryMethodCombo->currentData().value<QueryMethod>());
-    }else if(paramForm){
+    }else if(obj == paramForm){
         config.setQueryParams(paramForm->getData().value<KVList>());
-    }else if(headerForm){
+    }else if(obj == headerForm){
         config.setHeaders(headerForm->getData().value<HttpHeader>());
-    }else if(bodyForm){
+    }else if(obj == bodyForm){
         config.setBody(bodyForm->getData().value<HttpBody>());
     }
-}
-
-void QueryForm::onTestBtnClicked()
-{
-    ui->replyWidget->show();
 }
 
 void QueryForm::updateParam()
 {
     config.setUrl(ui->queryUrlEdit->text().trimmed());
     config.setMethod(ui->queryMethodCombo->currentData().value<QueryMethod>());
-    if (bodyForm) {
+    if (!bodyForm.isNull()) {
         config.setBody(bodyForm->getData().value<HttpBody>());
     }
-    if(headerForm){
+    if(!headerForm.isNull()){
         config.setHeaders(headerForm->getData().value<HttpHeader>());
     }
-    if(paramForm){
+    if(!paramForm.isNull()){
         config.setQueryParams(paramForm->getData().value<KVList>());
     }
 }
@@ -183,4 +195,6 @@ void QueryForm::updateUI()
         initHeaderForm();
     }
     headerForm->setData(QVariant::fromValue(config.getHeaders()));
+    ui->replyEdit->clear();
+    ui->replyWidget->hide();
 }

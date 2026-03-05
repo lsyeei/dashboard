@@ -61,6 +61,7 @@ private:
     void initUI();
     void initEvent();
     void initArrowType();
+    void switchPlayBtnText(bool flag);
 };
 
 #endif // LINEPROPERTYFORM_H

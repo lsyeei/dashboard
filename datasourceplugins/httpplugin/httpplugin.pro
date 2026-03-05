@@ -17,38 +17,58 @@ SOURCES += \
     bearertokenform.cpp \
     bodyform.cpp \
     connectform.cpp \
+    digestauthform.cpp \
     headerform.cpp \
     httpclient.cpp \
     httpconfig.cpp \
     httpplugin.cpp \
+    jwtform.cpp \
     keyvalueform.cpp \
+    ntlmform.cpp \
     oauth2form.cpp \
+    oauth1form.cpp \
+    oauth2client.cpp \
+    oauth1client.cpp \
     queryconfig.cpp \
     queryform.cpp \
-    settingform.cpp
+    settingform.cpp \
+    spnegoform.cpp
 
 HEADERS += \
     abstractsubform.h \
     apikeyform.h \
     auth2config.h \
+    auth1config.h \
+    authlocation.h \
     authdef.h \
     authform.h \
     basicauthform.h \
     bearertokenform.h \
     bodyform.h \
     connectform.h \
+    digestauthconfig.h \
+    digestauthform.h \
     headerform.h \
     httpbody.h \
     httpclient.h \
     httpconfig.h \
     httpheader.h \
     httpplugin.h \
+    jwtconfig.h \
+    jwtform.h \
     keyvalue.h \
     keyvalueform.h \
+    ntlmconfig.h \
+    ntlmform.h \
     oauth2form.h \
+    oauth1form.h \
+    oauth2client.h \
+    oauth1client.h \
     queryconfig.h \
     queryform.h \
-    settingform.h
+    settingform.h \
+    spnegoconfig.h \
+    spnegoform.h
 
 INCLUDEPATH += \
     ../common \
@@ -68,11 +88,16 @@ FORMS += \
     bearertokenform.ui \
     bodyform.ui \
     connectform.ui \
+    digestauthform.ui \
     headerform.ui \
+    jwtform.ui \
     keyvalueform.ui \
+    ntlmform.ui \
     oauth2form.ui \
+    oauth1form.ui \
     queryform.ui \
-    settingform.ui
+    settingform.ui \
+    spnegoform.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../common/release/ -lcommon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../common/debug/ -lcommon

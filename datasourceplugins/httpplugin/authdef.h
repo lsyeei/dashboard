@@ -21,7 +21,12 @@
 #include "apikeyform.h"
 #include "basicauthform.h"
 #include "bearertokenform.h"
+#include "jwtform.h"
+#include "digestauthform.h"
+#include "ntlmform.h"
+#include "spnegoform.h"
 #include "oauth2form.h"
+#include "oauth1form.h"
 #include "serializable.h"
 
 #include <QString>
@@ -70,16 +75,36 @@ namespace AuthDef {
     {
         return new OAuth2Form();
     }
+    static AbstractSubForm *oauth1Form()
+    {
+        return new OAuth1Form();
+    }
+    static AbstractSubForm *jwtForm()
+    {
+        return new JWTForm();
+    }
+    static AbstractSubForm *digestAuthForm()
+    {
+        return new DigestAuthForm();
+    }
+    static AbstractSubForm *ntlmForm()
+    {
+        return new NTLMForm();
+    }
+    static AbstractSubForm *spnegoForm()
+    {
+        return new SPNEGOForm();
+    }
     static QList<AuthMethodInfo> list{
     {AuthMethod::NoAuth, "No Auth","无授权", nullptr},
     {AuthMethod::APIKey,"API Key","API 密钥授权", apiForm},
     {AuthMethod::BearToken,"Bearer Token","Bearer Token授权", beareTokenForm},
-    {AuthMethod::JWT,"JWT","JWT令牌", nullptr},
+    {AuthMethod::JWT,"JWT","JWT令牌", jwtForm},
     {AuthMethod::BasicAuth,"Basic Auth","Basic Auth授权", basicAuthForm},
-    {AuthMethod::DigestAuth,"Digest Auth","摘要认证 Digest-MD5", nullptr},
-    {AuthMethod::NTLM,"NTLM","NT 本地身份验证, NTLM version 2", nullptr},
-    {AuthMethod::SPNEGO,"SPNEGO/Negotiate","SPNEGO 授权 或 Negotiate 授权", nullptr},
-    {AuthMethod::OAuth1,"OAuth 1.0","OAuth 1.0 授权", nullptr},
+    {AuthMethod::DigestAuth,"Digest Auth","摘要认证 Digest-MD5", digestAuthForm},
+    {AuthMethod::NTLM,"NTLM","NT 本地身份验证, NTLM version 2", ntlmForm},
+    {AuthMethod::SPNEGO,"SPNEGO/Negotiate","SPNEGO 授权 或 Negotiate 授权", spnegoForm},
+    {AuthMethod::OAuth1,"OAuth 1.0","OAuth 1.0 授权", oauth1Form},
     {AuthMethod::OAuth2,"OAuth 2.0","OAuth 2.0 授权", oauth2Form}
     };
 }

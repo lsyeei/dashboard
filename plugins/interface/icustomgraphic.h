@@ -25,8 +25,9 @@
 #define ICUSTOMGRAPHIC_H
 
 #include <QString>
+#include <QMap>
 enum class OperateMode{ReadOnly, ReadWrite, WriteOnly};
-enum class DataType{BOOL, INT, DOUBLE, STRING, POINT, SIZE, JSON};
+enum class DataType{BOOL, INT, DOUBLE, STRING, POINT, SIZE, JSON, ENUM};
 struct CustomMetadata{
     // 属性名
     QString name;
@@ -38,7 +39,10 @@ struct CustomMetadata{
     OperateMode mode;
     // 数据示例
     QString dataExample;
+    // 枚举类型
+    QMap<int, QString> enumData;
     QString dataTypeName(){
+        QString more;
         switch (dataType) {
         case DataType::BOOL:
             return "布尔"; break;
@@ -54,6 +58,11 @@ struct CustomMetadata{
             return "大小"; break;
         case DataType::JSON:
             return "json 字符串"; break;
+        case DataType::ENUM:
+            for(auto item=enumData.cbegin(); item != enumData.cend(); item++){
+                more += more.isEmpty()?QString("%1(%2)").arg(item.key()).arg(item.value()):QString("; %1(%2)").arg(item.key()).arg(item.value());
+            }
+            return "枚举值->  " + more; break;
         default:
             return "未知";break;
         }
