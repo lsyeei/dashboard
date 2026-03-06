@@ -56,6 +56,9 @@ DataDirDialog::~DataDirDialog()
 void DataDirDialog::setData(DataDirDO dataDir)
 {
     data = dataDir;
+    if (ui->dataSourceComboBox->count() <= 0) {
+        initDataSourceOption();
+    }
     auto parentId = dataDir.get_parentId();
     if (parentId < 0) {
         ui->topRadio->setChecked(true);

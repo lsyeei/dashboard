@@ -952,6 +952,9 @@ void BIGraphicsScene::doCommand(QVariant undoData)
         for(auto item = itemsPos.begin(); item != itemsPos.end(); ++item){
             item.key()->setPos(item.value());
         }
+    } if (data.first.compare("setItemName") == 0){
+        auto info = data.second.value<QPair<QGraphicsItem *, QString>>();
+        setItemName(info.first, info.second);
     }
 }
 

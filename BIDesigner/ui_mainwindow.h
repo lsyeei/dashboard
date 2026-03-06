@@ -83,6 +83,7 @@ public:
     QAction *doDelete;
     QAction *dataSource;
     QAction *showLayer;
+    QAction *doSaveAs;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QSplitter *splitter_2;
@@ -384,6 +385,11 @@ public:
         showLayer->setObjectName("showLayer");
         showLayer->setCheckable(true);
         showLayer->setMenuRole(QAction::MenuRole::NoRole);
+        doSaveAs = new QAction(MainWindow);
+        doSaveAs->setObjectName("doSaveAs");
+        QIcon icon33(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSaveAs));
+        doSaveAs->setIcon(icon33);
+        doSaveAs->setMenuRole(QAction::MenuRole::NoRole);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         QSizePolicy sizePolicy1(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
@@ -579,6 +585,7 @@ public:
         fileMenu->addAction(dataSource);
         fileMenu->addSeparator();
         fileMenu->addAction(doSave);
+        fileMenu->addAction(doSaveAs);
         fileMenu->addAction(doExport);
         fileMenu->addSeparator();
         fileMenu->addAction(doExit);
@@ -845,6 +852,10 @@ public:
 #if QT_CONFIG(tooltip)
         showLayer->setToolTip(QCoreApplication::translate("MainWindow", "\346\211\223\345\274\200\345\233\276\345\261\202\347\252\227\345\217\243", nullptr));
 #endif // QT_CONFIG(tooltip)
+        doSaveAs->setText(QCoreApplication::translate("MainWindow", "\345\217\246\345\255\230\344\270\272", nullptr));
+#if QT_CONFIG(shortcut)
+        doSaveAs->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+Shift+S", nullptr));
+#endif // QT_CONFIG(shortcut)
         propertyWidget->setTabText(propertyWidget->indexOf(property), QCoreApplication::translate("MainWindow", "Tab 1", nullptr));
         toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));
         fileMenu->setTitle(QCoreApplication::translate("MainWindow", "\346\226\207\344\273\266", nullptr));

@@ -19,12 +19,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "graphicdocument.h"
 #include "projectpropertyform.h"
 #include <QMainWindow>
 #include <QPointer>
+#include <QCloseEvent>
 
 QT_BEGIN_NAMESPACE
 
+class QLabel;
 class QLabel;
 class QPushButton;
 class GraphicPropertyForm;
@@ -49,10 +52,13 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private:
+
     BIGraphicsScene *scene;
     // QObject interface
     bool event(QEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 
 Q_SIGNALS:
     void singleSelectEvent(QGraphicsItem *item);
@@ -76,6 +82,7 @@ private slots:
 
     void doExit();
     void doSave();
+    void doSaveAs();
     void doOpen();
     void doExport();
     void doGroup();
@@ -102,6 +109,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QPointer<GraphicDocument> doc;
     // 图层窗口
     QPointer<QDockWidget> layerDocker;
     QPointer<GraphicListForm> layerForm;
@@ -130,6 +138,8 @@ private:
     QPointer<QMenu> viewMenu;
     // 数据源
     QPointer<DataSourceForm> dataSource;
+
+
     // void drawShape();
     void setScene();
     void initStatusBar();
@@ -152,10 +162,20 @@ private:
     void enableDistributeAction(bool flag);
     void enableLayerAction(bool flag);
     /**
+     * @brief projectToXml
+     * @return
+     */
+    QString projectToXml() const;
+    /**
      * @brief 解析 xml 中的project信息
      * @param xml xml文本
      */
     void parseProjectXml(const QString &xml);
+    /**
+     * @brief pageToXml
+     * @return
+     */
+    QString pageToXml() const;
     /**
      * @brief 解析 xml 中的project信息
      * @param xml xml文本
@@ -175,5 +195,9 @@ private:
      * @brief initWebEngine 初始化 web 引擎
      */
     void initWebEngine();
+    /**
+     * @brief initDataSource 初始化 datasource 模块
+     */
+    void initDataSource();
 };
 #endif // MAINWINDOW_H

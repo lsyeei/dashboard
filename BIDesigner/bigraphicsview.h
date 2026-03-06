@@ -24,8 +24,10 @@
 
 #include <QGraphicsView>
 #include <QObject>
+#include <QPointer>
 #include <QUndoStack>
 
+class GraphicDocument;
 class QXmlStreamWriter;
 class QXmlStreamReader;
 class IGraphicPlugin;
@@ -121,6 +123,11 @@ public:
      */
     QByteArray getItemThumbData(QGraphicsItem *item, const QSize &size, const QString &format="png");
     void setDragMode(QGraphicsView::DragMode mode);
+    /**
+     * @brief setDocument 设置文档对象
+     * @param doc 文档对象
+     */
+    void setDocument(GraphicDocument *doc);
 
 Q_SIGNALS:
     void mouseMove(QMouseEvent *event);
@@ -211,6 +218,7 @@ private:
     bool extendSelection{false};
     QPointF mousePressScenePoint, lastMouseMoveScenePoint, lastRubberbandScenePoint;
     QPoint mousePressViewPoint;
+    QPointer<GraphicDocument> graphicDoc;
     
     /**
      * @brief 初始化刻度尺等

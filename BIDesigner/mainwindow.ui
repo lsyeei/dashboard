@@ -410,6 +410,7 @@
     <addaction name="dataSource"/>
     <addaction name="separator"/>
     <addaction name="doSave"/>
+    <addaction name="doSaveAs"/>
     <addaction name="doExport"/>
     <addaction name="separator"/>
     <addaction name="doExit"/>
@@ -1162,6 +1163,20 @@
    </property>
    <property name="toolTip">
     <string>打开图层窗口</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="doSaveAs">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentSaveAs"/>
+   </property>
+   <property name="text">
+    <string>另存为</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

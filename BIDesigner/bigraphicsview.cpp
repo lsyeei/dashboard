@@ -18,6 +18,7 @@
 
 #include "bigraphicsscene.h"
 #include "bigraphicsview.h"
+#include "graphicdocument.h"
 #include "graphicgroupwidget.h"
 #include "graphicsitemgroup.h"
 
@@ -301,7 +302,14 @@ void BIGraphicsView::modifyItemName(QString name)
         return;
     }
     auto biScene = dynamic_cast<BIGraphicsScene *>(scene());
-    biScene->setItemName(items.first(), name);
+    auto item = items.first();
+    QPair<QGraphicsItem*, QString> undoData{item, biScene->itemName(item)},
+                                   redoData{item, name};
+    BIUndoCommand *command = new BIUndoCommand(dynamic_cast<UndoObject *>(scene()),
+       QVariant::fromValue(QPair<QString, QVariant>{"setItemName", QVariant::fromValue(undoData)}),
+       QVariant::fromValue(QPair<QString, QVariant>{"setItemName", QVariant::fromValue(redoData)}),
+       "name changed");
+    undoStack.push(command);
 }
 
 PageProperty BIGraphicsView::getPageProperty() const
@@ -495,6 +503,11 @@ void BIGraphicsView::setDragMode(DragMode mode)
     Q_UNUSED(mode)
     // qDebug() << "set drag mode:" << mode;
     // QGraphicsView::setDragMode(mode);
+}
+
+void BIGraphicsView::setDocument(GraphicDocument *doc)
+{
+    graphicDoc = doc;
 }
 
 void BIGraphicsView::doCopy()
@@ -934,6 +947,9 @@ void BIGraphicsView::init()
     setAcceptDrops(true);
     // 不使用默认拖动选择动作
     QGraphicsView::setDragMode(QGraphicsView::NoDrag);
+    connect(&undoStack, &QUndoStack::indexChanged, this, [&](){
+        graphicDoc->markDirty();
+    });
 }
 
 void BIGraphicsView::updateRuler(const QSize &size)

@@ -1,4 +1,4 @@
-/**
+﻿/**
 * This file is part of the dashboard library
 * 
 * Copyright 2025 lishiying  lsyeei@163.com
@@ -23,6 +23,7 @@
 #include "bigraphicsscene.h"
 #include "graphicrootwidget.h"
 #include "mainwindow.h"
+#include "graphicdocument.h"
 #include "graphicpropertyform.h"
 #include "svghelper.h"
 #include "ui_mainwindow.h"
@@ -48,6 +49,7 @@
 #include "xmlHelper.h"
 #include "graphiclistform.h"
 #include "datapropertyform.h"
+#include "configmaster.h"
 #include "datasource/datasourceform.h"
 #include "animation/animationform.h"
 #include "animation/animationfactory.h"
@@ -65,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
     // 修改滚动区域背景
     ui->scrollArea->setBackgroundRole(QPalette::Base);
     setCentralWidget(ui->centralwidget);
+
     // 加载图元控件
     loadPlugin();
     // 设置场景
@@ -86,6 +89,23 @@ MainWindow::MainWindow(QWidget *parent)
     // 初始化右键菜单
     initPopMenu();
     ui->graphicsView->installEventFilter(this);
+
+    // 初始化数据源
+    ConfigMaster::instance();
+    initDataSource();
+
+    // 初始化文件管理器
+    doc = new GraphicDocument(this);
+    doc->setSaveWatcher([&]()->bool{
+        doc->updateDoc({projectToXml(),
+                        pageToXml(),
+                        ui->graphicsView->toXml(),
+                        AnimationFactory::instance()->toXml(),
+                        DataActionManager::instance()->toXml()});
+        return true;
+    });
+    ui->graphicsView->setDocument(doc);
+
     // QTimer::singleShot(2000,[&](){
     //     // 初始化 web 引擎，初始化过程可能会导致UI页面卡顿
     //     initWebEngine();
@@ -95,6 +115,15 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (!doc.isNull() && !doc->checkSaveBeforeAction()) {
+        event->ignore();
+    } else {
+        event->accept();
+    }
 }
 
 bool MainWindow::event(QEvent *event)
@@ -181,6 +210,18 @@ void MainWindow::enableLayerAction(bool flag)
     ui->toBottom->setEnabled(flag);
 }
 
+QString MainWindow::projectToXml() const
+{
+    QString data;
+    QXmlStreamWriter xmlWriter(&data);
+    typedef XmlTemplate::projectTemplate project;
+    xmlWriter.writeTextElement(project::projectName, projectProperty.getName().toUtf8());
+    xmlWriter.writeTextElement(project::author, projectProperty.getAuthor().toUtf8());
+    xmlWriter.writeTextElement(project::createTime, projectProperty.getCreateTime().toString());
+    xmlWriter.writeTextElement(project::modifyTime, projectProperty.getModifyTime().toString());
+    return data;
+}
+
 void MainWindow::parseProjectXml(const QString &xml)
 {
     QXmlStreamReader reader(xml);
@@ -203,6 +244,18 @@ void MainWindow::parseProjectXml(const QString &xml)
         }
     }
     projectWidget->initProjectData(projectProperty);
+}
+
+QString MainWindow::pageToXml() const
+{
+    QString data;
+    QXmlStreamWriter xmlWriter(&data);
+    auto page = ui->graphicsView->getPageProperty();
+    QByteArray array;
+    QDataStream stream(&array, QIODevice::WriteOnly);
+    stream << page;
+    xmlWriter.writeCDATA(array.toHex());
+    return data;
 }
 
 void MainWindow::parsePageXml(const QString &xml)
@@ -383,6 +436,7 @@ void MainWindow::setMenuEvent()
     // 打开保存
     connect(ui->doOpen, SIGNAL(triggered(bool)), this, SLOT(doOpen()));
     connect(ui->doSave, SIGNAL(triggered(bool)), this, SLOT(doSave()));
+    connect(ui->doSaveAs, SIGNAL(triggered(bool)), this, SLOT(doSaveAs()));
     connect(ui->doExport, SIGNAL(triggered(bool)), this, SLOT(doExport()));
     // 编辑
     connect(ui->doCopy, SIGNAL(triggered(bool)), ui->graphicsView, SLOT(doCopy()));
@@ -726,109 +780,39 @@ void MainWindow::zoomMenuPopup()
 
 void MainWindow::doExit()
 {
-    QApplication::exit(0);
+    if (doc->checkSaveBeforeAction()) {
+        QApplication::exit(0);
+    }
 }
 
 void MainWindow::doSave()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("保存"), QDir::currentPath(), QString(tr("BI文件%1")).arg("(*.bi)"));
-    if (fileName.isEmpty()) {
-        return;
-    }
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly)) {
-        QMessageBox::information(this, tr("提示"), tr("打开文件错误，请重新保存。"));
-        return;
-    }
+    doc->save();
+}
 
-    QXmlStreamWriter xmlWriter(&file);
-    xmlWriter.writeStartDocument();
-    xmlWriter.writeStartElement(XmlTemplate::root);
-
-    xmlWriter.writeStartElement(XmlTemplate::project);
-    {
-        typedef XmlTemplate::projectTemplate project;
-        xmlWriter.writeTextElement(project::projectName, projectProperty.getName().toUtf8());
-        xmlWriter.writeTextElement(project::author, projectProperty.getAuthor().toUtf8());
-        xmlWriter.writeTextElement(project::createTime, projectProperty.getCreateTime().toString());
-        xmlWriter.writeTextElement(project::modifyTime, projectProperty.getModifyTime().toString());
-    }
-    xmlWriter.writeEndElement();
-
-
-    xmlWriter.writeStartElement(XmlTemplate::board);
-    {
-        auto page = ui->graphicsView->getPageProperty();
-        QByteArray data;
-        QDataStream stream(&data, QIODevice::WriteOnly);
-        stream << page;
-        xmlWriter.writeCDATA(data.toHex());
-    }
-    xmlWriter.writeEndElement();
-
-    xmlWriter.writeStartElement(XmlTemplate::shapes);
-    xmlWriter.writeCharacters("");
-    xmlWriter.device()->write(ui->graphicsView->toXml().toUtf8());
-    xmlWriter.writeEndElement();
-
-    xmlWriter.writeStartElement(XmlTemplate::animates);
-    xmlWriter.writeCharacters("");
-    xmlWriter.device()->write(AnimationFactory::instance()->toXml().toUtf8());
-    xmlWriter.writeEndElement();
-
-    xmlWriter.writeStartElement(XmlTemplate::dataSource);
-    xmlWriter.writeCharacters("");
-    xmlWriter.device()->write(DataActionManager::instance()->toXml().toUtf8());
-    xmlWriter.writeEndElement();
-
-    xmlWriter.writeEndElement();
-    xmlWriter.writeEndDocument();
-    file.close();
-
-    QMessageBox::information(this, tr("提示"), tr("文件保存成功"));
+void MainWindow::doSaveAs()
+{
+    doc->saveAs();
 }
 
 void MainWindow::doOpen()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("打开"), QDir::currentPath(), tr("BI文件(*.bi)"));
-    if (fileName.isEmpty()) {
+    if(!doc->open()){
         return;
     }
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::information(this, tr("提示"), QString(tr("打开文件错误。%1" )).arg(file.errorString()));
-        return;
-    }
-
-    QXmlStreamReader reader(&file);
-    while(!reader.atEnd()){
-        auto type = reader.readNext();
-        if (reader.hasError()) {
-            QMessageBox::information(this, tr("提示"), QString(tr("文件读取错误。%1" )).arg(reader.errorString()));
-            break;
-        }
-        if (type == QXmlStreamReader::StartDocument){
-
-        } else if (type == QXmlStreamReader::StartElement){
-            auto startName = reader.name();
-            if (startName.compare(XmlTemplate::project) == 0){
-                parseProjectXml(XmlHelper::rawText(&reader, false));
-            } else if (startName.compare(XmlTemplate::board) == 0){
-                parsePageXml(XmlHelper::rawText(&reader, false));
-            } else if (startName.compare(XmlTemplate::shapes) == 0){
-                ui->graphicsView->loadFromXml(XmlHelper::rawText(&reader, false));
-            } else if (startName.compare(XmlTemplate::animates) == 0){
-                AnimationFactory::instance()->parseXml(XmlHelper::rawText(&reader, false));
-            } else if (startName.compare(XmlTemplate::dataSource) == 0){
-                DataActionManager::instance()->parseXml(XmlHelper::rawText(&reader, false));
-            }
-        }
-    }
+    // 获取文档数据并解析
+    auto data = doc->getDoc();
+    parseProjectXml(data.project);
+    // 设置项目名称到数据操作管理器
     auto projectName = projectProperty.getName();
     if (!projectName.isEmpty()) {
         DataActionManager::instance()->setProjectName(projectName);
     }
-    file.close();
+    parsePageXml(data.page);
+    ui->graphicsView->loadFromXml(data.shapes);
+    AnimationFactory::instance()->parseXml(data.animates);
+    DataActionManager::instance()->parseXml(data.dataSource);
+    doc->clearDirty();
 }
 
 void MainWindow::doExport()
@@ -840,16 +824,17 @@ void MainWindow::doExport()
     if(dlg.exec()==QDialog::Accepted){
         if (dlg.fileType().compare("svg")==0){
             flag = ui->graphicsView->exportToSvg(dlg.selectedScope(),
-                                                 dlg.fileName(), dlg.imageSize());
+                                            dlg.fileName(), dlg.imageSize());
         }else{
             flag = ui->graphicsView->exportToImage(dlg.selectedScope(),
-                                                   dlg.fileName(),
-                                                   dlg.imageSize(),
-                                                   dlg.color(),
-                                                   dlg.quality());
+                                               dlg.fileName(),
+                                               dlg.imageSize(),
+                                               dlg.color(),
+                                               dlg.quality());
         }
         if (flag) {
-            QMessageBox::information(this, tr("提示"), QString(tr("导出成功，保存路径：%1")).arg(dlg.fileName()));
+            QMessageBox::information(this, tr("提示"),
+                        QString(tr("导出成功，保存路径：%1")).arg(dlg.fileName()));
         }else{
             QMessageBox::warning(this, tr("提示"), tr("导出失败！"));
         }
@@ -860,7 +845,6 @@ void MainWindow::doGroup()
 {
     ui->graphicsView->createGroup();
 }
-
 
 void MainWindow::doUngroup()
 {
@@ -987,6 +971,7 @@ void MainWindow::showRefLine(bool flag)
 void MainWindow::projectPropertyChanged(const ProjectProperty &project)
 {
     projectProperty = project;
+    doc->markDirty();
 }
 
 void MainWindow::pagePropertyChanged(const PageProperty &page)
@@ -994,6 +979,7 @@ void MainWindow::pagePropertyChanged(const PageProperty &page)
     ui->graphicsView->setPageProperty(page);
     QSignalBlocker blocker(ui->showViewGrid);
     ui->showViewGrid->setCheckable(page.getShowLine());
+    doc->markDirty();
 }
 
 void MainWindow::onAnimatePlay(bool flag)
@@ -1044,16 +1030,7 @@ void MainWindow::saveToLib()
 void MainWindow::showDataSource(bool flag)
 {
     if (dataSource.isNull()) {
-        dataSource = new DataSourceForm(this);
-        dataSource->setWindowFlag(Qt::Dialog);
-        dataSource->setWindowModality(Qt::WindowModality::ApplicationModal);
-        auto daManager = DataActionManager::instance();
-        connect(dataSource, &DataSourceForm::dataSourceChanged,
-                daManager, &DataActionManager::onDataSourceChanged);
-        connect(dataSource, &DataSourceForm::dataChanged,
-                daManager, &DataActionManager::onDataChanged);
-        connect(daManager, &DataActionManager::loadProjectData,
-                dataSource, &DataSourceForm::onLoadProjectData);
+        initDataSource();
     }
     dataSource->setVisible(!dataSource->isVisible());
 }
@@ -1090,4 +1067,19 @@ void MainWindow::initWebEngine()
     connect(page, &QWebEnginePage::loadFinished, this, [page]{
         page->deleteLater();
     });
+}
+
+void MainWindow::initDataSource()
+{
+    dataSource = new DataSourceForm(this);
+    dataSource->setWindowFlag(Qt::Dialog);
+    dataSource->setWindowModality(Qt::WindowModality::ApplicationModal);
+    dataSource->hide();
+    auto daManager = DataActionManager::instance();
+    connect(dataSource, &DataSourceForm::dataSourceChanged,
+            daManager, &DataActionManager::onDataSourceChanged);
+    connect(dataSource, &DataSourceForm::dataChanged,
+            daManager, &DataActionManager::onDataChanged);
+    connect(daManager, &DataActionManager::loadProjectData,
+            dataSource, &DataSourceForm::onLoadProjectData, Qt::QueuedConnection);
 }

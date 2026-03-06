@@ -66,6 +66,9 @@ bool DataSourceForm::event(QEvent *event)
     if (event->type() == QEvent::PaletteChange) {
         paletteCanged();
     }
+    if (event->type() == QEvent::Show) {
+        loadConfig();
+    }
     return QWidget::event(event);
 }
 
@@ -106,6 +109,7 @@ void DataSourceForm::onLoadProjectData(const QString &projectName, QList<DataMar
         qWarning() << __FUNCTION__ << projectName << "save failed!";
         return;
     }
+    bool flag{false};
     for (int i=0; i< dataList.count(); ++i) {
         auto& item = dataList[i];
         // 存储数据源
@@ -114,13 +118,23 @@ void DataSourceForm::onLoadProjectData(const QString &projectName, QList<DataMar
         auto oldSource = dataSourceService->list(QString("uuid='%1'").arg(uuid));
         if (oldSource.count() <= 0) {
             // 不存在此数据源
-            source.set_dataDirId(dir.get_id());
+            // 建立该数据源的目录
+            DataDirDO sourceDir;
+            sourceDir.set_parentId(dir.get_id());
+            sourceDir.set_name(source.getSourceName());
+            if (!dataDirService->save(&sourceDir)) {
+                qWarning() << __FUNCTION__ << "data source dir:" << source.getSourceName() << "save failed!";
+                continue;
+            }
+            // 存储数据源信息
+            source.set_dataDirId(sourceDir.get_id());
             if (!dataSourceService->save(&source)){
                 qWarning() << __FUNCTION__ << projectName
                            << "save data source failed:"
                            << source.getSourceName();
                 continue;
             }
+            flag = true;
         }else{
             // 此数据源已经存在
             if (source.get_id() != oldSource[0].get_id()){
@@ -145,8 +159,7 @@ void DataSourceForm::onLoadProjectData(const QString &projectName, QList<DataMar
         }
     }
     // 判断新建的 dir下面是否有数据，如果没有，删除该dir
-    auto childs = dataSourceService->list(QString("data_dir_id=%1").arg(dir.get_id()));
-    if (childs.count() <= 0) {
+    if (!flag) {
         // 删除该dir
         dataDirService->deleteById(dir);
     }
@@ -537,7 +550,7 @@ void DataSourceForm::loadConfig()
 {
     getDataSourceMap();
     auto rootItems = getDataDir(-1);
-
+    ui->dataDir->clear();
     foreach (auto item, rootItems) {
         item.setDataSource(sourceMap[item.get_id()]);
         ui->dataDir->addTopLevelItem(newTreeItem(item));

@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QMutex>
+#include <QTranslator>
 
 QtMessageHandler originalHandler = nullptr;
 // 全局互斥锁：保证多线程写日志时不冲突
@@ -67,6 +68,12 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
     QApplication a(argc, argv);
+
+    QTranslator translator;
+    if (translator.load("dashboard_zh_CN.ts")){
+        a.installTranslator(&translator);
+    }
+
     MainWindow w;
     w.show();
     return a.exec();
