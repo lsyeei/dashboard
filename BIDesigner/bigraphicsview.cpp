@@ -110,7 +110,8 @@ void BIGraphicsView::createGroup()
     }
     GraphicsItemGroup *group = new GraphicsItemGroup();
     biScene->setItemName(group, tr("组合图"));
-    connect(group, SIGNAL(undoEvent(QString,QVariant,QVariant)), this, SLOT(undoEventProcessor(QString,QVariant,QVariant)));
+    connect(group, SIGNAL(undoEvent(QString,QVariant,QVariant)),
+            this, SLOT(undoEventProcessor(QString,QVariant,QVariant)));
     QList<QGraphicsItem*> groupInfo;
     groupInfo << group << groupItems;
     // 创建可撤销命令
@@ -919,6 +920,11 @@ void BIGraphicsView::graphicItemChangedHandler(IGraphicPlugin *graphicItem)
 
 void BIGraphicsView::undoEventProcessor(const QString &text, QVariant undoData, QVariant redoData)
 {
+    // 判断自身是否为激活视图
+    if (!isActiveWindow()) {
+        return;
+    }
+
     UndoObject *obj = dynamic_cast<UndoObject *>(sender());
     if (obj) {
         BIUndoCommand *command = new BIUndoCommand(obj, undoData, redoData, text);

@@ -551,6 +551,10 @@ void MainWindow::initAnimateForm()
     ui->propertyWidget->setTabVisible(index, false);
     // animationForm->setDisabled(true);
     AnimationFactory::instance()->bindScene(scene);
+
+    // 连接 AnimationForm 的 undoEvent 信号到 graphicsView 的处理器
+    connect(animationForm, &AnimationForm::undoEvent,
+            ui->graphicsView, &BIGraphicsView::undoEventProcessor);
 }
 
 void MainWindow::initDataPropertyForm()

@@ -15,15 +15,18 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 #include "animationfactory.h"
 #include "animationform.h"
+#include "undoobject.h"
 #include "bigraphicsscene.h"
 #include "bigraphicsview.h"
 #include "graphicrootwidget.h"
 #include "ui_animationform.h"
 
+#include <QCborMap>
 #include <QMenu>
+#include <QSignalBlocker>
+#include <QTabWidget>
 #include "icustomgraphic.h"
 #include <animation/path/movepathfactory.h>
 #include "animation/abstractparamwidget.h"
@@ -39,6 +42,229 @@ AnimationForm::AnimationForm(QWidget *parent)
 AnimationForm::~AnimationForm()
 {
     delete ui;
+}
+
+void AnimationForm::undoTrigger(QString text, QList<UndoAction> actions)
+{
+    QList<QPair<QString, QVariant>> undoAction;
+    QList<QPair<QString, QVariant>> redoAction;
+
+    auto count = actions.count();
+    for(int i = 0; i<count; ++i){
+        undoAction.append({actions[count - i - 1].id, actions[count - i - 1].undoData});
+        redoAction.append({actions[i].id, actions[i].redoData});
+    }
+
+    // 统一携带graphic
+    QVariantList undoObj, redoObj;
+    undoObj << QVariant::fromValue(graphicItem) << QVariant::fromValue(undoAction);
+    redoObj << QVariant::fromValue(graphicItem) << QVariant::fromValue(redoAction);
+    static const QMetaMethod undoSignal = QMetaMethod::fromSignal(&AnimationForm::undoEvent);
+    if (isSignalConnected(undoSignal)) {
+        emit undoEvent(text, undoObj, redoObj);
+    } else {
+        parseUndoAction(redoObj, false);
+    }
+}
+
+int AnimationForm::groupId2ComboIndex(int groupId)
+{
+    for (int i = 0; i < ui->groupCombo->count(); ++i) {
+        if (ui->groupCombo->itemData(i).toInt() == groupId) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void AnimationForm::parseUndoAction(QVariant undoData, bool isUndo)
+{
+    auto list = undoData.toList();
+    if (list.count() < 2) {
+        return;
+    }
+    auto item = list[0].value<ICustomGraphic*>();
+    if (item == nullptr) {
+        return;  // 安全检查
+    }
+    graphicItem = item;
+    item->setSelected(true);
+    // 切换到本窗口
+    auto parent = parentWidget()->parentWidget();
+    if (parent) {
+        auto tab = dynamic_cast<QTabWidget*>(parent);
+        if (tab) {
+            tab->setCurrentWidget(this);
+        }
+    }
+
+    auto data = list[1].value<QList<QPair<QString, QVariant>>>();
+
+    foreach (auto command, data) {
+        commonAction(command.first, command.second, isUndo);
+    }
+}
+
+void AnimationForm::commonAction(QString action, QVariant data, bool isUndo)
+{
+    if (action == "addGroup") {
+        auto list = data.toList();
+        if (list.count() < 2) {
+            return;
+        }
+        int groupId = list[0].toInt();
+        QString groupName = list[1].toString();
+        int index{-1};
+        ui->groupCombo->blockSignals(true);
+        if (isUndo) {
+            // undo: 数据层 + UI 层
+            AnimationFactory::instance()->removeGroup(graphicItem, groupId);
+
+            // UI 操作：找到并删除 groupCombo 中的项
+            int comboIndex = groupId2ComboIndex(groupId);
+            if (comboIndex >= 0) {
+                ui->groupCombo->removeItem(comboIndex);
+            }
+        } else {
+            // redo: 数据层 + UI 层
+            AnimationFactory::instance()->addGroup(graphicItem, groupId, groupName);
+
+            // UI 操作：重新添加到 groupCombo
+            ui->groupCombo->addItem(groupName, groupId);
+        }
+        // 选中最后一项
+        index = ui->groupCombo->count() - 1;
+        ui->groupCombo->setCurrentItem(index);
+        ui->groupCombo->blockSignals(false);
+        onGroupChanged(index);
+
+    } else if (action == "removeGroup") {
+        ui->groupCombo->blockSignals(true);
+        if (isUndo) {
+            // undo: 数据层 + UI 层
+            auto group = data.value<AnimationGroup>();
+            AnimationFactory::instance()->addGroup(graphicItem, group.getId(), group.getName());
+            AnimationFactory::instance()->updateAnimate(graphicItem, group.getId(),
+                                                        group.getAnimationList());
+            AnimationFactory::instance()->enableGroup(graphicItem, group.getId(), group.getEnable());
+
+            // UI 操作：重新添加到 groupCombo
+            ui->groupCombo->addItem(group.getName(), group.getId());
+            ui->groupCombo->setCurrentItem(ui->groupCombo->count() - 1);
+
+        } else {
+            // redo: 数据层 + UI 层
+            auto groupId = data.toInt();
+            AnimationFactory::instance()->removeGroup(graphicItem, groupId);
+
+            // UI 操作：从 groupCombo 删除
+            int comboIndex = groupId2ComboIndex(groupId);
+            if (comboIndex >= 0) {
+                ui->groupCombo->removeItem(comboIndex);
+                // 清空动画列表
+                ui->animationView->clear();
+            }
+            ui->groupCombo->setCurrentItem(ui->groupCombo->count() - 1);
+        }
+        ui->groupCombo->blockSignals(false);
+        onGroupChanged(ui->groupCombo->currentIndex());
+
+    } else if (action == "modifyGroup") {
+        auto list = data.toList();
+        if (list.count() < 3) {
+            return;
+        }
+        int groupId = list[0].toInt();
+        QString name = list[1].toString();
+        bool enable = list[2].toBool();
+
+        // 数据层
+        AnimationFactory::instance()->modifyGroupName(graphicItem, groupId, name);
+        AnimationFactory::instance()->enableGroup(graphicItem, groupId, enable);
+
+        // UI 操作：修改 groupCombo 的文本
+        QSignalBlocker radio1(ui->enableRadio);
+        QSignalBlocker radio2(ui->disableRadio);
+        ui->enableRadio->setChecked(enable);
+        ui->disableRadio->setChecked(!enable);
+        int comboIndex = groupId2ComboIndex(groupId);
+        if (comboIndex >= 0) {
+            QSignalBlocker blocker(ui->groupCombo);
+            ui->groupCombo->setCurrentItem(comboIndex);
+            ui->groupCombo->setItemText(comboIndex, name);
+        }
+
+    } else if (action == "addAnimate") {
+        auto list = data.toList();
+        if (list.count() < 2) {
+            return;
+        }
+        auto group = list[0].value<AnimationGroup>();
+        auto index = list[1].toInt();
+        AnimationFactory::instance()->updateAnimate(graphicItem, group.getId(), group.getAnimationList());
+
+        ui->animationView->blockSignals(true);
+        ui->animationView->clear();
+        auto actions = group.getAnimationList();
+        foreach (auto act, actions) {
+            addAnimateItem(act);
+        }
+        if (!isUndo) {
+            index = ui->animationView->itemCount() - 1;
+        }
+        ui->animationView->blockSignals(false);
+        ui->animationView->setCurrentItemIndex(index);
+        ui->playBtn->setEnabled(ui->animationView->itemCount() > 0);
+
+    } else if (action == "removeAnimate") {
+        auto list = data.toList();
+        if (list.count() < 2) {
+            return;
+        }
+        auto group = list[0].value<AnimationGroup>();
+        auto index = list[1].toInt();
+
+        // 数据层
+        AnimationFactory::instance()->updateAnimate(graphicItem, group.getId(), group.getAnimationList());
+
+        // UI 操作
+        ui->animationView->blockSignals(true);
+        ui->animationView->clear();
+        auto actions = group.getAnimationList();
+        foreach (auto act, actions) {
+            addAnimateItem(act);
+        }
+        ui->animationView->blockSignals(false);
+        ui->animationView->setCurrentItemIndex(index);
+        ui->playBtn->setEnabled(ui->animationView->itemCount() > 0);
+
+    } else if (action == "updateAnimateParam") {
+        auto list = data.toList();
+        if (list.count() < 3) {
+            return;
+        }
+        int groupId = list[0].toInt();
+        auto index = list[1].toInt();
+        auto param = list[2].value<AnimationParam>();
+
+        // 数据层
+        AnimationFactory::instance()->updateAnimateParam(graphicItem, groupId, index, param);
+
+        // UI 操作：更新 animationView
+        ui->animationView->setAnimationParam(index, param);
+        ui->animationView->setCurrentItemIndex(index);
+        onAnimateSelectChanged(-1, index);
+    }
+}
+
+void AnimationForm::undo(QVariant undoData)
+{
+    parseUndoAction(undoData, true);
+}
+
+void AnimationForm::redo(QVariant redoData)
+{
+    parseUndoAction(redoData, false);
 }
 
 void AnimationForm::setGraphicItem(ICustomGraphic *item)
@@ -104,26 +330,51 @@ void AnimationForm::onAnimationMenuSelected()
     if (obj == nullptr) {
         return;
     }
+    bool firstGroup{false};
     if (ui->groupCombo->count() <= 0) {
         // 首次添加动画，自动添加一个分组
-        QSignalBlocker blocker{ui->groupCombo};
         QString groupName{tr("默认")};
         auto groupId = AnimationFactory::instance()->addGroup(graphicItem, groupName);
         if (groupId < 0) {
             return;
         }
+        QSignalBlocker blocker(ui->groupCombo);
         ui->groupCombo->addItem(groupName, groupId);
+        firstGroup = true;
     }
     graphicItem->setSelected(true);
+    QSignalBlocker blocker(ui->groupCombo);
+    auto groupId = ui->groupCombo->currentData().toInt();
     auto typeId = obj->property("id").toString();
     auto type = AnimationFactory::instance()->getAnimateType(typeId);
     if (type) {
         auto widget = type->paramWidget();
         widget->initWidget();
-        if(addAnimateItem(widget->getParam())){
-            widget->show();
-            ui->property->show();
+        // record undo
+        auto oldIndex = ui->animationView->currentItemIndex();
+        auto oldGroup = AnimationFactory::instance()->getGroup(graphicItem, groupId);
+        auto list = oldGroup.getAnimationList();
+        auto newParam = widget->getParam();
+        list << newParam;
+        AnimationGroup newGroup{groupId, oldGroup.getName(), oldGroup.getEnable()};
+        newGroup.setAnimationList(list);
+        QVariantList undoObj, redoObj;
+        undoObj << QVariant::fromValue(oldGroup) << oldIndex;
+        redoObj << QVariant::fromValue(newGroup) << -1;
+        if (firstGroup) {
+            ui->groupCombo->removeItem(ui->groupCombo->currentIndex());
+            QVariantList groupObj;
+            groupObj << groupId << oldGroup.getName();
+            undoTrigger(tr("添加动画"), {{"addGroup", groupObj, groupObj},
+                                         {"addAnimate", undoObj, redoObj}});
+        }else{
+            undoTrigger(tr("添加动画"), {{"addAnimate", undoObj, redoObj}});
         }
+    }else if (firstGroup) {
+        ui->groupCombo->removeItem(ui->groupCombo->currentIndex());
+        QVariantList groupObj;
+        groupObj << groupId << ui->groupCombo->itemText(ui->groupCombo->currentIndex());
+        undoTrigger(tr("添加组"), {{"addGroup", groupObj, groupObj}});
     }
 }
 
@@ -138,16 +389,25 @@ void AnimationForm::onRemoveAnimate()
         return;
     }
     auto groupId = ui->groupCombo->itemData(i).toInt();
-    auto param = ui->animationView->getItem(index).params;
-    auto type = AnimationFactory::instance()->getAnimateType(param.getTypeId());
-    if (type) {
-        type->paramWidget()->hide();
-    }
+    // auto param = ui->animationView->getItem(index).params;
+    // auto type = AnimationFactory::instance()->getAnimateType(param.getTypeId());
+    // if (type) {
+    //     type->paramWidget()->hide();
+    // }
+
+    // undoTrigger 前调用 getGroup 获取旧数据
+    QVariantList undoObj, redoObj;
+    auto group = AnimationFactory::instance()->getGroup(graphicItem, groupId);
+    AnimationGroup newGroup{groupId, group.getName(), group.getEnable()};
     ui->animationView->removeItem(index);
-    // 删除动画数据
-    AnimationFactory::instance()->updateAnimate(graphicItem, groupId,
-                                                ui->animationView->getAllAnimationParams());
-    ui->playBtn->setEnabled(ui->animationView->itemCount() > 0);
+    newGroup.setAnimationList(ui->animationView->getAllAnimationParams());
+    undoObj << QVariant::fromValue(group) << index;
+    redoObj << QVariant::fromValue(newGroup) << -1;
+
+    // 触发 undo 事件（只保存数据层）
+    undoTrigger("删除动画", {{"removeAnimate", undoObj, redoObj}});
+
+    // ui->playBtn->setEnabled(ui->animationView->itemCount() > 0);
 }
 
 void AnimationForm::onPlay()
@@ -186,10 +446,11 @@ void AnimationForm::onPlayEnd()
 
 void AnimationForm::onAnimateSelectChanged(int oldIndex, int newIndex)
 {
+    Q_UNUSED(oldIndex)
     // 使能移除按钮
     ui->removeBtn->setEnabled(newIndex >= 0);
     showProperty(nullptr);
-    if (newIndex < 0) {
+    if (newIndex < 0 || ui->animationView->itemCount() <= 0) {
         return;
     }
     auto param = ui->animationView->getItem(newIndex).params;
@@ -217,10 +478,16 @@ void AnimationForm::onAnimateParamChanged()
         return;
     }
     auto param = widget->getParam();
-
+    auto oldParams = ui->animationView->getItem(index).params;
     if (ui->animationView->setAnimationParam(index, param)){
-        // 更新图元动画参数
-        AnimationFactory::instance()->updateAnimate(graphicItem, groupId, ui->animationView->getAllAnimationParams());
+
+        // undoTrigger 前调用 getGroup 获取旧数据
+        QVariantList undoObj, redoObj;
+        undoObj << groupId << index << QVariant::fromValue(oldParams);
+        redoObj << groupId << index << QVariant::fromValue(param);
+
+        // 触发 undo 事件（只保存数据层）
+        undoTrigger("更新动画", {{"updateAnimateParam", undoObj, redoObj}});
     }else{
         // 重新显示原参数
         onAnimateSelectChanged(index, index);
@@ -233,15 +500,24 @@ void AnimationForm::onAddGroup(int index)
     if (groupName.isEmpty()) {
         QMessageBox::information(this, tr("提示"), tr("组名称不能为空！"));
         ui->groupCombo->setFocus();
+        return;
     }
-    auto id = AnimationFactory::instance()->addGroup(graphicItem, groupName);
-    if (id >= 0) {
-        ui->groupCombo->setItemData(index, id);
-        ui->animationView->clear();
-    }else{
+
+    // 先调用 addGroup 获取 groupId
+    int id = AnimationFactory::instance()->addGroup(graphicItem, groupName);
+    if (id < 0) {
         QMessageBox::information(this, tr("提示"), tr("新建组失败！"));
         ui->groupCombo->setFocus();
+        return;
     }
+
+    // ui->groupCombo->setItemData(index, id);
+    QSignalBlocker blocker(ui->groupCombo);
+    ui->groupCombo->removeItem(ui->groupCombo->currentIndex());
+    QVariantList redoObj;
+    redoObj << id << groupName;
+    // 触发 undo 事件（只保存数据层）
+    undoTrigger("添加动画组", {{"addGroup", redoObj, redoObj}});
 }
 
 void AnimationForm::onRemoveGroup(const QString &name, QVariant data)
@@ -250,19 +526,25 @@ void AnimationForm::onRemoveGroup(const QString &name, QVariant data)
         QMessageBox::information(this, tr("提示"), name + tr("删除失败！"));
         return;
     }
+
+    int groupId = data.toInt();
+
+    QSignalBlocker bolcker(ui->groupCombo);
+    ui->groupCombo->addItem(name, groupId);
+    ui->groupCombo->setCurrentItem(ui->groupCombo->count() - 1);
+    onGroupChanged(ui->groupCombo->currentIndex());
     auto btn = QMessageBox::question(this, tr("提示"),
                 QString(tr("确定要删除[%1]么，该组下的所有动画将同时删除").arg(name)));
     if (btn == QMessageBox::No) {
-        ui->groupCombo->addItem(name, data);
-        ui->groupCombo->setCurrentItem(ui->groupCombo->count() - 1);
         return;
     }
-    int groupId = data.toInt();
-    if (AnimationFactory::instance()->removeGroup(graphicItem, groupId)){
-        ui->animationView->clear();
-    }else{
-        QMessageBox::information(this, tr("提示"), name + tr("删除失败！"));
-    }
+
+    // undoTrigger 前获取完整数据
+    auto group = AnimationFactory::instance()->getGroup(graphicItem, groupId);
+
+    // 触发 undo 事件（只保存数据层：完整 AnimationGroup + groupId）
+    undoTrigger(tr("删除动画组"), {{"removeGroup",
+        QVariant::fromValue(group), groupId}});
 }
 
 void AnimationForm::onModifyGroup(int index)
@@ -273,8 +555,14 @@ void AnimationForm::onModifyGroup(int index)
     auto groupName = ui->groupCombo->itemText(index).trimmed();
     auto groupId = ui->groupCombo->itemData(index).toInt();
     bool flag = ui->enableRadio->isChecked();
-    AnimationFactory::instance()->modifyGroupName(graphicItem, groupId, groupName);
-    AnimationFactory::instance()->enableGroup(graphicItem, groupId, flag);
+
+    // undoTrigger 前调用 getGroup 获取旧数据
+    QVariantList undoObj, redoObj;
+    auto group = AnimationFactory::instance()->getGroup(graphicItem, groupId);
+    undoObj << groupId << group.getName() << group.getEnable();
+    redoObj << groupId << groupName << flag;
+    // 触发 undo 事件
+    undoTrigger("修改组", {{"modifyGroup", undoObj, redoObj}});
 }
 
 void AnimationForm::onGroupChanged(int index)
@@ -383,14 +671,10 @@ bool AnimationForm::addAnimateItem(const AnimationParam &param)
         minDelay += param.getDelay();
         newParam.setDelay(minDelay);
     }
-    // 添加新动画
+    // 添加动画到视图
     auto type = AnimationFactory::instance()->getAnimateType(param.getTypeId());
     AnimationItem item{type->getIcon(), type->getName(), newParam};
-    if (ui->animationView->addItem(item)){
-        // 更新图元动画参数
-        AnimationFactory::instance()->updateAnimate(graphicItem, groupId,
-                                                    ui->animationView->getAllAnimationParams());
-    }
+    ui->animationView->addItem(item);
     ui->playBtn->setEnabled(ui->animationView->itemCount() > 0);
     return true;
 }
@@ -408,4 +692,18 @@ void AnimationForm::showProperty(QWidget *widget)
     if (widget){
         widget->show();
     }
+}
+
+AbstractParamWidget* AnimationForm::currentPropertyWidget(){
+    AbstractParamWidget *widget{nullptr};
+    auto layout = ui->property->layout();
+    auto count = layout->count();
+    for (int i = 0; i < count; ++i) {
+        auto item = layout->itemAt(i)->widget();
+        if (item->isVisible()) {
+            widget = dynamic_cast<AbstractParamWidget*>(item);
+            break;
+        }
+    }
+    return widget;
 }

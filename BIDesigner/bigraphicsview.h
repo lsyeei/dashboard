@@ -137,6 +137,8 @@ public Q_SLOTS:
     void doCut();
     void doPast();
     void doDelete();
+    // UndoObject interface
+    void undoEventProcessor(const QString &text, QVariant oldData, QVariant newData);
 protected:
     // QWidget interface
     void mousePressEvent(QMouseEvent *event) override;
@@ -161,8 +163,6 @@ protected Q_SLOTS:
      * @param graphicItem 当前使用的图元
      */
     void graphicItemChangedHandler(IGraphicPlugin *graphicItem);
-    // UndoObject interface
-    void undoEventProcessor(const QString &text, QVariant oldData, QVariant newData);
 private:
     // 标尺
     QScopedPointer<RulerWidget> ruler;

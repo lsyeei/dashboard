@@ -98,6 +98,14 @@ public:
      */
     int addGroup(QGraphicsItem *graphic, const QString &groupName);
     /**
+     * @brief addGroup 向指定图元添加一个动画组，默认启用该组
+     * @param graphic 图元对象
+     * @param groupId 指定组ID
+     * @param groupName 动画组名称
+     * @return true 成功，false 失败，group ID已存在
+     */
+    bool addGroup(QGraphicsItem *graphic, int groupId, const QString &groupName);
+    /**
      * @brief removeGroup 删除一组动画
      * @param graphic 图元对象
      * @param groupId 组ID
@@ -126,6 +134,14 @@ public:
      * @param animates 动画参数列表
      */
     void updateAnimate(QGraphicsItem * graphic, int groupId, const QList<AnimationParam> animates);
+    /**
+     * @brief updateAnimateParam 更新动画指定数据
+     * @param graphic 图元对象
+     * @param groupId 动画组ID
+     * @param index 动画索引
+     * @param param 动画参数
+     */
+    void updateAnimateParam(QGraphicsItem * graphic, int groupId, int index, const AnimationParam &param);
     /**
      * @brief animateTypeList 获取支持的动画类型列表
      * @return 动画类型列表

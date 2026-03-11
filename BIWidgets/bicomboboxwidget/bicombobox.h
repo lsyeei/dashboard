@@ -43,6 +43,7 @@ public:
     QVariant currentData(int role = Qt::UserRole);
     void setCurrentItem(int index);
     QString itemText(int index);
+    void setItemText(int index, const QString &text);
     QVariant itemData(int index, int role = Qt::UserRole);
     void setItemData(int index, QVariant data, int role = Qt::UserRole);
     void addItem(QString name, QVariant data);

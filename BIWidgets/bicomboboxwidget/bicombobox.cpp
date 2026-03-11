@@ -70,6 +70,11 @@ QString BIComboBox::itemText(int index)
     return ui->comboBox->itemText(index);
 }
 
+void BIComboBox::setItemText(int index, const QString &text)
+{
+    ui->comboBox->setItemText(index, text);
+}
+
 QVariant BIComboBox::itemData(int index, int role)
 {
     return ui->comboBox->itemData(index, role);

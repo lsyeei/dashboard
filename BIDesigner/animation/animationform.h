@@ -20,6 +20,7 @@
 #define ANIMATIONFORM_H
 
 #include "animationParam.h"
+#include "undoobject.h"
 #include <QWidget>
 #include <QAbstractAnimation>
 #include <QPointer>
@@ -30,7 +31,7 @@ namespace Ui {
 class AnimationForm;
 }
 
-class AnimationForm : public QWidget
+class AnimationForm : public QWidget, public UndoObject
 {
     Q_OBJECT
 
@@ -38,7 +39,13 @@ public:
     explicit AnimationForm(QWidget *parent = nullptr);
     ~AnimationForm();
     void setGraphicItem(ICustomGraphic *item);
+    
+    // UndoObject 接口实现
+    void undo(QVariant undoData) override;
+    void redo(QVariant redoData) override;
+
 Q_SIGNALS:
+    void undoEvent(const QString &text, QVariant undoData, QVariant redoData) override;
     void playEvent(bool playing);
 protected Q_SLOTS:
     void onAnimationMenuSelected();
@@ -79,6 +86,19 @@ private:
      * @param widget 指定的属性
      */
     void showProperty(QWidget *widget);
+    AbstractParamWidget* currentPropertyWidget();
+    
+    // UndoObject 辅助方法
+    void undoTrigger(QString text, QList<UndoAction> actions);
+    void parseUndoAction(QVariant undoData, bool isUndo);
+    /**
+     * @brief 普通的撤销命令
+     * @param action 命令动作名词
+     * @param data 数据
+     * @param isUndo true 执行撤销，false 执行redo
+     */
+    void commonAction(QString action, QVariant data, bool isUndo = true);
+    int groupId2ComboIndex(int groupId);
 };
 
 #endif // ANIMATIONFORM_H

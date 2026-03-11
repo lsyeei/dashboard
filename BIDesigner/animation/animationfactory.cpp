@@ -315,6 +315,17 @@ int AnimationFactory::addGroup(QGraphicsItem *graphic, const QString &groupName)
 
 }
 
+bool AnimationFactory::addGroup(QGraphicsItem *graphic, int groupId, const QString &groupName)
+{
+    auto group = getGroup(graphic, groupId);
+    if (!group.isEmpty()) {
+        return false;
+    }
+    auto graphicId = scene->getItemId(graphic);
+    animations[graphicId] << AnimationGroup{groupId, groupName.trimmed()};
+    return true;
+}
+
 bool AnimationFactory::removeGroup(QGraphicsItem *graphic, int groupId)
 {
     if (graphic == nullptr || groupId < 0) {
@@ -379,6 +390,26 @@ void AnimationFactory::updateAnimate(QGraphicsItem *graphic, int groupId, const 
                 return;
             }
             group.setAnimationList(animates);
+            break;
+        }
+    }
+}
+
+void AnimationFactory::updateAnimateParam(QGraphicsItem *graphic, int groupId, int index, const AnimationParam &param)
+{
+    if (graphic == nullptr || groupId < 0 || index < 0){
+        return;
+    }
+    auto id = scene->getItemId(graphic);
+    if (id.isEmpty()) {
+        return;
+    }
+    for (int i=0;i< animations[id].count();++i) {
+        auto& group = animations[id][i];
+        if (groupId == group.getId()) {
+            auto list = group.getAnimationList();
+            list[index] = param;
+            group.setAnimationList(list);
             break;
         }
     }

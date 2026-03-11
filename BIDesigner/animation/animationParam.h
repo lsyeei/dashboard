@@ -19,8 +19,12 @@
 #ifndef ANIMATIONPARAM_H
 #define ANIMATIONPARAM_H
 
+#define EASY_JSON_DEFAULT
 #include "animateType.h"
 #include "serializable.h"
+
+#include <EASYJSON.h>
+#include <QJsonArray>
 
 class AnimationParam : public Serializable
 {
@@ -64,6 +68,32 @@ public:
     AnimationGroup(int groupId, const QString &groupName, bool enableFlag=true)
         : id(groupId), name(groupName), enable(enableFlag){}
     void clearAnimation(){animationList.clear();}
+    bool isEmpty(){return id < 0 && name.isEmpty();}
+    QJsonObject toJsonObject(){
+        QJsonObject obj;
+        obj["Id"] = id;
+        obj["Name"] = name;
+        obj["Enable"] = enable;
+        QJsonArray array;
+        foreach (auto item, animationList) {
+            array << EASYJSON->toJson(item);
+        }
+        obj["AnimationList"] = array;
+        return obj;
+    }
+    static AnimationGroup fromJson(const QJsonObject &obj){
+        AnimationGroup group;
+        group.setId(obj["Id"].toInt());
+        group.setName(obj["Name"].toString());
+        group.setEnable(obj["Enable"].toBool());
+        auto array = obj["AnimationList"].toArray();
+         QList<AnimationParam> animationList;
+        foreach (auto item, array) {
+            animationList << EASYJSON->parseObject<AnimationParam>(item.toObject());
+        }
+        group.setAnimationList(animationList);
+        return group;
+    }
 private:
     // 组 ID
     int id;

@@ -21,6 +21,15 @@
 
 #include <QVariant>
 
+struct UndoAction{
+    // 动作标识
+    QString id;
+    // undo 数据
+    QVariant undoData;
+    // redo 数据
+    QVariant redoData;
+};
+
 class UndoObject
 {
 public:
