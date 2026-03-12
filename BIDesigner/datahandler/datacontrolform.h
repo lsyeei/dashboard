@@ -38,6 +38,11 @@ public:
     ~DataControlForm();
     void setGraphicsItem(QGraphicsItem *item);
     void setData(QVariant action);
+    // /**
+    //  * @brief updateData 更新数据，不重置UI
+    //  * @param action 数据
+    //  */
+    // void updateData(QVariant action);
     ControlAction getData(){return controlAction;}
     /**
      * @brief reset 重置UI控件

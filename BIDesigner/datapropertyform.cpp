@@ -48,6 +48,7 @@ void DataPropertyForm::setGraphicItem(ICustomGraphic *item)
     if (graphicScene == nullptr) {
         return;
     }
+    graphicItem = item;
     dataEditor->setGraphicsItem(item);
     graphicId = graphicScene->getItemId(item);
     QSignalBlocker tableBlocker(ui->dataTable);
@@ -66,6 +67,16 @@ void DataPropertyForm::setGraphicItem(ICustomGraphic *item)
         addTableItem(data);
     }
     ui->dataTable->clearSelection();
+}
+
+void DataPropertyForm::undo(QVariant undoData)
+{
+    parseUndoAction(undoData, true);
+}
+
+void DataPropertyForm::redo(QVariant redoData)
+{
+    parseUndoAction(redoData, false);
 }
 
 void DataPropertyForm::onNewDataProperty()
@@ -96,14 +107,15 @@ void DataPropertyForm::onDelDataProperty()
         return;
     }
     auto item = ui->dataTable->item(row, 0);
-    auto data = item->data(DATA_ROLE).value<DataAction>();
-    DataActionManager::instance()->removeDataAction(data);
-    ui->dataTable->removeRow(row);
+    QVariantList undoData;
+    undoData << row << item->data(DATA_ROLE);
+    undoTrigger(tr("删除数据"),{{"removeData", undoData, undoData}});
 }
 
 void DataPropertyForm::onDataChanged(DataAction action)
 {
     action.setGraphicId(graphicId);
+    QVariant undoData, redoData;
     if (newFlag) {
         // 添加数据
         auto old = DataActionManager::instance()->getDataAction(graphicId, action.getDataId());
@@ -114,13 +126,9 @@ void DataPropertyForm::onDataChanged(DataAction action)
             dataEditor->reset();
             return;
         }
-        addTableItem(action);
-        ui->dataTable->blockSignals(true);
-        auto index = ui->dataTable->rowCount() - 1;
-        ui->dataTable->selectRow(index);
-        ui->dataTable->setCurrentItem(ui->dataTable->item(index,0));
-        ui->dataTable->blockSignals(false);
         newFlag = false;
+        undoData = QVariant::fromValue(action);
+        undoTrigger(tr("添加数据"), {{"addData", undoData, undoData}});
     }else{
         // 修改数据
         auto row = ui->dataTable->currentRow();
@@ -128,6 +136,7 @@ void DataPropertyForm::onDataChanged(DataAction action)
             return;
         }
         auto item = ui->dataTable->item(row, 0);
+        UndoAction delAction;
         // 检查数据是否变更
         auto oldData = item->data(DATA_ROLE).value<DataAction>();
         auto oldId = oldData.getDataId();
@@ -137,7 +146,9 @@ void DataPropertyForm::onDataChanged(DataAction action)
             auto newAction = DataActionManager::instance()->getDataAction(graphicId, newId);
             if (newAction.getDataId().isEmpty()) {
                 // 删除旧数据
-                DataActionManager::instance()->removeDataAction(graphicId, oldId);
+                delAction.id = "clearData";
+                delAction.redoData = QVariant::fromValue(oldData);
+                delAction.undoData = delAction.redoData;
             }else{
                 QMessageBox::warning(this, tr("警告"),
                                      QString(tr("数据[%1]已经存在，不能重复添加！"))
@@ -145,19 +156,15 @@ void DataPropertyForm::onDataChanged(DataAction action)
                 return;
             }
         }
-        auto data = action.getData();
-        auto dataName = data.get_dataName();
-        QString trigger = action.typeToString();
-        QString actionDetail = action.actionToString();
-        item->setData(DATA_ROLE,QVariant::fromValue(action));
-        item->setText(dataName);
-        item = ui->dataTable->item(row, 1);
-        item->setText(trigger);
-        item = ui->dataTable->item(row, 2);
-        item->setText(actionDetail);
+        QVariantList undoList, redoList;
+        undoList << newId << item->data(DATA_ROLE);
+        redoList << oldId << QVariant::fromValue(action);
+        if (delAction.id.isEmpty()) {
+            undoTrigger(tr("修改数据"), {{"modifyData", undoList, redoList}});
+        }else{
+            undoTrigger(tr("修改数据"), {delAction, {"modifyData", undoList, redoList}});
+        }
     }
-    // 数据更新到 manager
-    DataActionManager::instance()->updateDataAction(action);
 }
 
 void DataPropertyForm::initUI()
@@ -188,17 +195,171 @@ void DataPropertyForm::initUI()
             this, &DataPropertyForm::onDataChanged);
 }
 
-void DataPropertyForm::addTableItem(DataAction action)
+void DataPropertyForm::addTableItem(DataAction action, int beforeIndex)
 {
     auto data = action.getData();
     auto dataName = data.get_dataName();
     QString trigger = action.typeToString();
     QString actionDetail = action.actionToString();
-    auto index = ui->dataTable->rowCount();
+    auto index = beforeIndex;
+    if (index < 0) {
+        index = ui->dataTable->rowCount();
+    }
+
     ui->dataTable->insertRow(index);
     auto item = new QTableWidgetItem(dataName);
     item->setData(DATA_ROLE,QVariant::fromValue(action));
     ui->dataTable->setItem(index, 0, item);
     ui->dataTable->setItem(index, 1, new QTableWidgetItem{trigger});
     ui->dataTable->setItem(index, 2, new QTableWidgetItem{actionDetail});
+}
+
+void DataPropertyForm::undoTrigger(QString text, QList<UndoAction> actions)
+{
+    QList<QPair<QString, QVariant>> undoAction;
+    QList<QPair<QString, QVariant>> redoAction;
+
+    auto count = actions.count();
+    for(int i = 0; i<count; ++i){
+        undoAction.append({actions[count - i - 1].id, actions[count - i - 1].undoData});
+        redoAction.append({actions[i].id, actions[i].redoData});
+    }
+
+    // 统一携带graphic
+    QVariantList undoObj, redoObj;
+    undoObj << QVariant::fromValue(graphicItem) << QVariant::fromValue(undoAction);
+    redoObj << QVariant::fromValue(graphicItem) << QVariant::fromValue(redoAction);
+    static const QMetaMethod undoSignal = QMetaMethod::fromSignal(&DataPropertyForm::undoEvent);
+    if (isSignalConnected(undoSignal)) {
+        emit undoEvent(text, undoObj, redoObj);
+    } else {
+        parseUndoAction(redoObj, false);
+    }
+}
+
+void DataPropertyForm::parseUndoAction(QVariant undoData, bool isUndo)
+{
+    auto list = undoData.toList();
+    if (list.count() < 2) {
+        return;
+    }
+    auto item = list[0].value<ICustomGraphic*>();
+    if (item == nullptr) {
+        return;  // 安全检查
+    }
+    graphicItem = item;
+    dataEditor->setGraphicsItem(item);
+    item->setSelected(true);
+    // 切换到本窗口
+    auto parent = parentWidget()->parentWidget();
+    if (parent) {
+        auto tab = dynamic_cast<QTabWidget*>(parent);
+        if (tab) {
+            tab->setTabVisible(tab->indexOf(this), true);
+            tab->setCurrentWidget(this);
+        }
+    }
+
+    auto data = list[1].value<QList<QPair<QString, QVariant>>>();
+
+    foreach (auto command, data) {
+        commonAction(command.first, command.second, isUndo);
+    }
+}
+
+void DataPropertyForm::commonAction(QString action, QVariant data, bool isUndo)
+{
+    ui->dataTable->blockSignals(true);
+    if (action == "addData") {
+        auto dataAction = data.value<DataAction>();
+        if (isUndo) {
+            auto index = findTableItem(dataAction.getDataId());
+            if (index >= 0) {
+                ui->dataTable->removeRow(index);
+                ui->dataTable->setRowCount(ui->dataTable->rowCount() - 1);
+                ui->dataTable->selectRow(-1);
+            }
+            // 删除数据
+            DataActionManager::instance()->removeDataAction(dataAction);
+        }else{
+            addTableItem(dataAction);
+            auto index = ui->dataTable->rowCount() - 1;
+            ui->dataTable->selectRow(index);
+            ui->dataTable->setCurrentItem(ui->dataTable->item(index,0));
+            // 数据更新到 manager
+            DataActionManager::instance()->updateDataAction(dataAction);
+        }
+    } else if (action == "modifyData") {
+        auto list = data.toList();
+        if (list.count() < 2) {
+            return;
+        }
+        auto dataId = list[0].toString();
+        auto row = findTableItem(dataId);
+        if (row < 0) {
+            return;
+        }
+        auto item = ui->dataTable->item(row, 0);
+        auto dataAction = list[1].value<DataAction>();
+        auto data = dataAction.getData();
+        auto dataName = data.get_dataName();
+        QString trigger = dataAction.typeToString();
+        QString actionDetail = dataAction.actionToString();
+        item->setData(DATA_ROLE,QVariant::fromValue(dataAction));
+        item->setText(dataName);
+        item = ui->dataTable->item(row, 1);
+        item->setText(trigger);
+        item = ui->dataTable->item(row, 2);
+        item->setText(actionDetail);
+        // ui->dataTable->setItem(row, 0, item);
+        ui->dataTable->selectRow(row);
+        ui->dataTable->setCurrentCell(row, 0);
+        if (!isUndo) {
+            // 数据更新到 manager
+            DataActionManager::instance()->updateDataAction(dataAction);
+        }
+    } else if (action == "clearData") {
+        auto dataAction = data.value<DataAction>();
+        if (isUndo) {
+            DataActionManager::instance()->addDataAction(dataAction);
+        }else{
+            DataActionManager::instance()->removeDataAction(graphicId, dataAction.getDataId());
+        }
+    } else if (action == "removeData") {
+        auto list = data.toList();
+        if (list.count() < 2) {
+            return;
+        }
+        auto row = list[0].toInt();
+        if (row < 0) {
+            return;
+        }
+        auto dataAction = list[1].value<DataAction>();
+        if (isUndo) {
+            addTableItem(dataAction, row);
+            ui->dataTable->selectRow(row);
+            ui->dataTable->setCurrentCell(row, 0);
+            DataActionManager::instance()->addDataAction(dataAction);
+        }else{
+            ui->dataTable->removeRow(row);
+            ui->dataTable->selectRow(-1);
+            DataActionManager::instance()->removeDataAction(graphicId, dataAction.getDataId());
+        }
+    }
+    ui->dataTable->blockSignals(false);
+    onEditDataProperty();
+}
+
+int DataPropertyForm::findTableItem(const QString &dataId){
+    if (dataId.isEmpty()) {
+        return -1;
+    }
+    auto count = ui->dataTable->rowCount();
+    for(int i=0; i<count; i++){
+        auto itemData = ui->dataTable->item(i, 0)->data(DATA_ROLE).value<DataAction>();
+        if (dataId.compare(itemData.getDataId()) == 0) {
+            return i;
+        }
+    }
+    return -1;
 }

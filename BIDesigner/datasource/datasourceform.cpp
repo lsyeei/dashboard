@@ -77,6 +77,9 @@ void DataSourceForm::setEditable(bool flag)
     toolBar->setVisible(flag);
     ui->dataDir->setDragEnabled(flag);
     ui->dataDir->setEditTriggers(flag?QAbstractItemView::DoubleClicked:QAbstractItemView::NoEditTriggers);
+    ui->dataDir->clearSelection();
+    ui->dataTable->clearContents();
+    ui->dataTable->setRowCount(0);
 }
 
 DataMarketDO DataSourceForm::getSelectedData()
@@ -88,6 +91,9 @@ DataMarketDO DataSourceForm::getSelectedData()
     auto item = ui->dataTable->item(index.row(), 0);
     auto data = item->data(DATA_ROLE).value<DataMarketDO>();
     auto dirItem = ui->dataDir->currentItem();
+    if (dirItem == nullptr) {
+        return DataMarketDO();
+    }
     auto dir = dirItem->data(0, DATA_ROLE).value<DataDirDO>();
     auto source = data.getDataSource();
     source.setSourceName(dir.get_name());

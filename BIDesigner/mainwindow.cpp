@@ -563,6 +563,10 @@ void MainWindow::initDataPropertyForm()
     auto index = ui->propertyWidget->addTab(dataPropertyForm, tr("数据"));
     ui->propertyWidget->setTabVisible(index, false);
     DataActionManager::instance()->setGraphicsScene(scene);
+
+    // 连接 DataPropertyForm 的 undoEvent 信号到 graphicsView 的处理器
+    connect(dataPropertyForm, &DataPropertyForm::undoEvent,
+            ui->graphicsView, &BIGraphicsView::undoEventProcessor);
 }
 
 void MainWindow::loadPlugin()

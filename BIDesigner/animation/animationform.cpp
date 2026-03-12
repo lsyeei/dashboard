@@ -94,6 +94,7 @@ void AnimationForm::parseUndoAction(QVariant undoData, bool isUndo)
     if (parent) {
         auto tab = dynamic_cast<QTabWidget*>(parent);
         if (tab) {
+            tab->setTabVisible(tab->indexOf(this), true);
             tab->setCurrentWidget(this);
         }
     }

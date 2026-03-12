@@ -146,14 +146,31 @@ void DataControlForm::setData(QVariant action)
     if (!action.canConvert<ControlAction>()) {
         return;
     }
-    controlAction = action.value<ControlAction>();
+    auto newAction = action.value<ControlAction>();
     QSignalBlocker tableBlocker(ui->actionTable);
+    auto oldRow = ui->actionTable->currentRow();
+    controlAction = newAction;
     reset();
     foreach (auto item, controlAction.getLogicList()) {
         addActionTableItem(item);
     }
     ui->actionTable->clearSelection();
+    if (oldRow >= 0){
+        ui->actionTable->selectRow(oldRow);
+        editLogic();
+    }
 }
+
+// void DataControlForm::updateData(QVariant action)
+// {
+//     if (!action.canConvert<ControlAction>()) {
+//         return;
+//     }
+//     auto newAction = action.value<ControlAction>();
+//     QSignalBlocker tableBlocker(ui->actionTable);
+
+//     controlAction = newAction;
+// }
 
 void DataControlForm::controlTypeChanged(int index)
 {

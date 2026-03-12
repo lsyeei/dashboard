@@ -142,12 +142,17 @@ void DataEditorForm::onSelectData()
         dlgLayout->addWidget(dataSource);
         dlgLayout->addWidget(btnBox);
     }
+    dataSource->setEditable(false);
     selectorDlg->adjustSize();
     if (selectorDlg->exec() == QDialog::Rejected){
         return;
     }
     // 获取选中的数据
     auto data = dataSource->getSelectedData();
+    if (data.getDataSource().isEmpty()) {
+        QMessageBox::information(this, tr("提示") , tr("数据源信息不完整！"));
+        return;
+    }
     // 更新UI
     updateDataEdit(data);
     ui->controlTypeWidget->setVisible(true);

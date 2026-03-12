@@ -292,7 +292,7 @@ void DataActionManager::removeDataAction(const QString &graphicId, const QString
     if (graphicId.isEmpty() || dataId.isEmpty() || !actionMap.contains(graphicId)) {
         return;
     }
-    auto actMap = actionMap[graphicId];
+    auto& actMap = actionMap[graphicId];
     if (actMap.isEmpty()) {
         return;
     }
