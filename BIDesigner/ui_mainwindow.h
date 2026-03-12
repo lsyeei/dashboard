@@ -573,6 +573,7 @@ public:
         toolBar->addSeparator();
         toolBar->addAction(action);
         toolBar->addAction(action_animate);
+        toolBar->addAction(doPreview);
         toolBar->addSeparator();
         menuBar->addAction(fileMenu->menuAction());
         menuBar->addAction(editMenu->menuAction());

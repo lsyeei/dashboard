@@ -84,6 +84,10 @@ public:
      */
     QAbstractAnimation *playAll();
     /**
+     * @brief stop 停止所有动画
+     */
+    void stop();
+    /**
      * @brief getGroup 获取一组动画
      * @param graphic 图元对象
      * @param groupId 组ID

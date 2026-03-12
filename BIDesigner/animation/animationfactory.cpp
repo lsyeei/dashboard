@@ -263,6 +263,7 @@ QAbstractAnimation *AnimationFactory::playAll()
     while (it != animations.end()){
         auto graphic = scene->getItemById(it.key());
         if (graphic == nullptr) {
+            ++it;
             continue;
         }
         auto group = getEnableGroup(it.key());
@@ -273,9 +274,18 @@ QAbstractAnimation *AnimationFactory::playAll()
                 player->addAnimation(type->createAnimation(graphic, act));
             }
         }
+        ++it;
     }
     player->start();
     return player;
+}
+
+void AnimationFactory::stop()
+{
+    if (!player.isNull() && player->state() != QAbstractAnimation::Stopped) {
+        player->stop();
+        player.clear();
+    }
 }
 
 AnimationGroup AnimationFactory::getGroup(QGraphicsItem *graphic, int groupId)

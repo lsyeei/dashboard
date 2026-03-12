@@ -213,6 +213,7 @@ void DataActionManager::stop()
     for (auto item = timerMap.begin(); item != timerMap.end(); ++ item) {
         killTimer(item.key());
     }
+    timerMap.clear();  // 清空定时器映射
     // 停止所有数据连接线程
     foreach (auto item, threadPoolMap) {
         item->clear();

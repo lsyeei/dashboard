@@ -1,14 +1,14 @@
 ﻿/**
 * This file is part of the dashboard library
-* 
+*
 * Copyright 2025 lishiying  lsyeei@163.com
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the License);
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an AS IS BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -145,6 +145,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         event->accept();
         return true;
     }
+
     return QObject::eventFilter(watched, event);
 }
 
@@ -488,6 +489,8 @@ void MainWindow::setMenuEvent()
     connect(ui->zoomFitWindow, SIGNAL(triggered(bool)), this, SLOT(doZoom()));
     connect(ui->zoomFitWidth, SIGNAL(triggered(bool)), this, SLOT(doZoom()));
     connect(ui->zoomDefine, SIGNAL(triggered(bool)), this, SLOT(doZoom()));
+
+    connect(ui->doPreview, SIGNAL(triggered(bool)), this, SLOT(doPreview()));
 
     connect(ui->doAbout, SIGNAL(triggered(bool)), this, SLOT(showAbout()));
     connect(ui->saveToLib, SIGNAL(triggered(bool)), this, SLOT(saveToLib()));
@@ -1035,12 +1038,171 @@ void MainWindow::saveToLib()
     }
 }
 
+void MainWindow::doPreview()
+{
+    if (isPreviewMode) {
+        // 已在预览模式，不做操作
+        return;
+    }
+
+    isPreviewMode = true;
+
+    // 1. 保存当前窗口几何尺寸和view尺寸
+    savedGeometry = geometry();
+    savedViewSize = ui->graphicsView->size();
+
+    // 2. 记录graphicsView在splitter中的索引
+    splitterIndex = ui->splitter->indexOf(ui->graphicsView);
+
+    // 3. 获取工程设置中的页面尺寸
+    auto page = ui->graphicsView->getPageProperty();
+    QSize pageSize(page.getWidth(), page.getHeight());
+
+    // 4. 创建全屏预览容器
+    previewContainer = new PreviewContainer(nullptr);
+    previewContainer->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    previewContainer->setAttribute(Qt::WA_TranslucentBackground, false);
+    previewContainer->setStyleSheet("background-color: black;");
+    previewContainer->setFocus();
+
+    // 连接ESC键信号到退出预览槽
+    connect(previewContainer, &PreviewContainer::escapePressed, this, &MainWindow::exitPreviewMode);
+
+    auto layout = new QVBoxLayout(previewContainer);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setAlignment(Qt::AlignCenter);
+
+    // 5. 设置scene大小匹配工程设置
+    scene->setSceneRect(0, 0, pageSize.width(), pageSize.height());
+
+    // 6. 将graphicsView从splitter中移除，添加到previewContainer
+    ui->splitter->widget(splitterIndex)->setParent(nullptr);
+    layout->addWidget(ui->graphicsView);
+
+    // 7. 恢复view的尺寸限制，使其能自由缩放
+    ui->graphicsView->setMinimumSize(QSize(0, 0));
+    ui->graphicsView->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+
+    // 重置view的变换矩阵
+    ui->graphicsView->resetTransform();
+
+    // 8. 禁用编辑功能
+    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
+    ui->graphicsView->setInteractive(false);
+    ui->graphicsView->setFocusPolicy(Qt::NoFocus);
+    ui->graphicsView->viewport()->setFocusPolicy(Qt::NoFocus);
+
+    // 9. 禁用UI控件
+    ui->toolBar->setEnabled(false);
+    ui->menuBar->setEnabled(false);
+    ui->statusBar->setEnabled(false);
+    ui->splitter->setEnabled(false);
+    ui->propertyWidget->setEnabled(false);
+    ui->graphicItems->setEnabled(false);
+
+    // 隐藏图层窗口
+    if (layerDocker) {
+        layerDocker->setEnabled(false);
+        layerDocker->hide();
+    }
+
+    // 10. 隐藏网格、参考线、标尺
+    ui->graphicsView->setShowGrid(false);
+    ui->graphicsView->setShowRefLine(false);
+    ui->graphicsView->setShowScale(false);
+
+    // 11. 显示全屏容器
+    QScreen *screen = QApplication::primaryScreen();
+    QRect screenGeometry = screen->availableGeometry();
+    previewContainer->setGeometry(screenGeometry);
+    previewContainer->showFullScreen();
+
+    // 12. 适配view到屏幕大小（保持宽高比）
+    // 使用单次定时器确保布局完成后再适配
+    QTimer::singleShot(100, [this]() {
+        ui->graphicsView->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    });
+
+    // 13. 取消所有图元选中状态
+    scene->clearSelection();
+    QTimer::singleShot(500, []() {
+        // 13. 启用动画
+        AnimationFactory::instance()->playAll();
+
+        // // 14. 启用数据监听
+        DataActionManager::instance()->run();
+    });
+}
+
 void MainWindow::showDataSource(bool flag)
 {
     if (dataSource.isNull()) {
         initDataSource();
     }
     dataSource->setVisible(!dataSource->isVisible());
+}
+
+void MainWindow::exitPreviewMode()
+{
+    if (!isPreviewMode) {
+        return;
+    }
+
+    isPreviewMode = false;
+
+    // 1. 停止动画和数据监听
+    AnimationFactory::instance()->stop();
+    DataActionManager::instance()->stop();
+
+    // 2. 恢复view和scene大小（从工程设置获取）
+    auto page = ui->graphicsView->getPageProperty();
+    QSize pageSize(page.getWidth(), page.getHeight());
+    scene->setSceneRect(0, 0, pageSize.width(), pageSize.height());
+
+    // 恢复view的min/max尺寸
+    ui->graphicsView->setMinimumSize(QSize(500, 300));
+    ui->graphicsView->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+
+    // 3. 恢复编辑功能
+    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
+    ui->graphicsView->setInteractive(true);
+    ui->graphicsView->setFocusPolicy(Qt::StrongFocus);
+
+    // 4. 恢复UI控件状态
+    ui->toolBar->setEnabled(true);
+    ui->menuBar->setEnabled(true);
+    ui->statusBar->setEnabled(true);
+    ui->splitter->setEnabled(true);
+    ui->propertyWidget->setEnabled(true);
+    ui->graphicItems->setEnabled(true);
+
+    // 恢复图层窗口
+    if (layerDocker) {
+        layerDocker->setEnabled(true);
+        layerDocker->show();
+    }
+
+    // 5. 恢复网格、参考线、标尺状态（从UI控件获取当前状态）
+    ui->graphicsView->setShowGrid(ui->showViewGrid->isChecked());
+    ui->graphicsView->setShowRefLine(ui->showViewRefLine->isChecked());
+    ui->graphicsView->setShowScale(ui->showViewRuler->isChecked());
+
+    // 6. 将view放回原布局位置
+    if (previewContainer) {
+        // 从previewContainer中移除
+        previewContainer->layout()->removeWidget(ui->graphicsView);
+        ui->graphicsView->setParent(nullptr);
+
+        // 插入到splitter的原始位置
+        ui->splitter->insertWidget(splitterIndex, ui->graphicsView);
+
+        previewContainer->close();
+        previewContainer->deleteLater();
+        previewContainer = nullptr;
+    }
+
+    // 7. 恢复窗口几何尺寸
+    setGeometry(savedGeometry);
 }
 
 void MainWindow::onViewMenuEvent(QContextMenuEvent *event)

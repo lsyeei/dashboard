@@ -373,6 +373,7 @@
    <addaction name="separator"/>
    <addaction name="action"/>
    <addaction name="action_animate"/>
+   <addaction name="doPreview"/>
    <addaction name="separator"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>

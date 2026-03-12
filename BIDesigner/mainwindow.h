@@ -39,6 +39,27 @@ namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
+
+// 预览容器类，用于全屏预览模式
+class PreviewContainer : public QWidget {
+    Q_OBJECT
+public:
+    PreviewContainer(QWidget *parent = nullptr) : QWidget(parent) {}
+
+Q_SIGNALS:
+    void escapePressed();
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override {
+        if (event->key() == Qt::Key_Escape) {
+            emit escapePressed();
+            event->accept();
+        } else {
+            QWidget::keyPressEvent(event);
+        }
+    }
+};
+
 class BIGraphicsScene;
 class GraphicRootWidget;
 class QGraphicsItem;
@@ -106,6 +127,8 @@ private slots:
     void saveToLib();
 
     void showDataSource(bool flag);
+    void doPreview();
+    void exitPreviewMode();
 
 private:
     Ui::MainWindow *ui;
@@ -138,7 +161,12 @@ private:
     QPointer<QMenu> viewMenu;
     // 数据源
     QPointer<DataSourceForm> dataSource;
-
+    // 预览模式状态管理
+    bool isPreviewMode{false};
+    QPointer<PreviewContainer> previewContainer;
+    QRect savedGeometry;
+    QSize savedViewSize;
+    int splitterIndex{-1};
 
     // void drawShape();
     void setScene();
@@ -200,4 +228,5 @@ private:
      */
     void initDataSource();
 };
+
 #endif // MAINWINDOW_H
